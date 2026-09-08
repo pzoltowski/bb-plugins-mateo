@@ -52,8 +52,8 @@
     --tb-child-done: #b7b7b7;
     --tb-child-open: #858585;
     --tb-epic-footer: #b7b7b7;
-    --tb-card-surface: #1e1e1e;
-    --tb-card-border: #2a2a2a;
+    --tb-card-surface: #161616;
+    --tb-card-border: #262626;
     --tb-epic-track: #353535;
     --tb-attention: #e8923a;
     background: var(--canvas);
