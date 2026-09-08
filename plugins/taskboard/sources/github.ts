@@ -69,7 +69,7 @@ export const githubStatusOutputSchema = z
     ),
     lastSyncedAt: z.string().nullable()
   })
-  .strict();
+  .loose();
 
 const refreshOutputSchema = z
   .object({
