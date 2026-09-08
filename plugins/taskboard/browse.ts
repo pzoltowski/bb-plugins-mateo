@@ -139,6 +139,7 @@ function normalizedStatus(value: string): string {
 
 export const WORKFLOW_STATUS_TONES = [
   'unset',
+  'attention',
   'review',
   'progress',
   'blocked',
@@ -159,7 +160,9 @@ const EXACT_STATUS_TONES = new Map<string, WorkflowStatusTone>([
   ['review', 'review'],
   ['in progress', 'progress'],
   ['started', 'progress'],
-  ['blocked', 'blocked'],
+  ['needs you', 'attention'],
+  ['needs human', 'attention'],
+  ['blocked', 'attention'],
   ['paused', 'blocked'],
   ['qa', 'qa'],
   ['quality assurance', 'qa'],

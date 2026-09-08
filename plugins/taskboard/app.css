@@ -54,6 +54,8 @@
     --tb-epic-footer: #b7b7b7;
     --tb-card-surface: #1e1e1e;
     --tb-card-border: #2a2a2a;
+    --tb-epic-track: #151515;
+    --tb-attention: #e8923a;
     background: var(--canvas);
   }
 
@@ -294,6 +296,10 @@
     --tb-state-accent: var(--tb-red);
   }
 
+  [data-status-tone='attention'] {
+    --tb-state-accent: var(--tb-attention);
+  }
+
   [data-status-tone='qa'] {
     --tb-state-accent: var(--tb-teal);
   }
@@ -311,7 +317,7 @@
   }
 
   [data-status-tone='backlog'] {
-    --tb-state-accent: var(--tb-rose);
+    --tb-state-accent: var(--tb-slate);
   }
 
   [data-status-tone='done'] {
@@ -324,6 +330,16 @@
 
   .tb-state-glyph {
     color: var(--tb-state-accent);
+  }
+
+  /* The glyph carries its own category, so a tone-owned shape states its
+     colour here too. */
+  .tb-state-glyph[data-glyph-tone='attention'] {
+    color: var(--tb-attention);
+  }
+
+  .tb-state-glyph[data-glyph-tone='backlog'] {
+    color: var(--tb-slate);
   }
 
   /* The glyph carries its own state category, so the neutral no-status tone
@@ -583,7 +599,7 @@
 
   .tb-epic-bar {
     height: 4px;
-    background: var(--tb-border);
+    background: var(--tb-epic-track);
   }
 
   .tb-epic-bar-fill {

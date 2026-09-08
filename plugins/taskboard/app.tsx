@@ -1663,9 +1663,13 @@ function formatUpdatedAt(value: string): string {
 
 function WorkStateGlyph({
   category,
+  tone,
   className = 'size-4'
 }: {
   category: WorkStateCategory;
+  // Two workflow tones own their own shape: a board's attention column reads
+  // as a question, its backlog as a clock. Everything else draws its category.
+  tone?: 'attention' | 'backlog' | (string & {});
   className?: string;
 }) {
   const common = {
@@ -1680,10 +1684,22 @@ function WorkStateGlyph({
       aria-hidden="true"
       data-state-category={category}
       data-taskboard-state-glyph={category}
+      data-glyph-tone={tone}
       className={cn('tb-state-glyph shrink-0', className)}
       viewBox="0 0 16 16"
     >
-      {category === 'backlog' ? (
+      {tone === 'attention' ? (
+        <>
+          <circle {...common} cx="8" cy="8" r="5.25" />
+          <path {...common} d="M6.6 6.2a1.45 1.45 0 1 1 1.9 1.65c-.35.14-.5.42-.5.8v.35" />
+          <path {...common} d="M8 11.35h.01" />
+        </>
+      ) : tone === 'backlog' ? (
+        <>
+          <circle {...common} cx="8" cy="8" r="5.25" />
+          <path {...common} d="M8 5.15V8l1.95 1.15" />
+        </>
+      ) : category === 'backlog' ? (
         <circle {...common} cx="8" cy="8" r="5.25" strokeDasharray="1.6 2.1" />
       ) : category === 'todo' ? (
         <circle {...common} cx="8" cy="8" r="5.25" />
@@ -3162,7 +3178,10 @@ function WorkItemStatusMenu({
         aria-label={`Change status for ${item.key}. Current status: ${item.status}`}
         disabled={pendingStatusId !== null}
       >
-        <WorkStateGlyph category={item.stateCategory} />
+        <WorkStateGlyph
+          category={item.stateCategory}
+          tone={workflowStatusTone(item.status, item.stateCategory)}
+        />
       </Button>
     ) : (
       <Button
@@ -3178,7 +3197,10 @@ function WorkItemStatusMenu({
         )}
         disabled={pendingStatusId !== null}
       >
-        <WorkStateGlyph category={item.stateCategory} />
+        <WorkStateGlyph
+          category={item.stateCategory}
+          tone={workflowStatusTone(item.status, item.stateCategory)}
+        />
         {pendingStatusId === null ? item.status : 'Updating…'}
         <Icon name="ChevronDown" className="size-3 opacity-60" />
       </Button>
@@ -3216,7 +3238,10 @@ function WorkItemStatusMenu({
                 disabled={current || pendingStatusId !== null}
                 onSelect={() => void changeStatus(option)}
               >
-                <WorkStateGlyph category={option.stateCategory} />
+                <WorkStateGlyph
+                  category={option.stateCategory}
+                  tone={workflowStatusTone(option.name, option.stateCategory)}
+                />
                 <span className="min-w-0 flex-1 truncate">{option.name}</span>
                 {current ? <Icon name="Check" className="size-3.5" /> : null}
               </DropdownMenuItem>
@@ -3373,7 +3398,10 @@ function ListStateGroups({
                 collapsed && '-rotate-90'
               )}
             />
-            <WorkStateGlyph category={group.category} />
+            <WorkStateGlyph
+              category={group.category}
+              tone={workflowStatusTone(group.name, group.category)}
+            />
             <span className="truncate">{group.name}</span>
             <span className="tb-count-chip ml-auto rounded-full px-1.5 py-0.5 text-xs font-normal tabular-nums text-subtle-foreground">
               {group.items.length}
@@ -4076,7 +4104,10 @@ function KanbanBoard({
                 className="tb-kanban-column flex w-[264px] min-w-[264px] flex-col rounded-lg border border-transparent"
               >
                 <div className="tb-kanban-column-header sticky top-0 z-10 flex h-8 items-center gap-2 px-1">
-                  <WorkStateGlyph category={lane.category} />
+                  <WorkStateGlyph
+                    category={lane.category}
+                    tone={workflowStatusTone(lane.name, lane.category)}
+                  />
                   <h3
                     id={headingId}
                     className="min-w-0 truncate text-xs font-semibold"
@@ -4090,7 +4121,7 @@ function KanbanBoard({
                     {columnItems.length}
                   </span>
                 </div>
-                <div className="min-h-20 flex-1 space-y-1.5 p-1.5 pt-1">
+                <div className="tb-kanban-lane min-h-20 flex-1 space-y-1.5 p-3">
                   {columnItems.length > 0 ? (
                     columnItems.map(item => {
                       const itemId = kanbanItemId(item);

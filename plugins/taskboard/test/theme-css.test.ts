@@ -197,6 +197,26 @@ test('styles epic chips and child rows on theme tokens only', () => {
     stylesheet,
     /\[data-status-tone='unset'\]\s+\.tb-state-glyph\s*\{[^}]*color:\s*var\(--tb-slate\)/s
   );
+  // Attention columns read orange, backlog grey, and both own a glyph shape.
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='attention'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-attention\)/s
+  );
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='backlog'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-slate\)/s
+  );
+  assert.match(
+    stylesheet,
+    /\.tb-state-glyph\[data-glyph-tone='attention'\]\s*\{[^}]*color:\s*var\(--tb-attention\)/s
+  );
+  assert.match(
+    stylesheet,
+    /\.tb-state-glyph\[data-glyph-tone='backlog'\]\s*\{[^}]*color:\s*var\(--tb-slate\)/s
+  );
+  const track = ruleBody(/\.tb-epic-bar\s*\{([^}]*)\}/s, 'progress track');
+  assert.match(track, /height:\s*4px/);
+  assert.match(track, /background:\s*var\(--tb-epic-track\)/);
   // A board's in-progress column reads yellow.
   assert.match(
     stylesheet,

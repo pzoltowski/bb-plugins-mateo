@@ -412,3 +412,12 @@ test('leads the board with No status and reads in-progress by category', () => {
   assert.equal(workflowStatusTone('Working', 'in_progress'), 'progress');
   assert.equal(workflowStatusTone('In Progress', 'in_progress'), 'progress');
 });
+
+test('reads attention and backlog columns by name, whatever their category', () => {
+  for (const name of ['Needs-you', 'needs you', 'Needs human', 'Blocked']) {
+    assert.equal(workflowStatusTone(name, 'in_progress'), 'attention');
+  }
+  assert.equal(workflowStatusTone('Backlog', 'backlog'), 'backlog');
+  assert.equal(workflowStatusTone('No status', 'backlog'), 'unset');
+  assert.equal(workflowStatusTone('Working', 'in_progress'), 'progress');
+});

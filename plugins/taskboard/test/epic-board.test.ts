@@ -317,6 +317,8 @@ test('the Kanban card renders header, chips, progress, children and PR', async (
   assert.match(board, /setBoardOrder\(result\.options\.map\(option => option\.name\)\)/u);
   assert.match(board, /boardOrder && boardOrder\.length > 0 \? boardOrder : statusOrder/u);
   assert.match(board, /hideStatusLabels=\{boardOrder !== null\}/u);
+  // Even lane padding on every side, card spacing untouched.
+  assert.match(board, /className="tb-kanban-lane min-h-20 flex-1 space-y-1\.5 p-3"/u);
 });
 
 test('chips drop their group prefix and hide the status group', () => {
