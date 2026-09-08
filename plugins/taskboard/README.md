@@ -136,10 +136,15 @@ With a GitHub Project bound, the Kanban shows one card per epic and folds its
 children into it. Turn it off per project in **Manage → Board preferences →
 Kanban cards → Fold children under parent**.
 
-- A card shows the issue number and title, label chips, a
-  `completed / total children` progress bar (GitHub's own sub-issue summary),
-  the collapsible child list (`✓` when a child is closed) and the linked pull
+- A card reads `#9 Title`, then label chips (`type:epic` renders as `epic`;
+  `status:*` is dropped because the column already says it), a
+  `completed / total children` progress bar (GitHub's own sub-issue summary)
+  with a chevron that collapses the child list, the child list itself (`✓`
+  when a child is closed, each row linking to its issue), and the linked pull
   request as `PR #17 · draft · feat/timeline`.
+- The reference is short (`#9`) while one repository is mapped, and
+  `repo#9` once several are; the full `owner/repo#9` stays in the tooltip and
+  the detail view.
 - An item whose parent is not on the board stays a top-level card, so nothing
   disappears. Issues without children render as plain cards.
 - Children keep existing everywhere else: list view, search and detail still

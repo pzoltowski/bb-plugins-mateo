@@ -25,6 +25,8 @@ const [board, projects] = await Promise.all([
   import('../sources/github-projects.ts')
 ]);
 const {
+  cardReference,
+  chipLabelText,
   epicChildTitle,
   epicProgressLabel,
   epicProgressPercent,
@@ -33,7 +35,9 @@ const {
   labelChipTone,
   pullRequestFooterText,
   shortItemReference,
-  supportsEpicFolding
+  singleRepositoryBoard,
+  supportsEpicFolding,
+  visibleChipLabels
 } = board;
 const { buildEpicIndex, pickPullRequest } = projects;
 
@@ -194,6 +198,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
     {
       locator: `${REPO}#10`,
       title: 'Timeline',
+      url: `https://github.com/${REPO}/issues/10`,
       closed: false,
       parentLocator: null,
       subIssues: { total: 6, completed: 2 },
@@ -202,6 +207,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
     {
       locator: `${REPO}#12`,
       title: 'Timeline: ruler',
+      url: `https://github.com/${REPO}/issues/12`,
       closed: true,
       parentLocator: `${REPO}#10`,
       subIssues: null,
@@ -210,6 +216,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
     {
       locator: `${REPO}#11`,
       title: 'Timeline: pure C seams',
+      url: `https://github.com/${REPO}/issues/11`,
       closed: true,
       parentLocator: `${REPO}#10`,
       subIssues: null,
@@ -218,6 +225,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
     {
       locator: `${REPO}#30`,
       title: 'Child of an invisible parent',
+      url: `https://github.com/${REPO}/issues/30`,
       closed: false,
       parentLocator: `${REPO}#99`,
       subIssues: null,
@@ -253,6 +261,7 @@ test('the epic index falls back to visible children when GitHub reports none', (
     {
       locator: `${REPO}#20`,
       title: 'Mobile arc',
+      url: `https://github.com/${REPO}/issues/20`,
       closed: false,
       parentLocator: null,
       subIssues: null,
@@ -261,6 +270,7 @@ test('the epic index falls back to visible children when GitHub reports none', (
     {
       locator: `${REPO}#21`,
       title: 'Mobile arc: fabric',
+      url: `https://github.com/${REPO}/issues/21`,
       closed: false,
       parentLocator: `${REPO}#20`,
       subIssues: null,
@@ -272,22 +282,75 @@ test('the epic index falls back to visible children when GitHub reports none', (
   assert.equal(parent.completedChildren, 0);
 });
 
-test('the Kanban card renders progress, children and the PR footer', async () => {
+test('the Kanban card renders header, chips, progress, children and PR', async () => {
   const app = await readFile(new URL('../app.tsx', import.meta.url), 'utf8');
   const card = app.match(/function KanbanCard\(\{[\s\S]*?\nfunction KanbanBoard/u)?.[0];
   assert.ok(card, 'Missing KanbanCard');
-  assert.match(card, /role="progressbar"/u);
-  assert.match(card, /epicProgressLabel\(epic\)/u);
-  assert.match(card, /pullRequestFooterText\(epic\.pullRequest\)/u);
+  // Short reference inline with the title, full locator kept in the tooltip.
+  assert.match(card, /cardReference\(item\.key, singleRepository\)/u);
+  assert.match(card, /title=\{item\.key\}/u);
+  assert.match(card, /visibleChipLabels\(item\.labels, \{[\s\S]*?hideStatusLabels: epic !== null/u);
   assert.match(card, /data-chip-tone=\{labelChipTone\(label\)\}/u);
-  assert.match(card, /<EpicChildList item=\{item\} listId=\{listId\}/u);
+  assert.match(card, /\{chipLabelText\(label\)\}/u);
+  assert.match(card, /<EpicSummary item=\{item\} listId=\{listId\}/u);
+  // Folded cards drop the updated timestamp the reference board does not show.
+  assert.doesNotMatch(card, /formatUpdatedAt/u);
 
-  const list = app.match(/function EpicChildList\(\{[\s\S]*?\nfunction KanbanCard/u)?.[0];
-  assert.ok(list, 'Missing EpicChildList');
-  assert.match(list, /aria-expanded=\{expanded\}/u);
-  assert.match(list, /data-child-state=\{child\.closed \? 'closed' : 'open'\}/u);
+  const summary = app.match(/function EpicSummary\(\{[\s\S]*?\nfunction KanbanCard/u)?.[0];
+  assert.ok(summary, 'Missing EpicSummary');
+  assert.match(summary, /role="progressbar"/u);
+  assert.match(summary, /epicProgressLabel\(epic\)/u);
+  assert.match(summary, /pullRequestFooterText\(epic\.pullRequest\)/u);
+  assert.match(summary, /aria-expanded=\{expanded\}/u);
+  assert.match(summary, /data-child-state=\{child\.closed \? 'closed' : 'open'\}/u);
+  // Children link out to their own issue without disturbing the card.
+  assert.match(summary, /href=\{child\.url\}/u);
+  assert.match(summary, /onClick=\{event => event\.stopPropagation\(\)\}/u);
+  assert.match(summary, /onPointerDown=\{event => event\.stopPropagation\(\)\}/u);
 
   const board = app.match(/function KanbanBoard[\s\S]*?\nfunction TrackerList/u)?.[0];
   assert.ok(board, 'Missing KanbanBoard');
   assert.match(board, /foldedBoardItems\(allItems, foldChildren\)/u);
+  assert.match(board, /singleRepositoryBoard\(allItems\)/u);
+});
+
+test('chips drop their group prefix and hide the status group', () => {
+  assert.equal(chipLabelText('type:epic'), 'epic');
+  assert.equal(chipLabelText('area:deck'), 'deck');
+  assert.equal(chipLabelText('bug'), 'bug');
+  assert.deepEqual(
+    visibleChipLabels(['type:epic', 'area:deck', 'status:in-progress'], {
+      hideStatusLabels: true
+    }),
+    ['type:epic', 'area:deck']
+  );
+  assert.deepEqual(
+    visibleChipLabels(['type:epic', 'status:ready'], {
+      hideStatusLabels: false
+    }),
+    ['type:epic', 'status:ready']
+  );
+  assert.deepEqual(
+    visibleChipLabels(['type:epic', 'kind:epic', 'area:deck'], {
+      hideStatusLabels: true,
+      limit: 2
+    }),
+    ['type:epic', 'area:deck']
+  );
+  assert.equal(labelChipTone('epic'), 'type');
+  assert.equal(labelChipTone('spike'), 'type');
+});
+
+test('the card reference shortens to #N on a single-repository board', () => {
+  assert.equal(cardReference(`${REPO}#9`, true), '#9');
+  assert.equal(cardReference(`${REPO}#9`, false), 'mock-highgui-github#9');
+  assert.equal(cardReference('TASK-42', true), 'TASK-42');
+  assert.equal(
+    singleRepositoryBoard([{ project: REPO }, { project: REPO }]),
+    true
+  );
+  assert.equal(
+    singleRepositoryBoard([{ project: REPO }, { project: 'a/b' }]),
+    false
+  );
 });

@@ -216,6 +216,7 @@ export interface GithubProjectItem {
 export interface EpicSourceItem {
   readonly locator: string;
   readonly title: string;
+  readonly url: string;
   readonly closed: boolean;
   readonly parentLocator: string | null;
   readonly subIssues: { total: number; completed: number } | null;
@@ -243,6 +244,7 @@ export function epicSourceItems(
       {
         locator: item.locator,
         title: content.title,
+        url: content.url,
         closed: content.state.toUpperCase() !== 'OPEN',
         parentLocator: content.parent
           ? `${content.parent.repository.nameWithOwner}#${content.parent.number}`
@@ -337,6 +339,7 @@ export function buildEpicIndex(
       children: children.map(child => ({
         key: child.locator,
         title: child.title.slice(0, 300),
+        url: child.url,
         closed: child.closed
       })),
       completedChildren: item.subIssues

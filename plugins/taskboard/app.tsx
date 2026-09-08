@@ -89,13 +89,17 @@ import {
   formatWorkItemHandoffPrompt
 } from './contract.js';
 import {
+  cardReference,
+  chipLabelText,
   epicChildTitle,
   epicProgressLabel,
   epicProgressPercent,
   foldedBoardItems,
   labelChipTone,
   pullRequestFooterText,
-  shortItemReference
+  shortItemReference,
+  singleRepositoryBoard,
+  visibleChipLabels
 } from './epic-board.js';
 import {
   defaultProjectBoardSettings,
@@ -3530,7 +3534,7 @@ function AssigneeMark({ assignee }: { assignee: string }) {
   );
 }
 
-function EpicChildList({
+function EpicSummary({
   item,
   listId
 }: {
@@ -3538,46 +3542,90 @@ function EpicChildList({
   listId: string;
 }) {
   const [expanded, setExpanded] = useState(true);
-  const children = item.epic?.children ?? [];
-  if (children.length === 0) return null;
+  const epic = item.epic;
+  if (!epic) return null;
+  const children = epic.children;
+  const hasProgress = epic.totalChildren > 0;
+  if (!hasProgress && !epic.pullRequest) return null;
+
   return (
-    <>
-      <button
-        type="button"
-        aria-expanded={expanded}
-        aria-controls={listId}
-        onClick={() => setExpanded(current => !current)}
-        className="tb-epic-toggle mt-1 flex w-full items-center gap-1 rounded px-3 pb-1 text-left text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <Icon
-          name={expanded ? 'ArrowDown' : 'ArrowRight'}
-          className="size-3"
-        />
-        <span>
-          {expanded ? 'Hide' : 'Show'} {children.length}{' '}
-          {children.length === 1 ? 'child' : 'children'}
-        </span>
-      </button>
-      {expanded ? (
-        <ul id={listId} className="tb-epic-children px-3 pb-2">
+    <div className="tb-epic-summary px-3 pb-2">
+      {hasProgress ? (
+        <>
+          <div
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={epic.totalChildren}
+            aria-valuenow={epic.completedChildren}
+            aria-label={epicProgressLabel(epic)}
+            className="tb-epic-bar overflow-hidden rounded-full"
+          >
+            <div
+              className="tb-epic-bar-fill"
+              style={{ width: `${epicProgressPercent(epic)}%` }}
+            />
+          </div>
+          <div className="tb-epic-progress-row mt-1 flex items-center gap-1">
+            <span className="tb-meta text-xs tabular-nums">
+              {epicProgressLabel(epic)}
+            </span>
+            {children.length > 0 ? (
+              <button
+                type="button"
+                aria-expanded={expanded}
+                aria-controls={listId}
+                aria-label={`${expanded ? 'Hide' : 'Show'} ${children.length} ${children.length === 1 ? 'child' : 'children'}`}
+                onClick={event => {
+                  event.stopPropagation();
+                  setExpanded(current => !current);
+                }}
+                className="tb-epic-toggle flex size-4 items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Icon
+                  name={expanded ? 'ArrowDown' : 'ArrowRight'}
+                  className="size-3"
+                />
+              </button>
+            ) : null}
+          </div>
+        </>
+      ) : null}
+      {expanded && children.length > 0 ? (
+        <ul id={listId} className="tb-epic-children mt-1">
           {children.map(child => (
             <li
               key={child.key}
               data-child-state={child.closed ? 'closed' : 'open'}
               className="tb-epic-child"
             >
-              <span aria-hidden="true" className="tb-epic-child-mark">
-                {child.closed ? '✓' : '○'}
-              </span>{' '}
-              <span className="tb-key tabular-nums">
-                {shortItemReference(child.key)}
-              </span>{' '}
-              <span>{epicChildTitle(child.title, item.title)}</span>
+              <a
+                href={child.url}
+                target="_blank"
+                rel="noreferrer"
+                title={child.key}
+                draggable={false}
+                onClick={event => event.stopPropagation()}
+                onPointerDown={event => event.stopPropagation()}
+                className="tb-epic-child-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span aria-hidden="true" className="tb-epic-child-mark">
+                  {child.closed ? '✓' : '○'}
+                </span>{' '}
+                <span className="tb-key tabular-nums">
+                  {shortItemReference(child.key)}
+                </span>{' '}
+                <span>{epicChildTitle(child.title, item.title)}</span>
+              </a>
             </li>
           ))}
         </ul>
       ) : null}
-    </>
+      {epic.pullRequest ? (
+        <p className="tb-epic-pr mt-1.5 truncate text-xs">
+          {pullRequestFooterText(epic.pullRequest)}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -3586,6 +3634,7 @@ function KanbanCard({
   pickedUp,
   pending,
   moveDisabled,
+  singleRepository,
   composerDragEnabled,
   onOpen,
   onPrepare,
@@ -3597,6 +3646,7 @@ function KanbanCard({
   pickedUp: boolean;
   pending: boolean;
   moveDisabled: boolean;
+  singleRepository: boolean;
   composerDragEnabled: boolean;
   onOpen: () => void;
   onPrepare: () => void;
@@ -3607,114 +3657,90 @@ function KanbanCard({
   const priority = visiblePriority(item.priority);
   const assignee = visibleAssignee(item.assignee);
   const epic = item.epic ?? null;
-  const labels = item.labels
-    .map(label => label.trim())
-    .filter(Boolean)
-    .slice(0, epic ? 3 : 2);
+  // A bound workflow board already says the status in the column header.
+  const labels = visibleChipLabels(item.labels, {
+    hideStatusLabels: epic !== null,
+    limit: 4
+  });
+  const reference = cardReference(item.key, singleRepository);
   const listId = `epic-children-${encodeURIComponent(item.locator)}`;
 
   return (
     <div className="tb-kanban-card-shell rounded-md">
-    <button
-      type="button"
-      draggable={!pending && !moveDisabled}
-      aria-grabbed={pickedUp}
-      aria-busy={pending}
-      aria-label={`${item.key}: ${item.title}. Status ${item.status}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}${moveDisabled ? ' Workflow statuses are loading. Press Enter to open.' : ' Press Space to move, or Enter to open.'}`}
-      data-state-category={item.stateCategory}
-      data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
-      data-picked-up={pickedUp ? 'true' : 'false'}
-      data-pending={pending ? 'true' : 'false'}
-      data-move-disabled={moveDisabled ? 'true' : 'false'}
-      data-composer-drag={composerDragEnabled ? 'true' : undefined}
-      onPointerDown={onPrepare}
-      onFocus={onPrepare}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onKeyDown={onKeyDown}
-      onClick={onOpen}
-      className={cn(
-        'tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        composerDragEnabled && 'cursor-grab active:cursor-grabbing'
-      )}
-    >
-      <span className="flex items-center gap-2 text-xs">
-        <span className="tb-priority-slot flex size-4 items-center justify-center">
-          {priority ? <PriorityMark priority={priority} /> : null}
-        </span>
-        <span className="tb-key min-w-0 truncate font-medium tabular-nums">
-          {item.key}
-        </span>
-        {composerDragEnabled ? (
-          <span
-            aria-hidden="true"
-            className="tb-composer-drag-grip ml-auto flex items-center justify-center text-muted-foreground"
-          >
-            <Icon name="DragDropVertical" className="size-3.5" />
-          </span>
-        ) : null}
-      </span>
-      <span className="mt-1.5 flex items-start gap-1.5">
-        <span className="mt-1 flex shrink-0">
-          <WorkStateGlyph category={item.stateCategory} />
-        </span>
-        <span className="line-clamp-2 block text-sm font-medium leading-snug text-foreground">
-          {item.title}
-        </span>
-      </span>
-      {labels.length > 0 ? (
-        <span className="mt-2 flex min-w-0 gap-1 overflow-hidden">
-          {labels.map((label, index) => (
-            <span
-              key={`${label}-${index}`}
-              data-chip-tone={labelChipTone(label)}
-              className="tb-label-chip min-w-0 truncate rounded-full px-2 py-0.5 text-xs"
-              title={label}
-            >
-              {label}
+      <button
+        type="button"
+        draggable={!pending && !moveDisabled}
+        aria-grabbed={pickedUp}
+        aria-busy={pending}
+        aria-label={`${item.key}: ${item.title}. Status ${item.status}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}${moveDisabled ? ' Workflow statuses are loading. Press Enter to open.' : ' Press Space to move, or Enter to open.'}`}
+        data-state-category={item.stateCategory}
+        data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
+        data-picked-up={pickedUp ? 'true' : 'false'}
+        data-pending={pending ? 'true' : 'false'}
+        data-move-disabled={moveDisabled ? 'true' : 'false'}
+        data-composer-drag={composerDragEnabled ? 'true' : undefined}
+        onPointerDown={onPrepare}
+        onFocus={onPrepare}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onKeyDown={onKeyDown}
+        onClick={onOpen}
+        className={cn(
+          'tb-kanban-card group w-full rounded-md px-3 pb-1.5 pt-2 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          composerDragEnabled && 'cursor-grab active:cursor-grabbing'
+        )}
+      >
+        <span className="flex items-start gap-1.5">
+          {priority ? (
+            <span className="tb-priority-slot mt-0.5 flex size-4 shrink-0 items-center justify-center">
+              <PriorityMark priority={priority} />
             </span>
-          ))}
-        </span>
-      ) : null}
-      {epic && epic.totalChildren > 0 ? (
-        <span className="mt-2 block">
-          <span
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={epic.totalChildren}
-            aria-valuenow={epic.completedChildren}
-            aria-label={epicProgressLabel(epic)}
-            className="tb-epic-bar block overflow-hidden rounded-full"
-          >
+          ) : null}
+          <span className="line-clamp-3 block text-sm font-medium leading-snug text-foreground">
             <span
-              className="tb-epic-bar-fill block"
-              style={{ width: `${epicProgressPercent(epic)}%` }}
-            />
+              className="tb-key mr-1 font-normal tabular-nums"
+              title={item.key}
+            >
+              {reference}
+            </span>
+            {item.title}
           </span>
-          <span className="tb-meta mt-1 block text-xs tabular-nums">
-            {epicProgressLabel(epic)}
-          </span>
+          {composerDragEnabled ? (
+            <span
+              aria-hidden="true"
+              className="tb-composer-drag-grip ml-auto flex shrink-0 items-center justify-center text-muted-foreground"
+            >
+              <Icon name="DragDropVertical" className="size-3.5" />
+            </span>
+          ) : null}
         </span>
-      ) : null}
-      {epic?.pullRequest ? (
-        <span className="tb-epic-pr mt-1.5 block truncate text-xs">
-          {pullRequestFooterText(epic.pullRequest)}
-        </span>
-      ) : null}
-      <span className="tb-meta mt-2 flex min-w-0 items-center gap-2 text-xs">
-        <time className="shrink-0 tabular-nums" dateTime={item.updatedAt}>
-          Updated {formatUpdatedAt(item.updatedAt)}
-        </time>
-        {pending ? (
-          <span className="ml-auto min-w-0 truncate">Updating…</span>
-        ) : assignee ? (
-          <span className="ml-auto flex shrink-0">
-            <AssigneeMark assignee={assignee} />
+        {labels.length > 0 ? (
+          <span className="mt-1.5 flex min-w-0 flex-wrap gap-1">
+            {labels.map((label, index) => (
+              <span
+                key={`${label}-${index}`}
+                data-chip-tone={labelChipTone(label)}
+                className="tb-label-chip rounded-full"
+                title={label}
+              >
+                {chipLabelText(label)}
+              </span>
+            ))}
           </span>
         ) : null}
-      </span>
-    </button>
-    <EpicChildList item={item} listId={listId} />
+        {pending || assignee ? (
+          <span className="tb-meta mt-1.5 flex min-w-0 items-center gap-2 text-xs">
+            {pending ? (
+              <span className="min-w-0 truncate">Updating…</span>
+            ) : assignee ? (
+              <span className="ml-auto flex shrink-0">
+                <AssigneeMark assignee={assignee} />
+              </span>
+            ) : null}
+          </span>
+        ) : null}
+      </button>
+      <EpicSummary item={item} listId={listId} />
     </div>
   );
 }
@@ -3742,6 +3768,10 @@ function KanbanBoard({
   const items = useMemo(
     () => foldedBoardItems(allItems, foldChildren),
     [allItems, foldChildren]
+  );
+  const singleRepository = useMemo(
+    () => singleRepositoryBoard(allItems),
+    [allItems]
   );
   const optionsRef = useRef(
     new Map<string, Promise<readonly WorkStatusOption[]>>()
@@ -4061,6 +4091,7 @@ function KanbanBoard({
                           }
                           pending={pending === itemId}
                           moveDisabled={!workflowReady}
+                          singleRepository={singleRepository}
                           composerDragEnabled={composerDragEnabled}
                           onPrepare={() => {
                             void loadOptions(item).catch(() => undefined);

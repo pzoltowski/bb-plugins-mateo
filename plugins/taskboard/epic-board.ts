@@ -16,6 +16,70 @@ export type LabelChipTone =
   | 'decision'
   | 'neutral';
 
+/** The part of a label a chip shows: `type:epic` reads as `epic`. */
+export function chipLabelText(label: string): string {
+  const trimmed = label.trim();
+  const colon = trimmed.indexOf(':');
+  const value = colon === -1 ? trimmed : trimmed.slice(colon + 1).trim();
+  return value.length > 0 ? value : trimmed;
+}
+
+/**
+ * Chips a Kanban card shows. `status:*` duplicates the column the card sits
+ * in, so it is dropped once a real workflow status is in play.
+ */
+export function visibleChipLabels(
+  labels: readonly string[],
+  options: { hideStatusLabels: boolean; limit?: number }
+): string[] {
+  const seen = new Set<string>();
+  const chips: string[] = [];
+  for (const raw of labels) {
+    const label = raw.trim();
+    if (!label) continue;
+    if (
+      options.hideStatusLabels &&
+      label.toLocaleLowerCase().startsWith('status:')
+    ) {
+      continue;
+    }
+    const text = chipLabelText(label);
+    const key = text.toLocaleLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    chips.push(label);
+    if (chips.length >= (options.limit ?? 4)) break;
+  }
+  return chips;
+}
+
+/**
+ * How a card refers to its issue. One mapped repository needs only `#9`; more
+ * than one needs the repository name to stay unambiguous.
+ */
+export function cardReference(
+  locator: string,
+  singleRepository: boolean
+): string {
+  const hash = locator.lastIndexOf('#');
+  if (hash === -1) return locator;
+  const number = locator.slice(hash);
+  if (singleRepository) return number;
+  const repo = locator.slice(0, hash);
+  const slash = repo.lastIndexOf('/');
+  return `${slash === -1 ? repo : repo.slice(slash + 1)}${number}`;
+}
+
+/** True when every item comes from the same repository/external project. */
+export function singleRepositoryBoard(
+  items: readonly { project: string | null }[]
+): boolean {
+  const repositories = new Set(
+    items.map(item => item.project ?? '').filter(Boolean)
+  );
+  return repositories.size <= 1;
+}
+
 /** Colour group for a label chip, mirroring the playbook's board rendering. */
 export function labelChipTone(label: string): LabelChipTone {
   const normalized = label.trim().toLocaleLowerCase();
@@ -25,6 +89,11 @@ export function labelChipTone(label: string): LabelChipTone {
   if (value === 'bug' || value === 'defect') return 'bug';
   if (value === 'decision' || value === 'adr') return 'decision';
   if (normalized.startsWith('type:') || normalized.startsWith('kind:')) {
+    return 'type';
+  }
+  if (
+    ['epic', 'feature', 'spike', 'polish', 'chore', 'task'].includes(value)
+  ) {
     return 'type';
   }
   if (normalized.startsWith('area:') || normalized.startsWith('scope:')) {

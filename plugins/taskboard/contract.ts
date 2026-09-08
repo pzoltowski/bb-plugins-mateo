@@ -157,6 +157,7 @@ export const workItemChildSchema = z
   .object({
     key: z.string().min(1).max(200),
     title: z.string().max(300),
+    url: z.string().max(500).default(''),
     closed: z.boolean()
   })
   .strict();
