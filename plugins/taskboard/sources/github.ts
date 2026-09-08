@@ -33,7 +33,9 @@ const githubItemSchema = z
     body: z.string(),
     updatedAt: z.string()
   })
-  .strict();
+  // The official GitHub plugin adds fields over time (for example ghState);
+  // ignore what this adapter does not read instead of failing the sync.
+  .loose();
 
 const listOutputSchema = z
   .object({ items: z.array(githubItemSchema) })
@@ -54,7 +56,7 @@ const detailOutputSchema = z
             .strict()
         )
       })
-      .strict()
+      .loose()
   })
   .strict();
 
