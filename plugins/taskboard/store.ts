@@ -42,6 +42,7 @@ interface WorkItemRow {
   project: string | null;
   labels_json: string;
   updated_at: string;
+  epic_json: string | null;
 }
 
 interface SyncRow {
@@ -68,6 +69,7 @@ interface ProjectBoardSettingsRow {
   default_view: string;
   enabled_filters_json: string;
   status_order_json: string;
+  fold_children: number;
 }
 
 interface FilterPresetRow {
@@ -116,7 +118,8 @@ function itemFromRow(row: WorkItemRow): WorkItem {
     assignee: row.assignee,
     project: row.project,
     labels: JSON.parse(row.labels_json),
-    updatedAt: row.updated_at
+    updatedAt: row.updated_at,
+    epic: row.epic_json === null ? null : JSON.parse(row.epic_json)
   });
 }
 
@@ -140,7 +143,8 @@ function boardSettingsFromRow(
     projectId: row.bb_project_id,
     defaultView: row.default_view,
     enabledFilters: JSON.parse(row.enabled_filters_json),
-    statusOrder: JSON.parse(row.status_order_json)
+    statusOrder: JSON.parse(row.status_order_json),
+    foldChildren: row.fold_children === 1
   });
 }
 
@@ -421,6 +425,12 @@ export function createWorkItemStore(bb: BbPluginApi) {
       ALTER TABLE project_source_config
         ADD COLUMN github_project_number INTEGER NOT NULL DEFAULT 0
         CHECK (github_project_number >= 0);
+    `,
+    `
+      ALTER TABLE work_items_by_project ADD COLUMN epic_json TEXT;
+      ALTER TABLE project_board_settings
+        ADD COLUMN fold_children INTEGER NOT NULL DEFAULT 1
+        CHECK (fold_children IN (0, 1));
     `
   ]);
 
@@ -439,14 +449,15 @@ export function createWorkItemStore(bb: BbPluginApi) {
       string | null,
       string | null,
       string,
-      string
+      string,
+      string | null
     ]
   >(`
     INSERT INTO work_items_by_project (
       bb_project_id, source, locator, item_key, title, description, url,
       status, state_category, priority, assignee, project, labels_json,
-      updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      updated_at, epic_json
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(bb_project_id, source, locator) DO UPDATE SET
       item_key = excluded.item_key,
       title = excluded.title,
@@ -458,7 +469,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
       assignee = excluded.assignee,
       project = excluded.project,
       labels_json = excluded.labels_json,
-      updated_at = excluded.updated_at
+      updated_at = excluded.updated_at,
+      epic_json = excluded.epic_json
   `);
 
   function writeItem(item: WorkItem): void {
@@ -477,7 +489,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
       parsed.assignee,
       parsed.project,
       JSON.stringify(parsed.labels),
-      parsed.updatedAt
+      parsed.updatedAt,
+      parsed.epic === null ? null : JSON.stringify(parsed.epic)
     );
   }
 
@@ -528,7 +541,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
       bb_project_id,
       default_view,
       enabled_filters_json,
-      status_order_json
+      status_order_json,
+      fold_children
     FROM project_board_settings
     WHERE bb_project_id = ?
   `);
@@ -822,16 +836,17 @@ export function createWorkItemStore(bb: BbPluginApi) {
     },
     saveProjectBoardSettings(input: ProjectBoardSettings): ProjectBoardSettings {
       const settings = projectBoardSettingsSchema.parse(input);
-      db.prepare<[string, string, string, string, string]>(
+      db.prepare<[string, string, string, string, number, string]>(
         `
         INSERT INTO project_board_settings (
           bb_project_id, default_view, enabled_filters_json, status_order_json,
-          updated_at
-        ) VALUES (?, ?, ?, ?, ?)
+          fold_children, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
         ON CONFLICT(bb_project_id) DO UPDATE SET
           default_view = excluded.default_view,
           enabled_filters_json = excluded.enabled_filters_json,
           status_order_json = excluded.status_order_json,
+          fold_children = excluded.fold_children,
           updated_at = excluded.updated_at
       `
       ).run(
@@ -839,6 +854,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
         settings.defaultView,
         JSON.stringify(settings.enabledFilters),
         JSON.stringify(settings.statusOrder),
+        settings.foldChildren ? 1 : 0,
         new Date().toISOString()
       );
       return boardSettingsFromRow(

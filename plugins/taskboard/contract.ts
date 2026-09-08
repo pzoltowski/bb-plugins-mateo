@@ -153,6 +153,40 @@ export const workStatusOptionSchema = z
   .strict();
 export type WorkStatusOption = z.infer<typeof workStatusOptionSchema>;
 
+export const workItemChildSchema = z
+  .object({
+    key: z.string().min(1).max(200),
+    title: z.string().max(300),
+    closed: z.boolean()
+  })
+  .strict();
+export type WorkItemChild = z.infer<typeof workItemChildSchema>;
+
+export const workItemPullRequestSchema = z
+  .object({
+    number: z.number().int().positive(),
+    state: z.enum(['draft', 'open', 'merged', 'closed']),
+    branch: z.string().max(300)
+  })
+  .strict();
+export type WorkItemPullRequest = z.infer<typeof workItemPullRequestSchema>;
+
+/**
+ * Epic shape carried by trackers that expose a parent/child hierarchy.
+ * `null` for every item read from a tracker that does not report one, which is
+ * what keeps the flat board unchanged.
+ */
+export const workItemEpicSchema = z
+  .object({
+    parentKey: z.string().min(1).max(200).nullable(),
+    children: z.array(workItemChildSchema).max(100),
+    completedChildren: z.number().int().nonnegative().max(1000),
+    totalChildren: z.number().int().nonnegative().max(1000),
+    pullRequest: workItemPullRequestSchema.nullable()
+  })
+  .strict();
+export type WorkItemEpic = z.infer<typeof workItemEpicSchema>;
+
 export const workItemSchema = z
   .object({
     bbProjectId: bbProjectIdSchema,
@@ -168,10 +202,15 @@ export const workItemSchema = z
     assignee: z.string().nullable(),
     project: z.string().nullable(),
     labels: z.array(z.string()),
-    updatedAt: z.string()
+    updatedAt: z.string(),
+    epic: workItemEpicSchema.nullable().default(null)
   })
   .strict();
-export type WorkItem = z.infer<typeof workItemSchema>;
+// `epic` is optional in the TypeScript surface (the schema defaults it to
+// null) so trackers without a hierarchy construct items exactly as before.
+export type WorkItem = Omit<z.infer<typeof workItemSchema>, 'epic'> & {
+  epic?: WorkItemEpic | null;
+};
 
 export const workCommentSchema = z
   .object({
@@ -184,7 +223,10 @@ export const workCommentSchema = z
 export const workItemDetailSchema = workItemSchema
   .extend({ comments: z.array(workCommentSchema) })
   .strict();
-export type WorkItemDetail = z.infer<typeof workItemDetailSchema>;
+export type WorkItemDetail = Omit<
+  z.infer<typeof workItemDetailSchema>,
+  'epic'
+> & { epic?: WorkItemEpic | null };
 
 export const workSourceStatusSchema = z
   .object({

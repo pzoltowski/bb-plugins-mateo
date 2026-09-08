@@ -48,6 +48,7 @@ function workItem(overrides: Partial<WorkItem> = {}): WorkItem {
     project: 'Taskboard',
     labels: ['security', 'agent-context'],
     updatedAt: '2026-08-26T12:00:00.000Z',
+    epic: null,
     ...overrides
   };
 }

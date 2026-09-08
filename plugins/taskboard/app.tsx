@@ -89,6 +89,15 @@ import {
   formatWorkItemHandoffPrompt
 } from './contract.js';
 import {
+  epicChildTitle,
+  epicProgressLabel,
+  epicProgressPercent,
+  foldedBoardItems,
+  labelChipTone,
+  pullRequestFooterText,
+  shortItemReference
+} from './epic-board.js';
+import {
   defaultProjectBoardSettings,
   projectBoardSettingsSchema,
   type ProjectBoardSettings,
@@ -3521,6 +3530,57 @@ function AssigneeMark({ assignee }: { assignee: string }) {
   );
 }
 
+function EpicChildList({
+  item,
+  listId
+}: {
+  item: WorkItem;
+  listId: string;
+}) {
+  const [expanded, setExpanded] = useState(true);
+  const children = item.epic?.children ?? [];
+  if (children.length === 0) return null;
+  return (
+    <>
+      <button
+        type="button"
+        aria-expanded={expanded}
+        aria-controls={listId}
+        onClick={() => setExpanded(current => !current)}
+        className="tb-epic-toggle mt-1 flex w-full items-center gap-1 rounded px-3 pb-1 text-left text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Icon
+          name={expanded ? 'ArrowDown' : 'ArrowRight'}
+          className="size-3"
+        />
+        <span>
+          {expanded ? 'Hide' : 'Show'} {children.length}{' '}
+          {children.length === 1 ? 'child' : 'children'}
+        </span>
+      </button>
+      {expanded ? (
+        <ul id={listId} className="tb-epic-children px-3 pb-2">
+          {children.map(child => (
+            <li
+              key={child.key}
+              data-child-state={child.closed ? 'closed' : 'open'}
+              className="tb-epic-child"
+            >
+              <span aria-hidden="true" className="tb-epic-child-mark">
+                {child.closed ? '✓' : '○'}
+              </span>{' '}
+              <span className="tb-key tabular-nums">
+                {shortItemReference(child.key)}
+              </span>{' '}
+              <span>{epicChildTitle(child.title, item.title)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </>
+  );
+}
+
 function KanbanCard({
   item,
   pickedUp,
@@ -3546,12 +3606,15 @@ function KanbanCard({
 }) {
   const priority = visiblePriority(item.priority);
   const assignee = visibleAssignee(item.assignee);
+  const epic = item.epic ?? null;
   const labels = item.labels
     .map(label => label.trim())
     .filter(Boolean)
-    .slice(0, 2);
+    .slice(0, epic ? 3 : 2);
+  const listId = `epic-children-${encodeURIComponent(item.locator)}`;
 
   return (
+    <div className="tb-kanban-card-shell rounded-md">
     <button
       type="button"
       draggable={!pending && !moveDisabled}
@@ -3604,12 +3667,38 @@ function KanbanCard({
           {labels.map((label, index) => (
             <span
               key={`${label}-${index}`}
+              data-chip-tone={labelChipTone(label)}
               className="tb-label-chip min-w-0 truncate rounded-full px-2 py-0.5 text-xs"
               title={label}
             >
               {label}
             </span>
           ))}
+        </span>
+      ) : null}
+      {epic && epic.totalChildren > 0 ? (
+        <span className="mt-2 block">
+          <span
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={epic.totalChildren}
+            aria-valuenow={epic.completedChildren}
+            aria-label={epicProgressLabel(epic)}
+            className="tb-epic-bar block overflow-hidden rounded-full"
+          >
+            <span
+              className="tb-epic-bar-fill block"
+              style={{ width: `${epicProgressPercent(epic)}%` }}
+            />
+          </span>
+          <span className="tb-meta mt-1 block text-xs tabular-nums">
+            {epicProgressLabel(epic)}
+          </span>
+        </span>
+      ) : null}
+      {epic?.pullRequest ? (
+        <span className="tb-epic-pr mt-1.5 block truncate text-xs">
+          {pullRequestFooterText(epic.pullRequest)}
         </span>
       ) : null}
       <span className="tb-meta mt-2 flex min-w-0 items-center gap-2 text-xs">
@@ -3625,13 +3714,16 @@ function KanbanCard({
         ) : null}
       </span>
     </button>
+    <EpicChildList item={item} listId={listId} />
+    </div>
   );
 }
 
 function KanbanBoard({
-  items,
+  items: allItems,
   workflowItems,
   statusOrder,
+  foldChildren,
   composerDragEnabled,
   onOpen,
   onMove
@@ -3639,11 +3731,18 @@ function KanbanBoard({
   items: readonly WorkItem[];
   workflowItems: readonly WorkItem[];
   statusOrder: readonly string[];
+  foldChildren: boolean;
   composerDragEnabled: boolean;
   onOpen: (item: WorkItem) => void;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
+  // Folding only removes cards whose parent is on the board; children keep
+  // existing in the data, and dropping a parent moves the parent alone.
+  const items = useMemo(
+    () => foldedBoardItems(allItems, foldChildren),
+    [allItems, foldChildren]
+  );
   const optionsRef = useRef(
     new Map<string, Promise<readonly WorkStatusOption[]>>()
   );
@@ -4642,6 +4741,7 @@ function TrackerList({
               items={visibleItems}
               workflowItems={items}
               statusOrder={boardSettings.statusOrder}
+              foldChildren={boardSettings.foldChildren}
               composerDragEnabled={surfaceMode === 'constrained'}
               onOpen={onOpen}
               onMove={moveItemStatus}
@@ -5707,6 +5807,31 @@ function ProjectBoardSettingsForm({
             </label>
           ))}
         </div>
+      </fieldset>
+
+      <fieldset disabled={saving} className="space-y-2">
+        <legend className="text-xs font-medium">Kanban cards</legend>
+        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border px-3 py-3">
+          <input
+            type="checkbox"
+            checked={settings.foldChildren}
+            className="mt-0.5 size-4 accent-primary"
+            onChange={event => {
+              const foldChildren = event.target.checked;
+              setSettings(current => ({ ...current, foldChildren }));
+              setSaved(false);
+            }}
+          />
+          <span className="min-w-0">
+            <span className="text-sm font-medium">
+              Fold children under parent
+            </span>
+            <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+              Show one card per epic with its children listed inside it.
+              Trackers without a parent/child hierarchy are unaffected.
+            </span>
+          </span>
+        </label>
       </fieldset>
 
       <fieldset disabled={saving} className="space-y-2">

@@ -68,8 +68,8 @@ test('keeps Taskboard private and Git-buildable without npm publication hooks', 
     assert.equal(typeof rootManifest.scripts[script], 'string');
   }
   assert.equal(taskboardManifest.name, 'bb-plugin-taskboard');
-  // Fork-only release carrying GitHub Projects (v2) support.
-  assert.equal(taskboardManifest.version, '0.4.0');
+  // Fork-only release: GitHub Projects (v2) columns and epic folding.
+  assert.equal(taskboardManifest.version, '0.5.0');
   assert.equal(taskboardManifest.private, true);
   assert.equal('publishConfig' in taskboardManifest, false);
   assert.equal('files' in taskboardManifest, false);

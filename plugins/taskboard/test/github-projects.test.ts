@@ -42,8 +42,31 @@ const STATUS_OPTIONS = [
   { id: 'opt-done', name: 'Done' }
 ];
 
-function content(number: number, title: string) {
+function content(
+  number: number,
+  title: string,
+  hierarchy: {
+    parent?: number;
+    subIssues?: { total: number; completed: number };
+    prs?: {
+      number: number;
+      isDraft: boolean;
+      state: string;
+      headRefName: string;
+    }[];
+  } = {}
+) {
   return {
+    parent: hierarchy.parent
+      ? {
+          number: hierarchy.parent,
+          repository: { nameWithOwner: REPO }
+        }
+      : null,
+    subIssuesSummary: hierarchy.subIssues ?? null,
+    closedByPullRequestsReferences: hierarchy.prs
+      ? { nodes: hierarchy.prs }
+      : null,
     __typename: 'Issue',
     number,
     title,
@@ -398,4 +421,54 @@ test('without a configured project the adapter still reports Open and Closed', a
     ['open', 'closed']
   );
   assert.equal(cli.calls.length, 0);
+});
+
+test('board items carry parent, progress and pull request facts', async () => {
+  clearGithubProjectCache();
+  const cli = makeCli({
+    items: [
+      {
+        id: 'PVTI_epic',
+        fieldValueByName: { optionId: 'opt-progress', name: 'In progress' },
+        content: content(10, 'Timeline', {
+          subIssues: { total: 6, completed: 2 },
+          prs: [
+            {
+              number: 17,
+              isDraft: true,
+              state: 'OPEN',
+              headRefName: 'feat/timeline'
+            }
+          ]
+        })
+      },
+      {
+        id: 'PVTI_child',
+        fieldValueByName: null,
+        content: content(11, 'Timeline: pure C seams', { parent: 10 })
+      }
+    ]
+  });
+  const adapter = createGithubAdapter(
+    makeBb([ghIssue(10, 'Timeline'), ghIssue(11, 'Timeline: pure C seams')]),
+    true,
+    'proj_test',
+    cli.run,
+    PROJECT
+  );
+  const items = await adapter.list();
+  const parent = items.find(item => item.locator === `${REPO}#10`)!;
+  const child = items.find(item => item.locator === `${REPO}#11`)!;
+  assert.equal(parent.epic?.parentKey, null);
+  assert.equal(parent.epic?.totalChildren, 6);
+  assert.equal(parent.epic?.completedChildren, 2);
+  assert.deepEqual(parent.epic?.children.map(entry => entry.key), [
+    `${REPO}#11`
+  ]);
+  assert.deepEqual(parent.epic?.pullRequest, {
+    number: 17,
+    state: 'draft',
+    branch: 'feat/timeline'
+  });
+  assert.equal(child.epic?.parentKey, `${REPO}#10`);
 });

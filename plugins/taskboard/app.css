@@ -518,6 +518,90 @@
     transform: scale(0.985);
   }
 
+  .tb-kanban-card-shell {
+    border: 1px solid var(--border-hairline);
+    background: var(--canvas);
+  }
+
+  .tb-kanban-card-shell:has(> .tb-kanban-card) > .tb-kanban-card {
+    border: 0;
+    background: transparent;
+  }
+
+  .tb-kanban-card-shell:hover {
+    border-color: var(--input);
+  }
+
+  .tb-epic-bar {
+    height: 4px;
+    background: var(--tb-border);
+  }
+
+  .tb-epic-bar-fill {
+    height: 100%;
+    background: var(--tb-green);
+  }
+
+  .tb-epic-pr {
+    color: var(--tb-ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tb-epic-toggle {
+    color: var(--tb-ink-soft);
+  }
+
+  .tb-epic-toggle:hover {
+    color: var(--ink);
+  }
+
+  .tb-epic-children {
+    margin: 0;
+    list-style: none;
+  }
+
+  .tb-epic-child {
+    margin: 2px 0 2px 6px;
+    padding: 1px 7px;
+    border-left: 2px solid var(--tb-border);
+    color: var(--tb-ink-soft);
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  .tb-epic-child[data-child-state='closed'] {
+    border-left-color: color-mix(in oklch, var(--tb-green) 62%, var(--tb-border));
+    color: color-mix(in oklch, var(--tb-green) 58%, var(--ink));
+  }
+
+  .tb-epic-child-mark {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tb-label-chip[data-chip-tone='type'] {
+    border-color: color-mix(in oklch, var(--tb-blue) 26%, var(--border-hairline));
+    background: color-mix(in oklch, var(--tb-blue) 10%, var(--canvas));
+    color: color-mix(in oklch, var(--tb-blue) 64%, var(--ink));
+  }
+
+  .tb-label-chip[data-chip-tone='area'] {
+    border-color: color-mix(in oklch, var(--tb-slate) 26%, var(--border-hairline));
+    background: color-mix(in oklch, var(--tb-slate) 10%, var(--canvas));
+    color: color-mix(in oklch, var(--tb-slate) 64%, var(--ink));
+  }
+
+  .tb-label-chip[data-chip-tone='bug'] {
+    border-color: color-mix(in oklch, var(--tb-red) 26%, var(--border-hairline));
+    background: color-mix(in oklch, var(--tb-red) 10%, var(--canvas));
+    color: color-mix(in oklch, var(--tb-red) 64%, var(--ink));
+  }
+
+  .tb-label-chip[data-chip-tone='decision'] {
+    border-color: color-mix(in oklch, var(--tb-violet) 26%, var(--border-hairline));
+    background: color-mix(in oklch, var(--tb-violet) 10%, var(--canvas));
+    color: color-mix(in oklch, var(--tb-violet) 64%, var(--ink));
+  }
+
   .tb-kanban-card[data-pending='true'] {
     cursor: progress;
     opacity: 0.72;

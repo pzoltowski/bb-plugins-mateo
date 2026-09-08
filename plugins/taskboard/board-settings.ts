@@ -37,7 +37,10 @@ export const projectBoardSettingsSchema = z
     projectId: bbProjectIdSchema,
     defaultView: trackerViewSchema,
     enabledFilters: z.array(workItemFilterFieldSchema),
-    statusOrder: z.array(z.string().trim().min(1).max(80)).min(1).max(50)
+    statusOrder: z.array(z.string().trim().min(1).max(80)).min(1).max(50),
+    // Fold child issues into their parent's Kanban card. Only trackers that
+    // report a hierarchy (today: a bound GitHub Project) can honour it.
+    foldChildren: z.boolean().default(true)
   })
   .strict()
   .superRefine((settings, context) => {
@@ -65,6 +68,7 @@ export function defaultProjectBoardSettings(
     projectId,
     defaultView: 'list',
     enabledFilters: [...DEFAULT_WORK_ITEM_FILTER_FIELDS],
-    statusOrder: [...DEFAULT_WORKFLOW_STATUS_ORDER]
+    statusOrder: [...DEFAULT_WORKFLOW_STATUS_ORDER],
+    foldChildren: true
   });
 }
