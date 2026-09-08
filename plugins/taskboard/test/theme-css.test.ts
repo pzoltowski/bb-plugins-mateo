@@ -152,7 +152,11 @@ test('styles epic chips and child rows on theme tokens only', () => {
     '--tb-chip-bug-fg: #e0705a',
     '--tb-chip-decision-bg: #271f2a',
     '--tb-chip-decision-fg: #be84cf',
-    '--tb-child-number: #8fb8ff'
+    '--tb-child-number: #3b82c4',
+    '--tb-epic-title: #c1c1c1',
+    '--tb-child-done: #b7b7b7',
+    '--tb-child-open: #858585',
+    '--tb-epic-footer: #b7b7b7'
   ]) {
     assert.ok(tokens.includes(token), `Missing ${token}`);
   }
@@ -164,11 +168,11 @@ test('styles epic chips and child rows on theme tokens only', () => {
   assert.match(doneChild, /border-left-color:\s*var\(--tb-green\)/);
   assert.match(
     doneChild,
-    /color:\s*color-mix\(in oklch, white 65%, var\(--canvas\)\)/
+    /color:\s*var\(--tb-child-done\)/
   );
 
   const openChild = ruleBody(/\.tb-epic-child\s*\{([^}]*)\}/s, 'open child');
-  assert.match(openChild, /color:\s*var\(--tb-ink-soft\)/);
+  assert.match(openChild, /color:\s*var\(--tb-child-open\)/);
 
   const childNumber = ruleBody(
     /\.tb-epic-child\s+\.tb-key\s*\{([^}]*)\}/s,

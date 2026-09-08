@@ -41,7 +41,11 @@
     --tb-chip-bug-fg: #e0705a;
     --tb-chip-decision-bg: #271f2a;
     --tb-chip-decision-fg: #be84cf;
-    --tb-child-number: #8fb8ff;
+    --tb-child-number: #3b82c4;
+    --tb-epic-title: #c1c1c1;
+    --tb-child-done: #b7b7b7;
+    --tb-child-open: #858585;
+    --tb-epic-footer: #b7b7b7;
     background: var(--canvas);
   }
 
@@ -569,7 +573,7 @@
   }
 
   .tb-epic-pr {
-    color: var(--tb-ink-soft);
+    color: var(--tb-epic-footer);
     font-variant-numeric: tabular-nums;
   }
 
@@ -590,9 +594,13 @@
     margin: 2px 0 2px 2px;
     padding: 1px 7px;
     border-left: 2px solid var(--tb-border);
-    color: var(--tb-ink-soft);
+    color: var(--tb-child-open);
     font-size: 11px;
     line-height: 1.35;
+  }
+
+  .tb-kanban-card-shell .tb-kanban-card-title {
+    color: var(--tb-epic-title);
   }
 
   .tb-epic-child-link {
@@ -608,7 +616,7 @@
      the card title; only the rail and the tick are green. */
   .tb-epic-child[data-child-state='closed'] {
     border-left-color: var(--tb-green);
-    color: color-mix(in oklch, white 65%, var(--canvas));
+    color: var(--tb-child-done);
   }
 
   .tb-epic-child[data-child-state='closed'] .tb-epic-child-mark {

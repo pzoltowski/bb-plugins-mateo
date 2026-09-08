@@ -3694,7 +3694,7 @@ function KanbanCard({
               <PriorityMark priority={priority} />
             </span>
           ) : null}
-          <span className="line-clamp-3 block text-sm font-medium leading-snug text-foreground">
+          <span className="tb-kanban-card-title line-clamp-3 block text-sm font-medium leading-snug">
             <span
               className="tb-key mr-1 font-normal tabular-nums"
               title={item.key}
