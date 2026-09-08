@@ -1690,14 +1690,14 @@ function WorkStateGlyph({
     >
       {tone === 'attention' ? (
         <>
-          <circle {...common} cx="8" cy="8" r="5.25" />
-          <path {...common} d="M6.6 6.2a1.45 1.45 0 1 1 1.9 1.65c-.35.14-.5.42-.5.8v.35" />
-          <path {...common} d="M8 11.35h.01" />
+          <circle {...common} cx="8" cy="8" r="5.25" strokeWidth={1.25} />
+          <path {...common} strokeWidth={1.25} d="M6.4 6.35a1.6 1.6 0 1 1 2.35 1.45c-.5.28-.75.6-.75 1.05v.25" />
+          <path {...common} strokeWidth={1.25} d="M8 11.4h.01" />
         </>
       ) : tone === 'backlog' ? (
         <>
-          <circle {...common} cx="8" cy="8" r="5.25" />
-          <path {...common} d="M8 5.15V8l1.95 1.15" />
+          <circle {...common} cx="8" cy="8" r="5.25" strokeWidth={1.25} />
+          <path {...common} strokeWidth={1.25} d="M8 5.15V8l1.95 1.15" />
         </>
       ) : category === 'backlog' ? (
         <circle {...common} cx="8" cy="8" r="5.25" strokeDasharray="1.6 2.1" />
