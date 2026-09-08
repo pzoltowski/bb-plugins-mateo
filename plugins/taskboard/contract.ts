@@ -71,6 +71,17 @@ export type {
 export const workSourceSchema = z.enum(['linear', 'github', 'jira']);
 export type WorkSource = z.infer<typeof workSourceSchema>;
 
+export const githubProjectOwnerSchema = z
+  .string()
+  .trim()
+  .max(100)
+  .regex(/^[A-Za-z0-9-]*$/u, 'GitHub owner login is invalid');
+export const githubProjectNumberSchema = z
+  .number()
+  .int()
+  .nonnegative()
+  .max(1_000_000);
+
 export const trackerProjectSchema = z
   .object({
     id: bbProjectIdSchema,
@@ -84,6 +95,8 @@ export const projectSourceConfigSchema = z
     projectId: bbProjectIdSchema,
     source: workSourceSchema,
     linearTeamKey: z.string().trim(),
+    githubProjectOwner: githubProjectOwnerSchema.default(''),
+    githubProjectNumber: githubProjectNumberSchema.default(0),
     jiraBaseUrl: jiraBaseUrlSchema,
     jiraEmail: z.string().trim(),
     jiraJql: z.string().trim().min(1)
@@ -102,6 +115,10 @@ export type ProjectConfigView = z.infer<typeof projectConfigViewSchema>;
 
 export const projectConfigMutationSchema = projectSourceConfigSchema
   .extend({
+    // Optional so callers that do not manage the GitHub Project binding
+    // (credentials form, settings UI) leave the existing binding untouched.
+    githubProjectOwner: githubProjectOwnerSchema.optional(),
+    githubProjectNumber: githubProjectNumberSchema.optional(),
     linearCredential: secretMutationSchema,
     jiraCredential: secretMutationSchema
   })

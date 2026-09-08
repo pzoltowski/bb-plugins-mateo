@@ -72,6 +72,8 @@ const KEEP_SECRET = { operation: 'keep' } as const;
 const DEFAULT_PROJECT_CONFIG = {
   source: 'github',
   linearTeamKey: '',
+  githubProjectOwner: '',
+  githubProjectNumber: 0,
   jiraBaseUrl: '',
   jiraEmail: '',
   jiraJql:
@@ -154,6 +156,8 @@ interface ParsedCliArguments {
   source: string | undefined;
   query: string | undefined;
   linearTeam: string | undefined;
+  githubProjectOwner: string | undefined;
+  githubProjectNumber: string | undefined;
   jiraUrl: string | undefined;
   jiraEmail: string | undefined;
   jiraJql: string | undefined;
@@ -187,6 +191,8 @@ const CLI_OPTIONS_BY_COMMAND = new Map<string, ReadonlySet<string>>([
       '--project',
       '--source',
       '--linear-team',
+      '--github-project-owner',
+      '--github-project-number',
       '--jira-url',
       '--jira-email',
       '--jira-jql',
@@ -210,6 +216,8 @@ export function parseTaskboardCliArguments(
   let source: string | undefined;
   let query: string | undefined;
   let linearTeam: string | undefined;
+  let githubProjectOwner: string | undefined;
+  let githubProjectNumber: string | undefined;
   let jiraUrl: string | undefined;
   let jiraEmail: string | undefined;
   let jiraJql: string | undefined;
@@ -227,6 +235,7 @@ export function parseTaskboardCliArguments(
       (value.length === 0 &&
         ![
           '--linear-team',
+          '--github-project-owner',
           '--jira-url',
           '--jira-email',
           '--query'
@@ -261,6 +270,12 @@ export function parseTaskboardCliArguments(
       index += 1;
     } else if (argument === '--linear-team') {
       linearTeam = valueAfter(argument, index);
+      index += 1;
+    } else if (argument === '--github-project-owner') {
+      githubProjectOwner = valueAfter(argument, index);
+      index += 1;
+    } else if (argument === '--github-project-number') {
+      githubProjectNumber = valueAfter(argument, index);
       index += 1;
     } else if (argument === '--jira-url') {
       jiraUrl = valueAfter(argument, index);
@@ -304,6 +319,8 @@ export function parseTaskboardCliArguments(
     source,
     query,
     linearTeam,
+    githubProjectOwner,
+    githubProjectNumber,
     jiraUrl,
     jiraEmail,
     jiraJql,
@@ -352,6 +369,11 @@ function formatProjectConfig(config: ProjectConfigView): string {
     `Project\t${config.projectId}`,
     `Source\t${sourceName(config.source)}`,
     `GitHub repos\t${config.githubRepos.join(', ') || 'none mapped'}`,
+    `GitHub project\t${
+      config.githubProjectOwner && config.githubProjectNumber
+        ? `${config.githubProjectOwner}/${config.githubProjectNumber}`
+        : 'not configured'
+    }`,
     `Linear team\t${config.linearTeamKey || 'not configured'}`,
     `Linear credential\t${config.linearCredentialConfigured ? 'configured' : 'not configured'}`,
     `Jira URL\t${config.jiraBaseUrl || 'not configured'}`,
@@ -886,7 +908,18 @@ export default async function plugin(bb: BbPluginApi) {
                 apiToken: credential,
                 jql: config.jiraJql
               })
-            : createGithubAdapter(bb, true, projectId);
+            : createGithubAdapter(
+                bb,
+                true,
+                projectId,
+                undefined,
+                config.githubProjectOwner && config.githubProjectNumber > 0
+                  ? {
+                      owner: config.githubProjectOwner,
+                      number: config.githubProjectNumber
+                    }
+                  : null
+              );
       return new Map([[config.source, adapter]]);
     }
   }
@@ -1060,6 +1093,14 @@ export default async function plugin(bb: BbPluginApi) {
     if (previous.source !== next.source) return [...SOURCES];
     const changed = new Set<WorkSource>();
     if (
+      (next.githubProjectOwner !== undefined &&
+        previous.githubProjectOwner !== next.githubProjectOwner) ||
+      (next.githubProjectNumber !== undefined &&
+        previous.githubProjectNumber !== next.githubProjectNumber)
+    ) {
+      changed.add('github');
+    }
+    if (
       previous.linearTeamKey !== next.linearTeamKey ||
       next.linearCredential.operation !== 'keep'
     ) {
@@ -1095,6 +1136,8 @@ export default async function plugin(bb: BbPluginApi) {
       left.projectId === right.projectId &&
       left.source === right.source &&
       left.linearTeamKey === right.linearTeamKey &&
+      left.githubProjectOwner === right.githubProjectOwner &&
+      left.githubProjectNumber === right.githubProjectNumber &&
       left.jiraBaseUrl === right.jiraBaseUrl &&
       left.jiraEmail === right.jiraEmail &&
       left.jiraJql === right.jiraJql
@@ -1169,6 +1212,10 @@ export default async function plugin(bb: BbPluginApi) {
           projectId: input.projectId,
           source: input.source,
           linearTeamKey: input.linearTeamKey,
+          githubProjectOwner:
+            input.githubProjectOwner ?? previous.githubProjectOwner,
+          githubProjectNumber:
+            input.githubProjectNumber ?? previous.githubProjectNumber,
           jiraBaseUrl: input.jiraBaseUrl,
           jiraEmail: input.jiraEmail,
           jiraJql: input.jiraJql
@@ -2097,7 +2144,7 @@ export default async function plugin(bb: BbPluginApi) {
         if (command === 'config') {
           if (args.positionals.length > 0) {
             throw new Error(
-              'Usage: bb taskboard config [--project <proj_id>] [--source linear|github|jira] [--linear-team <key>] [--jira-url <url>] [--jira-email <email>] [--jira-jql <text>] [--json]'
+              'Usage: bb taskboard config [--project <proj_id>] [--source linear|github|jira] [--linear-team <key>] [--github-project-owner <login>] [--github-project-number <n>] [--jira-url <url>] [--jira-email <email>] [--jira-jql <text>] [--json]'
             );
           }
           const parsedSource = args.source
@@ -2105,6 +2152,20 @@ export default async function plugin(bb: BbPluginApi) {
             : null;
           if (parsedSource && !parsedSource.success) {
             throw new Error('--source must be linear, github, or jira');
+          }
+          let githubProjectNumber: number | undefined;
+          if (args.githubProjectNumber !== undefined) {
+            const parsedNumber = Number(args.githubProjectNumber);
+            if (
+              !Number.isSafeInteger(parsedNumber) ||
+              parsedNumber < 0 ||
+              parsedNumber > 1_000_000
+            ) {
+              throw new Error(
+                '--github-project-number must be a non-negative integer (0 clears the binding)'
+              );
+            }
+            githubProjectNumber = parsedNumber;
           }
           if (args.jiraJql !== undefined && !args.jiraJql.trim()) {
             throw new Error('--jira-jql requires a non-empty value');
@@ -2115,6 +2176,8 @@ export default async function plugin(bb: BbPluginApi) {
           const changed =
             parsedSource !== null ||
             args.linearTeam !== undefined ||
+            args.githubProjectOwner !== undefined ||
+            githubProjectNumber !== undefined ||
             args.jiraUrl !== undefined ||
             args.jiraEmail !== undefined ||
             args.jiraJql !== undefined;
@@ -2124,6 +2187,10 @@ export default async function plugin(bb: BbPluginApi) {
                   projectId: previous.projectId,
                   source: parsedSource?.data ?? previous.source,
                   linearTeamKey: args.linearTeam ?? previous.linearTeamKey,
+                  githubProjectOwner:
+                    args.githubProjectOwner ?? previous.githubProjectOwner,
+                  githubProjectNumber:
+                    githubProjectNumber ?? previous.githubProjectNumber,
                   jiraBaseUrl: args.jiraUrl ?? previous.jiraBaseUrl,
                   jiraEmail: args.jiraEmail ?? previous.jiraEmail,
                   jiraJql: args.jiraJql ?? previous.jiraJql,

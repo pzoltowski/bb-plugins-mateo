@@ -56,6 +56,8 @@ interface ProjectConfigRow {
   bb_project_id: string;
   source: string;
   linear_team_key: string;
+  github_project_owner: string;
+  github_project_number: number;
   jira_base_url: string;
   jira_email: string;
   jira_jql: string;
@@ -123,6 +125,8 @@ function configFromRow(row: ProjectConfigRow): ProjectSourceConfig {
     projectId: row.bb_project_id,
     source: row.source,
     linearTeamKey: row.linear_team_key,
+    githubProjectOwner: row.github_project_owner,
+    githubProjectNumber: row.github_project_number,
     jiraBaseUrl: row.jira_base_url,
     jiraEmail: row.jira_email,
     jiraJql: row.jira_jql
@@ -410,6 +414,13 @@ export function createWorkItemStore(bb: BbPluginApi) {
         ON project_filter_presets(
           bb_project_id, position, created_at, id
         );
+    `,
+    `
+      ALTER TABLE project_source_config
+        ADD COLUMN github_project_owner TEXT NOT NULL DEFAULT '';
+      ALTER TABLE project_source_config
+        ADD COLUMN github_project_number INTEGER NOT NULL DEFAULT 0
+        CHECK (github_project_number >= 0);
     `
   ]);
 
@@ -500,6 +511,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
       bb_project_id,
       source,
       linear_team_key,
+      github_project_owner,
+      github_project_number,
       jira_base_url,
       jira_email,
       jira_jql
@@ -715,18 +728,23 @@ export function createWorkItemStore(bb: BbPluginApi) {
       defaults: ProjectSourceConfigDefaults
     ): ProjectSourceConfig {
       const config = defaultConfig(projectId, defaults);
-      db.prepare<[string, WorkSource, string, string, string, string, string]>(
+      db.prepare<
+        [string, WorkSource, string, string, number, string, string, string, string]
+      >(
         `
         INSERT INTO project_source_config (
-          bb_project_id, source, linear_team_key, jira_base_url, jira_email,
+          bb_project_id, source, linear_team_key, github_project_owner,
+          github_project_number, jira_base_url, jira_email,
           jira_jql, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(bb_project_id) DO NOTHING
       `
       ).run(
         config.projectId,
         config.source,
         config.linearTeamKey,
+        config.githubProjectOwner,
+        config.githubProjectNumber,
         config.jiraBaseUrl,
         config.jiraEmail,
         config.jiraJql,
@@ -739,16 +757,29 @@ export function createWorkItemStore(bb: BbPluginApi) {
       return db.transaction(() => {
         const previous = readProjectConfig.get(config.projectId);
         db.prepare<
-          [string, WorkSource, string, string, string, string, string]
+          [
+            string,
+            WorkSource,
+            string,
+            string,
+            number,
+            string,
+            string,
+            string,
+            string
+          ]
         >(
           `
           INSERT INTO project_source_config (
-            bb_project_id, source, linear_team_key, jira_base_url, jira_email,
+            bb_project_id, source, linear_team_key, github_project_owner,
+            github_project_number, jira_base_url, jira_email,
             jira_jql, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(bb_project_id) DO UPDATE SET
             source = excluded.source,
             linear_team_key = excluded.linear_team_key,
+            github_project_owner = excluded.github_project_owner,
+            github_project_number = excluded.github_project_number,
             jira_base_url = excluded.jira_base_url,
             jira_email = excluded.jira_email,
             jira_jql = excluded.jira_jql,
@@ -758,6 +789,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
           config.projectId,
           config.source,
           config.linearTeamKey,
+          config.githubProjectOwner,
+          config.githubProjectNumber,
           config.jiraBaseUrl,
           config.jiraEmail,
           config.jiraJql,
