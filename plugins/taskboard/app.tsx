@@ -3565,29 +3565,27 @@ function EpicSummary({
               style={{ width: `${epicProgressPercent(epic)}%` }}
             />
           </div>
-          <div className="tb-epic-progress-row mt-1 flex items-center gap-1">
+          <button
+            type="button"
+            aria-expanded={expanded}
+            aria-controls={listId}
+            disabled={children.length === 0}
+            onClick={event => {
+              event.stopPropagation();
+              setExpanded(current => !current);
+            }}
+            className="tb-epic-progress-row mt-1 flex w-full items-center gap-2 rounded px-1 py-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <span className="tb-meta text-xs tabular-nums">
               {epicProgressLabel(epic)}
             </span>
             {children.length > 0 ? (
-              <button
-                type="button"
-                aria-expanded={expanded}
-                aria-controls={listId}
-                aria-label={`${expanded ? 'Hide' : 'Show'} ${children.length} ${children.length === 1 ? 'child' : 'children'}`}
-                onClick={event => {
-                  event.stopPropagation();
-                  setExpanded(current => !current);
-                }}
-                className="tb-epic-toggle flex size-4 items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Icon
-                  name={expanded ? 'ArrowDown' : 'ArrowRight'}
-                  className="size-3"
-                />
-              </button>
+              <Icon
+                name={expanded ? 'ArrowDown' : 'ArrowRight'}
+                className="tb-epic-chevron ml-auto size-3 shrink-0"
+              />
             ) : null}
-          </div>
+          </button>
         </>
       ) : null}
       {expanded && children.length > 0 ? (

@@ -131,3 +131,46 @@ test('shows restrained composer drop feedback and discoverable drag grips', () =
     /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.tb-composer-drag-grip/u
   );
 });
+
+test('styles epic chips and child rows on theme tokens only', () => {
+  const chip = ruleBody(/\.tb-label-chip\s*\{([^}]*)\}/s, 'label chip');
+  assert.match(chip, /border-radius:\s*6px/);
+  assert.match(chip, /border:\s*0/);
+  assert.match(chip, /font-weight:\s*600/);
+  assert.match(
+    chip,
+    /background:\s*color-mix\(in oklch, var\(--tb-chip-accent\) 14%, var\(--canvas\)\)/
+  );
+
+  const doneChild = ruleBody(
+    /\.tb-epic-child\[data-child-state='closed'\]\s*\{([^}]*)\}/s,
+    'done child'
+  );
+  assert.match(doneChild, /border-left-color:\s*var\(--tb-green\)/);
+  assert.match(
+    doneChild,
+    /color:\s*color-mix\(in oklch, var\(--ink\) 86%, var\(--canvas\)\)/
+  );
+
+  const openChild = ruleBody(/\.tb-epic-child\s*\{([^}]*)\}/s, 'open child');
+  assert.match(openChild, /color:\s*var\(--tb-ink-soft\)/);
+
+  const childNumber = ruleBody(
+    /\.tb-epic-child\s+\.tb-key\s*\{([^}]*)\}/s,
+    'child number'
+  );
+  assert.match(
+    childNumber,
+    /color:\s*color-mix\(in oklch, var\(--tb-blue\) 60%, var\(--ink\)\)/
+  );
+
+  const row = ruleBody(/\.tb-epic-progress-row\s*\{([^}]*)\}/s, 'progress row');
+  assert.match(row, /cursor:\s*pointer/);
+  assert.match(
+    stylesheet,
+    /\.tb-epic-progress-row:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--state-hover\)/s
+  );
+  // No literal colours in the epic surface.
+  assert.doesNotMatch(chip, /#[0-9a-f]{3,8}/i);
+  assert.doesNotMatch(doneChild, /#[0-9a-f]{3,8}/i);
+});

@@ -381,15 +381,19 @@
     color: color-mix(in oklch, var(--tb-source-accent) 66%, var(--ink));
   }
 
+  /* Badge shape borrowed from Dockside: tinted fill, no border, tight pill. */
   .tb-label-chip {
+    --tb-chip-accent: var(--tb-slate);
     display: inline-block;
     max-width: 100%;
     overflow-wrap: anywhere;
-    padding: 0 6px;
-    border: 1px solid var(--border-hairline);
-    background: color-mix(in oklch, var(--ink) 3.5%, var(--canvas));
-    color: var(--tb-ink-soft);
-    font-size: 11px;
+    padding: 1px 6px;
+    border: 0;
+    border-radius: 6px;
+    background: color-mix(in oklch, var(--tb-chip-accent) 14%, var(--canvas));
+    color: color-mix(in oklch, var(--tb-chip-accent) 78%, var(--ink));
+    font-size: 11.5px;
+    font-weight: 600;
     line-height: 16px;
   }
 
@@ -584,10 +588,11 @@
     text-decoration: underline;
   }
 
-  /* Done children read as neutral text; only the rail and the tick are green. */
+  /* Done children read brighter (≈65% white in the dark theme) but stay below
+     the card title; only the rail and the tick are green. */
   .tb-epic-child[data-child-state='closed'] {
     border-left-color: var(--tb-green);
-    color: color-mix(in oklch, var(--ink) 78%, var(--canvas));
+    color: color-mix(in oklch, var(--ink) 86%, var(--canvas));
   }
 
   .tb-epic-child[data-child-state='closed'] .tb-epic-child-mark {
@@ -599,33 +604,42 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .tb-epic-child .tb-key {
+    color: color-mix(in oklch, var(--tb-blue) 60%, var(--ink));
+  }
+
+  .tb-epic-progress-row {
+    color: var(--tb-ink-soft);
+    cursor: pointer;
+  }
+
+  .tb-epic-progress-row:hover:not(:disabled) {
+    background: var(--state-hover);
+    color: var(--ink);
+  }
+
+  .tb-epic-progress-row:disabled {
+    cursor: default;
+  }
+
+  .tb-epic-chevron {
+    color: var(--tb-ink-soft);
+  }
+
   .tb-label-chip[data-chip-tone='type'] {
     --tb-chip-accent: color-mix(in oklch, var(--tb-blue) 62%, var(--tb-violet));
-    border-color: color-mix(
-      in oklch,
-      var(--tb-chip-accent) 26%,
-      var(--border-hairline)
-    );
-    background: color-mix(in oklch, var(--tb-chip-accent) 12%, var(--canvas));
-    color: color-mix(in oklch, var(--tb-chip-accent) 72%, var(--ink));
   }
 
   .tb-label-chip[data-chip-tone='area'] {
-    border-color: color-mix(in oklch, var(--tb-slate) 26%, var(--border-hairline));
-    background: color-mix(in oklch, var(--tb-slate) 10%, var(--canvas));
-    color: color-mix(in oklch, var(--tb-slate) 64%, var(--ink));
+    --tb-chip-accent: var(--tb-slate);
   }
 
   .tb-label-chip[data-chip-tone='bug'] {
-    border-color: color-mix(in oklch, var(--tb-red) 26%, var(--border-hairline));
-    background: color-mix(in oklch, var(--tb-red) 10%, var(--canvas));
-    color: color-mix(in oklch, var(--tb-red) 64%, var(--ink));
+    --tb-chip-accent: var(--tb-red);
   }
 
   .tb-label-chip[data-chip-tone='decision'] {
-    border-color: color-mix(in oklch, var(--tb-violet) 26%, var(--border-hairline));
-    background: color-mix(in oklch, var(--tb-violet) 10%, var(--canvas));
-    color: color-mix(in oklch, var(--tb-violet) 64%, var(--ink));
+    --tb-chip-accent: var(--tb-violet);
   }
 
   .tb-kanban-card[data-pending='true'] {
