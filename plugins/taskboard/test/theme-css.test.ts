@@ -136,10 +136,11 @@ test('styles epic chips and child rows on theme tokens only', () => {
   const chip = ruleBody(/\.tb-label-chip\s*\{([^}]*)\}/s, 'label chip');
   assert.match(chip, /border-radius:\s*6px/);
   assert.match(chip, /border:\s*0/);
-  assert.match(chip, /font-weight:\s*500/);
+  assert.match(chip, /font-size:\s*10\.5px/);
+  assert.match(chip, /font-weight:\s*400/);
+  assert.match(chip, /line-height:\s*15px/);
   assert.match(chip, /letter-spacing:\s*0\.01em/);
   assert.match(chip, /padding:\s*1px 6px/);
-  assert.match(chip, /font-size:\s*11\.5px/);
   assert.match(chip, /background:\s*var\(--tb-chip-bg\)/);
   assert.match(chip, /color:\s*var\(--tb-chip-fg\)/);
   // The approved badge palette is literal; it lives in the token block only.

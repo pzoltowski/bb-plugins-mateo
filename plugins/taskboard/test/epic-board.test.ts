@@ -289,7 +289,7 @@ test('the Kanban card renders header, chips, progress, children and PR', async (
   // Short reference inline with the title, full locator kept in the tooltip.
   assert.match(card, /cardReference\(item\.key, singleRepository\)/u);
   assert.match(card, /title=\{item\.key\}/u);
-  assert.match(card, /visibleChipLabels\(item\.labels, \{[\s\S]*?hideStatusLabels: epic !== null/u);
+  assert.match(card, /visibleChipLabels\(item\.labels, \{[\s\S]*?hideStatusLabels,/u);
   assert.match(card, /data-chip-tone=\{labelChipTone\(label\)\}/u);
   assert.match(card, /\{chipLabelText\(label\)\}/u);
   assert.match(card, /<EpicSummary item=\{item\} listId=\{listId\}/u);
@@ -312,6 +312,11 @@ test('the Kanban card renders header, chips, progress, children and PR', async (
   assert.ok(board, 'Missing KanbanBoard');
   assert.match(board, /foldedBoardItems\(allItems, foldChildren\)/u);
   assert.match(board, /singleRepositoryBoard\(allItems\)/u);
+  // A tracker-owned board supplies the column order and hides status labels.
+  assert.match(board, /result\.boardOrdered && result\.options\.length > 0/u);
+  assert.match(board, /setBoardOrder\(result\.options\.map\(option => option\.name\)\)/u);
+  assert.match(board, /boardOrder && boardOrder\.length > 0 \? boardOrder : statusOrder/u);
+  assert.match(board, /hideStatusLabels=\{boardOrder !== null\}/u);
 });
 
 test('chips drop their group prefix and hide the status group', () => {

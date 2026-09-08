@@ -49,6 +49,11 @@ export interface WorkSourceAdapter {
   list(options?: { refresh?: boolean }): Promise<ExternalWorkItem[]>;
   get(locator: string): Promise<ExternalWorkItemDetail>;
   statusOptions(locator: string): Promise<ExternalWorkStatusOption[]>;
+  /**
+   * True when statusOptions() returns the tracker's own ordered board, so the
+   * UI can rank its columns by that order instead of a configured one.
+   */
+  boardOrdered?(): boolean;
   createMetadata(
     input: ExternalWorkItemCreateMetadataInput
   ): Promise<CreateIssueMetadata>;

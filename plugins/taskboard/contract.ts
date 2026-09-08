@@ -409,7 +409,13 @@ export const taskboardRpcContract = defineRpcContract({
         locator: z.string().min(1)
       })
       .strict(),
-    output: z.object({ options: z.array(workStatusOptionSchema) }).strict()
+    output: z
+      .object({
+        options: z.array(workStatusOptionSchema),
+        // The tracker owns this order (a bound GitHub Project board).
+        boardOrdered: z.boolean().default(false)
+      })
+      .strict()
   },
   updateItemStatus: {
     input: z

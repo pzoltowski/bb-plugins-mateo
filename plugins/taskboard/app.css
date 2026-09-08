@@ -52,6 +52,8 @@
     --tb-child-done: #b7b7b7;
     --tb-child-open: #858585;
     --tb-epic-footer: #b7b7b7;
+    --tb-card-surface: #1e1e1e;
+    --tb-card-border: #2a2a2a;
     background: var(--canvas);
   }
 
@@ -428,9 +430,9 @@
     background: var(--tb-chip-bg);
     color: var(--tb-chip-fg);
     font-family: inherit;
-    font-size: 11.5px;
-    font-weight: 500;
-    line-height: 16px;
+    font-size: 10.5px;
+    font-weight: 400;
+    line-height: 15px;
     letter-spacing: 0.01em;
   }
 
@@ -541,8 +543,8 @@
   }
 
   .tb-kanban-card {
-    border: 1px solid var(--border-hairline);
-    background: var(--canvas);
+    border: 1px solid var(--tb-card-border);
+    background: var(--tb-card-surface);
     box-shadow: none;
   }
 
@@ -566,8 +568,8 @@
   }
 
   .tb-kanban-card-shell {
-    border: 1px solid var(--border-hairline);
-    background: var(--canvas);
+    border: 1px solid var(--tb-card-border);
+    background: var(--tb-card-surface);
   }
 
   .tb-kanban-card-shell:has(> .tb-kanban-card) > .tb-kanban-card {
@@ -604,6 +606,7 @@
 
   .tb-epic-children {
     margin: 0;
+    padding: 0;
     list-style: none;
   }
 

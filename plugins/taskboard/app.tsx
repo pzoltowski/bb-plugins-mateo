@@ -3633,6 +3633,7 @@ function KanbanCard({
   pending,
   moveDisabled,
   singleRepository,
+  hideStatusLabels,
   composerDragEnabled,
   onOpen,
   onPrepare,
@@ -3645,6 +3646,7 @@ function KanbanCard({
   pending: boolean;
   moveDisabled: boolean;
   singleRepository: boolean;
+  hideStatusLabels: boolean;
   composerDragEnabled: boolean;
   onOpen: () => void;
   onPrepare: () => void;
@@ -3655,9 +3657,10 @@ function KanbanCard({
   const priority = visiblePriority(item.priority);
   const assignee = visibleAssignee(item.assignee);
   const epic = item.epic ?? null;
-  // A bound workflow board already says the status in the column header.
+  // A bound workflow board already says the status in the column header, for
+  // every card on it — including the ones the board itself has not claimed.
   const labels = visibleChipLabels(item.labels, {
-    hideStatusLabels: epic !== null,
+    hideStatusLabels,
     limit: 4
   });
   const reference = cardReference(item.key, singleRepository);
@@ -3777,6 +3780,9 @@ function KanbanBoard({
   const draggedItemRef = useRef<WorkItem | null>(null);
   const suppressOpenRef = useRef<string | null>(null);
   const [discovered, setDiscovered] = useState<WorkStatusOption[]>([]);
+  // A tracker that owns its board (a bound GitHub Project) supplies both the
+  // column order and the fact that a status label would only repeat a column.
+  const [boardOrder, setBoardOrder] = useState<readonly string[] | null>(null);
   const [pickup, setPickup] = useState<{
     item: WorkItem;
     options: readonly WorkStatusOption[];
@@ -3791,8 +3797,13 @@ function KanbanBoard({
   const [announcement, setAnnouncement] = useState('');
   const [visibleMessage, setVisibleMessage] = useState<string | null>(null);
   const lanes = useMemo(
-    () => workflowStatusLanes(items, discovered, statusOrder),
-    [discovered, items, statusOrder]
+    () =>
+      workflowStatusLanes(
+        items,
+        discovered,
+        boardOrder && boardOrder.length > 0 ? boardOrder : statusOrder
+      ),
+    [boardOrder, discovered, items, statusOrder]
   );
   const preloadItems = useMemo(() => {
     const representatives = new Map<string, WorkItem>();
@@ -3816,7 +3827,12 @@ function KanbanBoard({
           source: item.source,
           locator: item.locator
         })
-        .then(result => result.options)
+        .then(result => {
+          if (result.boardOrdered && result.options.length > 0) {
+            setBoardOrder(result.options.map(option => option.name));
+          }
+          return result.options;
+        })
         .catch((error: unknown) => {
           optionsRef.current.delete(itemId);
           throw error;
@@ -4090,6 +4106,7 @@ function KanbanBoard({
                           pending={pending === itemId}
                           moveDisabled={!workflowReady}
                           singleRepository={singleRepository}
+                          hideStatusLabels={boardOrder !== null}
                           composerDragEnabled={composerDragEnabled}
                           onPrepare={() => {
                             void loadOptions(item).catch(() => undefined);
