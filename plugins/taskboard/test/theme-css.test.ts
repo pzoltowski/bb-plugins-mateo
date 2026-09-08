@@ -137,10 +137,25 @@ test('styles epic chips and child rows on theme tokens only', () => {
   assert.match(chip, /border-radius:\s*6px/);
   assert.match(chip, /border:\s*0/);
   assert.match(chip, /font-weight:\s*600/);
-  assert.match(
-    chip,
-    /background:\s*color-mix\(in oklch, var\(--tb-chip-accent\) 14%, var\(--canvas\)\)/
-  );
+  assert.match(chip, /padding:\s*1px 6px/);
+  assert.match(chip, /font-size:\s*11\.5px/);
+  assert.match(chip, /background:\s*var\(--tb-chip-bg\)/);
+  assert.match(chip, /color:\s*var\(--tb-chip-fg\)/);
+  // The approved badge palette is literal; it lives in the token block only.
+  const tokens = ruleBody(/\.tb-linear\s*\{([^}]*)\}/s, 'taskboard tokens');
+  for (const token of [
+    '--tb-chip-type-bg: #1f2432',
+    '--tb-chip-type-fg: #8ea8ff',
+    '--tb-chip-area-bg: #202020',
+    '--tb-chip-area-fg: #979eaa',
+    '--tb-chip-bug-bg: #2b1e1b',
+    '--tb-chip-bug-fg: #e0705a',
+    '--tb-chip-decision-bg: #271f2a',
+    '--tb-chip-decision-fg: #be84cf',
+    '--tb-child-number: #8fb8ff'
+  ]) {
+    assert.ok(tokens.includes(token), `Missing ${token}`);
+  }
 
   const doneChild = ruleBody(
     /\.tb-epic-child\[data-child-state='closed'\]\s*\{([^}]*)\}/s,
@@ -149,7 +164,7 @@ test('styles epic chips and child rows on theme tokens only', () => {
   assert.match(doneChild, /border-left-color:\s*var\(--tb-green\)/);
   assert.match(
     doneChild,
-    /color:\s*color-mix\(in oklch, var\(--ink\) 86%, var\(--canvas\)\)/
+    /color:\s*color-mix\(in oklch, white 65%, var\(--canvas\)\)/
   );
 
   const openChild = ruleBody(/\.tb-epic-child\s*\{([^}]*)\}/s, 'open child');
@@ -159,10 +174,7 @@ test('styles epic chips and child rows on theme tokens only', () => {
     /\.tb-epic-child\s+\.tb-key\s*\{([^}]*)\}/s,
     'child number'
   );
-  assert.match(
-    childNumber,
-    /color:\s*color-mix\(in oklch, var\(--tb-blue\) 60%, var\(--ink\)\)/
-  );
+  assert.match(childNumber, /color:\s*var\(--tb-child-number\)/);
 
   const row = ruleBody(/\.tb-epic-progress-row\s*\{([^}]*)\}/s, 'progress row');
   assert.match(row, /cursor:\s*pointer/);
@@ -170,7 +182,8 @@ test('styles epic chips and child rows on theme tokens only', () => {
     stylesheet,
     /\.tb-epic-progress-row:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--state-hover\)/s
   );
-  // No literal colours in the epic surface.
+  // Outside the token block the epic surface stays literal-colour free.
   assert.doesNotMatch(chip, /#[0-9a-f]{3,8}/i);
   assert.doesNotMatch(doneChild, /#[0-9a-f]{3,8}/i);
+  assert.doesNotMatch(childNumber, /#[0-9a-f]{3,8}/i);
 });

@@ -29,6 +29,19 @@
     --tb-slate: color-mix(in oklch, var(--ink) 52%, var(--canvas));
     --tb-rose: color-mix(in oklch, var(--tb-violet) 56%, var(--tb-red));
     --tb-coral: color-mix(in oklch, var(--tb-red) 62%, var(--tb-amber));
+    /* Approved board palette (prototype A). These four badge pairs and the
+       child-number blue are hand-picked literals on purpose: deriving them
+       from theme tokens drifted into saturated fills. This block is the only
+       place in the stylesheet that carries literal colours. */
+    --tb-chip-type-bg: #1f2432;
+    --tb-chip-type-fg: #8ea8ff;
+    --tb-chip-area-bg: #202020;
+    --tb-chip-area-fg: #979eaa;
+    --tb-chip-bug-bg: #2b1e1b;
+    --tb-chip-bug-fg: #e0705a;
+    --tb-chip-decision-bg: #271f2a;
+    --tb-chip-decision-fg: #be84cf;
+    --tb-child-number: #8fb8ff;
     background: var(--canvas);
   }
 
@@ -382,19 +395,22 @@
   }
 
   /* Badge shape borrowed from Dockside: tinted fill, no border, tight pill. */
+  /* Badge shape and palette borrowed from Dockside (prototype A). */
   .tb-label-chip {
-    --tb-chip-accent: var(--tb-slate);
+    --tb-chip-bg: var(--tb-chip-area-bg);
+    --tb-chip-fg: var(--tb-chip-area-fg);
     display: inline-block;
     max-width: 100%;
     overflow-wrap: anywhere;
     padding: 1px 6px;
     border: 0;
     border-radius: 6px;
-    background: color-mix(in oklch, var(--tb-chip-accent) 14%, var(--canvas));
-    color: color-mix(in oklch, var(--tb-chip-accent) 78%, var(--ink));
+    background: var(--tb-chip-bg);
+    color: var(--tb-chip-fg);
     font-size: 11.5px;
     font-weight: 600;
     line-height: 16px;
+    letter-spacing: 0;
   }
 
   .tb-lane-count {
@@ -592,7 +608,7 @@
      the card title; only the rail and the tick are green. */
   .tb-epic-child[data-child-state='closed'] {
     border-left-color: var(--tb-green);
-    color: color-mix(in oklch, var(--ink) 86%, var(--canvas));
+    color: color-mix(in oklch, white 65%, var(--canvas));
   }
 
   .tb-epic-child[data-child-state='closed'] .tb-epic-child-mark {
@@ -605,7 +621,7 @@
   }
 
   .tb-epic-child .tb-key {
-    color: color-mix(in oklch, var(--tb-blue) 60%, var(--ink));
+    color: var(--tb-child-number);
   }
 
   .tb-epic-progress-row {
@@ -627,19 +643,23 @@
   }
 
   .tb-label-chip[data-chip-tone='type'] {
-    --tb-chip-accent: color-mix(in oklch, var(--tb-blue) 62%, var(--tb-violet));
+    --tb-chip-bg: var(--tb-chip-type-bg);
+    --tb-chip-fg: var(--tb-chip-type-fg);
   }
 
   .tb-label-chip[data-chip-tone='area'] {
-    --tb-chip-accent: var(--tb-slate);
+    --tb-chip-bg: var(--tb-chip-area-bg);
+    --tb-chip-fg: var(--tb-chip-area-fg);
   }
 
   .tb-label-chip[data-chip-tone='bug'] {
-    --tb-chip-accent: var(--tb-red);
+    --tb-chip-bg: var(--tb-chip-bug-bg);
+    --tb-chip-fg: var(--tb-chip-bug-fg);
   }
 
   .tb-label-chip[data-chip-tone='decision'] {
-    --tb-chip-accent: var(--tb-violet);
+    --tb-chip-bg: var(--tb-chip-decision-bg);
+    --tb-chip-fg: var(--tb-chip-decision-fg);
   }
 
   .tb-kanban-card[data-pending='true'] {

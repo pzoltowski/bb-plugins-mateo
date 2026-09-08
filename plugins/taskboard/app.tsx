@@ -3718,7 +3718,7 @@ function KanbanCard({
               <span
                 key={`${label}-${index}`}
                 data-chip-tone={labelChipTone(label)}
-                className="tb-label-chip rounded-full"
+                className="tb-label-chip"
                 title={label}
               >
                 {chipLabelText(label)}
