@@ -9,6 +9,15 @@ import type {
   WorkSourceAdapter
 } from './types.js';
 import { withoutComments } from './types.js';
+import {
+  NO_STATUS_ID,
+  loadGithubProjectSnapshot,
+  projectStatusOptions,
+  setProjectItemStatus,
+  withProjectStatus,
+  workItemFromProjectItem,
+  type GithubProjectRef
+} from './github-projects.js';
 
 const githubItemSchema = z
   .object({
@@ -273,7 +282,10 @@ export function createGithubAdapter(
   bb: BbPluginApi,
   enabled: boolean,
   projectId: string,
-  runGithubCli: (args: string[], timeoutMs?: number) => Promise<string> = runGh
+  runGithubCli: (args: string[], timeoutMs?: number) => Promise<string> = runGh,
+  // When set, the board's columns come from this GitHub Project (v2) Status
+  // field instead of the issue's Open/Closed state.
+  githubProject: GithubProjectRef | null = null
 ): WorkSourceAdapter {
   async function scopedIssue(locator: string): Promise<ExternalWorkItemDetail> {
     const { repo, number } = parseLocator(locator);
@@ -298,9 +310,38 @@ export function createGithubAdapter(
     return toItem({ ...result.issue, kind: 'issue' }, result.issue.comments);
   }
 
+  function projectSnapshot(refresh = false) {
+    if (!githubProject) throw new Error('GitHub project is not configured');
+    return loadGithubProjectSnapshot(runGithubCli, githubProject, { refresh });
+  }
+
+  // In project mode a card can live in a repository that is not mapped to this
+  // BB project; the board is the source of truth, so fall back to the card's
+  // own content when the mapped-repository read rejects it.
+  async function itemDetail(locator: string): Promise<ExternalWorkItemDetail> {
+    if (!githubProject) return scopedIssue(locator);
+    const snapshot = await projectSnapshot();
+    try {
+      return withProjectStatus(snapshot, await scopedIssue(locator));
+    } catch (error) {
+      const projectItem = snapshot.itemsByLocator.get(locator);
+      const fallback = projectItem
+        ? workItemFromProjectItem(snapshot, projectItem)
+        : null;
+      if (fallback) return fallback;
+      throw error;
+    }
+  }
+
   async function statusOptions(
     locator: string
   ): Promise<ExternalWorkStatusOption[]> {
+    if (githubProject) {
+      const snapshot = await projectSnapshot();
+      const current =
+        snapshot.itemsByLocator.get(locator)?.statusOptionId ?? NO_STATUS_ID;
+      return projectStatusOptions(snapshot, current);
+    }
     const issue = await scopedIssue(locator);
     const current = issue.status.toLowerCase() === 'open' ? 'open' : 'closed';
     return [
@@ -355,7 +396,7 @@ export function createGithubAdapter(
           })
         }))
       );
-      return results.flatMap(({ repo, result }) =>
+      const repoItems = results.flatMap(({ repo, result }) =>
         result.items.map(item => {
           if (item.repo !== repo || item.kind !== 'issue') {
             throw new Error(
@@ -365,10 +406,22 @@ export function createGithubAdapter(
           return withoutComments(toItem(item));
         })
       );
+      if (!githubProject) return repoItems;
+      const snapshot = await projectSnapshot(options?.refresh === true);
+      const seen = new Set(repoItems.map(item => item.locator));
+      const boardOnly = snapshot.items
+        .filter(item => !seen.has(item.locator))
+        .map(item => workItemFromProjectItem(snapshot, item))
+        .filter((item): item is ExternalWorkItemDetail => item !== null)
+        .map(withoutComments);
+      return [
+        ...repoItems.map(item => withProjectStatus(snapshot, item)),
+        ...boardOnly
+      ];
     },
     async get(locator) {
       if (!enabled) throw new Error('GitHub is disabled');
-      return scopedIssue(locator);
+      return itemDetail(locator);
     },
     async statusOptions(locator) {
       if (!enabled) throw new Error('GitHub is disabled');
@@ -558,6 +611,20 @@ export function createGithubAdapter(
     },
     async updateStatus(locator, statusId) {
       if (!enabled) throw new Error('GitHub is disabled');
+      if (githubProject) {
+        if (statusId === NO_STATUS_ID) {
+          throw new Error(
+            'Cards cannot be moved back to “No status”; pick a board column'
+          );
+        }
+        await setProjectItemStatus(
+          runGithubCli,
+          githubProject,
+          locator,
+          statusId
+        );
+        return itemDetail(locator);
+      }
       const available = await statusOptions(locator);
       const target = available.find(option => option.id === statusId);
       if (!target) {

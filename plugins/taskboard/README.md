@@ -108,6 +108,28 @@ gh auth login
 bb plugin reload github
 ```
 
+#### GitHub Projects
+
+Issues alone only have Open and Closed. Bind a BB project to a GitHub Project
+(v2) board and the columns become that board's `Status` single-select options,
+in board order:
+
+```sh
+gh auth refresh -h github.com -s project,read:project
+gh project list --owner <login>
+bb taskboard config --project <proj_id> --source github \
+  --github-project-owner <login> --github-project-number <n>
+```
+
+- Columns follow the board. The first option counts as backlog and the last as
+  done unless the option name says otherwise (`Done`, `Ready`, `Backlog`, …).
+- Issues in the mapped repositories that are not on the board appear under
+  **No status**; cards on the board from other repositories are still listed,
+  because the board is the source of truth.
+- Moving a card writes `updateProjectV2ItemFieldValue`, adding the issue to the
+  board first when needed. It does not open or close the issue.
+- `--github-project-number 0` clears the binding and restores Open/Closed.
+
 ### Linear
 
 Choose Linear in **Manage**, then provide the project's Linear personal API key
@@ -183,7 +205,7 @@ The CLI uses the current BB project unless `--project <proj_id>` is supplied:
 
 ```text
 bb taskboard status [--project <proj_id>] [--json]
-bb taskboard config [--project <proj_id>] [--source linear|github|jira] [provider fields] [--json]
+bb taskboard config [--project <proj_id>] [--source linear|github|jira] [provider fields] [--github-project-owner <login>] [--github-project-number <n>] [--json]
 bb taskboard credentials [--project <proj_id>] [--json]
 bb taskboard refresh [linear|github|jira] [--project <proj_id>] [--json]
 bb taskboard list [--project <proj_id>] [--source linear|github|jira] [--query <text>] [--preset <name>] [--cached] [--json]
