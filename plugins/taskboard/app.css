@@ -627,7 +627,7 @@
   }
 
   .tb-epic-child {
-    margin: 2px 0 2px 2px;
+    margin: 4px 0 4px 2px;
     padding: 1px 7px;
     border-left: 2px solid var(--tb-border);
     color: var(--tb-child-open);
