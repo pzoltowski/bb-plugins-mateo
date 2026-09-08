@@ -338,7 +338,12 @@ test('chips drop their group prefix and hide the status group', () => {
     ['type:epic', 'area:deck']
   );
   assert.equal(labelChipTone('epic'), 'type');
-  assert.equal(labelChipTone('spike'), 'type');
+  assert.equal(labelChipTone('type:epic'), 'type');
+  assert.equal(labelChipTone('type:feature'), 'feature');
+  assert.equal(labelChipTone('spike'), 'spike');
+  assert.equal(labelChipTone('type:polish'), 'polish');
+  assert.equal(labelChipTone('type:chore'), 'area');
+  assert.equal(labelChipTone('task'), 'area');
 });
 
 test('the card reference shortens to #N on a single-repository board', () => {

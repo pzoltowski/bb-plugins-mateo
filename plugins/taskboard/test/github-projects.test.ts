@@ -293,7 +293,7 @@ test('list joins repository issues with the board and keeps board-only cards', a
     items.map(item => [item.locator, item.status, item.stateCategory]),
     [
       [`${REPO}#25`, 'Ready', 'todo'],
-      [`${REPO}#8`, 'No status', 'todo'],
+      [`${REPO}#8`, 'No status', 'backlog'],
       ['pzoltowski/other-repo#3', 'Done', 'done']
     ]
   );

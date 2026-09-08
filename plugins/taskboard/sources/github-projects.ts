@@ -560,7 +560,7 @@ export function projectStatusOptions(
     options.unshift({
       id: NO_STATUS_ID,
       name: NO_STATUS_NAME,
-      stateCategory: 'todo',
+      stateCategory: 'backlog',
       current: true
     });
   }
@@ -576,7 +576,7 @@ export function statusForOption(
     : undefined;
   return option
     ? { id: option.id, name: option.name, stateCategory: option.stateCategory }
-    : { id: NO_STATUS_ID, name: NO_STATUS_NAME, stateCategory: 'todo' };
+    : { id: NO_STATUS_ID, name: NO_STATUS_NAME, stateCategory: 'backlog' };
 }
 
 /** Build a work item for a card whose repository is not mapped to the BB project. */

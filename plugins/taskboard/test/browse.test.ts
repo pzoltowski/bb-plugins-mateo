@@ -113,6 +113,8 @@ test('uses the backlog-first default before provider-specific states', () => {
 
 test('defines the complete backlog-first default status order', () => {
   assert.deepEqual(DEFAULT_WORKFLOW_STATUS_ORDER, [
+    // Items no column has claimed lead the board.
+    'No status',
     'Backlog',
     'Todo',
     'In Progress',
@@ -387,4 +389,26 @@ test('combines different filter fields with AND and values within a field with O
     }).map(workItem => workItem.key),
     ['NO-METADATA']
   );
+});
+
+test('leads the board with No status and reads in-progress by category', () => {
+  const items = [
+    item('DONE', 'Done', 'done', null),
+    item('WORK', 'Working', 'in_progress', null),
+    item('BACK', 'Backlog', 'backlog', null),
+    item('NONE', 'No status', 'backlog', null)
+  ];
+  assert.deepEqual(
+    workflowStatusLanes(items, []).map(lane => lane.name),
+    ['No status', 'Backlog', 'Working', 'Done']
+  );
+  // A saved order that predates the synthetic column still puts it first.
+  assert.equal(
+    workflowStatusLanes(items, [], ['Backlog', 'Working', 'Done'])[0]?.name,
+    'No status'
+  );
+  assert.equal(workflowStatusTone('No status', 'backlog'), 'unset');
+  // The board names its own column; the tone follows the category.
+  assert.equal(workflowStatusTone('Working', 'in_progress'), 'progress');
+  assert.equal(workflowStatusTone('In Progress', 'in_progress'), 'progress');
 });

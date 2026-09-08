@@ -10,6 +10,7 @@ export const NO_PROJECT_FILTER = '__taskboard_no_project__';
 export const NO_LABELS_FILTER = '__taskboard_no_labels__';
 
 export const DEFAULT_WORKFLOW_STATUS_ORDER: readonly string[] = [
+  'No status',
   'Backlog',
   'Todo',
   'In Progress',
@@ -137,6 +138,7 @@ function normalizedStatus(value: string): string {
 }
 
 export const WORKFLOW_STATUS_TONES = [
+  'unset',
   'review',
   'progress',
   'blocked',
@@ -151,6 +153,8 @@ export const WORKFLOW_STATUS_TONES = [
 export type WorkflowStatusTone = (typeof WORKFLOW_STATUS_TONES)[number];
 
 const EXACT_STATUS_TONES = new Map<string, WorkflowStatusTone>([
+  ['no status', 'unset'],
+  ['none', 'unset'],
   ['in review', 'review'],
   ['review', 'review'],
   ['in progress', 'progress'],
@@ -178,6 +182,9 @@ export function workflowStatusTone(
   const normalized = normalizedStatus(name);
   const exact = EXACT_STATUS_TONES.get(normalized);
   if (exact) return exact;
+  // A board's own in-progress column ("Working", "Doing", …) reads from its
+  // category, so the tone never depends on what the column is called.
+  if (category === 'in_progress') return 'progress';
 
   let hash = 0;
   for (const character of `${category}:${normalized}`) {
@@ -190,6 +197,8 @@ function workflowRank(
   status: WorkflowStatus,
   statusOrder: readonly string[]
 ): number {
+  // Items no column has claimed lead the board, whatever the saved order says.
+  if (normalizedStatus(status.name) === 'no status') return -1;
   const normalizedOrder = statusOrder.map(normalizedStatus);
   const exactRank = normalizedOrder.indexOf(normalizedStatus(status.name));
   if (exactRank >= 0) return exactRank;

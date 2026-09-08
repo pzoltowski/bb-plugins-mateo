@@ -136,7 +136,8 @@ test('styles epic chips and child rows on theme tokens only', () => {
   const chip = ruleBody(/\.tb-label-chip\s*\{([^}]*)\}/s, 'label chip');
   assert.match(chip, /border-radius:\s*6px/);
   assert.match(chip, /border:\s*0/);
-  assert.match(chip, /font-weight:\s*600/);
+  assert.match(chip, /font-weight:\s*500/);
+  assert.match(chip, /letter-spacing:\s*0\.01em/);
   assert.match(chip, /padding:\s*1px 6px/);
   assert.match(chip, /font-size:\s*11\.5px/);
   assert.match(chip, /background:\s*var\(--tb-chip-bg\)/);
@@ -152,6 +153,12 @@ test('styles epic chips and child rows on theme tokens only', () => {
     '--tb-chip-bug-fg: #e0705a',
     '--tb-chip-decision-bg: #271f2a',
     '--tb-chip-decision-fg: #be84cf',
+    '--tb-chip-feature-bg: #1a2a29',
+    '--tb-chip-feature-fg: #6fc3b8',
+    '--tb-chip-spike-bg: #2a2418',
+    '--tb-chip-spike-fg: #d9b45a',
+    '--tb-chip-polish-bg: #2a1f26',
+    '--tb-chip-polish-fg: #d08fb0',
     '--tb-child-number: #3b82c4',
     '--tb-epic-title: #c1c1c1',
     '--tb-child-done: #b7b7b7',
@@ -179,6 +186,21 @@ test('styles epic chips and child rows on theme tokens only', () => {
     'child number'
   );
   assert.match(childNumber, /color:\s*var\(--tb-child-number\)/);
+
+  // The synthetic no-status column reads grey, not Backlog's purple.
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='unset'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-slate\)/s
+  );
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='unset'\]\s+\.tb-state-glyph\s*\{[^}]*color:\s*var\(--tb-slate\)/s
+  );
+  // A board's in-progress column reads yellow.
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='progress'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-amber\)/s
+  );
 
   const row = ruleBody(/\.tb-epic-progress-row\s*\{([^}]*)\}/s, 'progress row');
   assert.match(row, /cursor:\s*pointer/);

@@ -11,6 +11,9 @@ import type { WorkItem, WorkItemEpic, WorkItemPullRequest } from './contract.js'
 
 export type LabelChipTone =
   | 'type'
+  | 'feature'
+  | 'spike'
+  | 'polish'
   | 'area'
   | 'bug'
   | 'decision'
@@ -88,12 +91,13 @@ export function labelChipTone(label: string): LabelChipTone {
     : normalized;
   if (value === 'bug' || value === 'defect') return 'bug';
   if (value === 'decision' || value === 'adr') return 'decision';
+  if (value === 'feature' || value === 'enhancement') return 'feature';
+  if (value === 'spike' || value === 'research') return 'spike';
+  if (value === 'polish' || value === 'refactor') return 'polish';
+  // Work that is neither an epic nor a shaped type reads as a neutral group.
+  if (value === 'chore' || value === 'task') return 'area';
+  if (value === 'epic') return 'type';
   if (normalized.startsWith('type:') || normalized.startsWith('kind:')) {
-    return 'type';
-  }
-  if (
-    ['epic', 'feature', 'spike', 'polish', 'chore', 'task'].includes(value)
-  ) {
     return 'type';
   }
   if (normalized.startsWith('area:') || normalized.startsWith('scope:')) {

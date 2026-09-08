@@ -41,6 +41,12 @@
     --tb-chip-bug-fg: #e0705a;
     --tb-chip-decision-bg: #271f2a;
     --tb-chip-decision-fg: #be84cf;
+    --tb-chip-feature-bg: #1a2a29;
+    --tb-chip-feature-fg: #6fc3b8;
+    --tb-chip-spike-bg: #2a2418;
+    --tb-chip-spike-fg: #d9b45a;
+    --tb-chip-polish-bg: #2a1f26;
+    --tb-chip-polish-fg: #d08fb0;
     --tb-child-number: #3b82c4;
     --tb-epic-title: #c1c1c1;
     --tb-child-done: #b7b7b7;
@@ -275,7 +281,11 @@
   }
 
   [data-status-tone='progress'] {
-    --tb-state-accent: var(--tb-blue);
+    --tb-state-accent: var(--tb-amber);
+  }
+
+  [data-status-tone='unset'] {
+    --tb-state-accent: var(--tb-slate);
   }
 
   [data-status-tone='blocked'] {
@@ -312,6 +322,12 @@
 
   .tb-state-glyph {
     color: var(--tb-state-accent);
+  }
+
+  /* The glyph carries its own state category, so the neutral no-status tone
+     has to reach past it to stay grey next to a purple Backlog. */
+  [data-status-tone='unset'] .tb-state-glyph {
+    color: var(--tb-slate);
   }
 
   .tb-source-mark[data-source='linear'],
@@ -411,10 +427,11 @@
     border-radius: 6px;
     background: var(--tb-chip-bg);
     color: var(--tb-chip-fg);
+    font-family: inherit;
     font-size: 11.5px;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 16px;
-    letter-spacing: 0;
+    letter-spacing: 0.01em;
   }
 
   .tb-lane-count {
@@ -668,6 +685,21 @@
   .tb-label-chip[data-chip-tone='decision'] {
     --tb-chip-bg: var(--tb-chip-decision-bg);
     --tb-chip-fg: var(--tb-chip-decision-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='feature'] {
+    --tb-chip-bg: var(--tb-chip-feature-bg);
+    --tb-chip-fg: var(--tb-chip-feature-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='spike'] {
+    --tb-chip-bg: var(--tb-chip-spike-bg);
+    --tb-chip-fg: var(--tb-chip-spike-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='polish'] {
+    --tb-chip-bg: var(--tb-chip-polish-bg);
+    --tb-chip-fg: var(--tb-chip-polish-fg);
   }
 
   .tb-kanban-card[data-pending='true'] {
