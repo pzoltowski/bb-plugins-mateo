@@ -1677,7 +1677,54 @@ function formatUpdatedAt(value: string): string {
 const EpicFoldContext = createContext<{
   collapsed: ReadonlySet<string>;
   toggle: (locator: string) => void;
-}>({ collapsed: new Set<string>(), toggle: () => {} });
+  setMany: (locators: readonly string[], collapsed: boolean) => void;
+}>({
+  collapsed: new Set<string>(),
+  toggle: () => {},
+  setMany: () => {}
+});
+
+/**
+ * Expand-all / collapse-all.
+ *
+ * Folding is per-epic and persists, so on a board with a dozen epics setting
+ * them all one way is a dozen clicks. Epics with no children are ignored: they
+ * have nothing to fold, and counting them would leave the buttons looking stuck.
+ */
+function EpicFoldToolbar({ items }: { items: readonly WorkItem[] }) {
+  const { collapsed, setMany } = useContext(EpicFoldContext);
+  const keys = useMemo(
+    () =>
+      items
+        .filter(item => (item.epic?.children.length ?? 0) > 0)
+        .map(item => item.locator),
+    [items]
+  );
+  if (keys.length === 0) return null;
+  const openCount = keys.filter(key => !collapsed.has(key)).length;
+  return (
+    <div className="tb-epic-fold-toolbar mb-2 flex w-fit items-center gap-1.5">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={openCount === keys.length}
+        onClick={() => setMany(keys, false)}
+      >
+        <Icon name="ChevronDown" className="size-3" />
+        Expand all
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={openCount === 0}
+        onClick={() => setMany(keys, true)}
+      >
+        <Icon name="ChevronUp" className="size-3" />
+        Collapse all
+      </Button>
+    </div>
+  );
+}
 
 /** Eight spokes fading clockwise from the top, inside the r=5.25 ring's box. */
 const SPINNER_SPOKES = Array.from({ length: 8 }, (_, index) => {
@@ -4077,6 +4124,7 @@ function KanbanBoard({
       >
         {announcement}
       </p>
+      <EpicFoldToolbar items={items} />
       {visibleMessage ? (
         <div
           role="alert"
@@ -4385,28 +4433,38 @@ function TrackerList({
   const requestRevisionRef = useRef(0);
   const stateFilterEnabled = boardSettings.enabledFilters.includes('state');
 
-  const epicFold = useMemo(
-    () => ({
+  const epicFold = useMemo(() => {
+    const persist = (collapsed: Set<string>) => {
+      const next = {
+        ...boardSettings,
+        // The schema caps the list; drop the oldest rather than fail the save
+        // and lose the fold the reader just asked for.
+        collapsedEpics: [...collapsed].slice(-200)
+      };
+      setBoardSettings(next);
+      // Across-projects has no row to write to, and a failed save must not take
+      // the fold with it — the board stays folded for this session either way.
+      if (projectId === null) return;
+      void rpc.call('saveProjectBoardSettings', next).catch(() => {});
+    };
+    return {
       collapsed: new Set(boardSettings.collapsedEpics),
       toggle: (locator: string) => {
         const collapsed = new Set(boardSettings.collapsedEpics);
         if (collapsed.has(locator)) collapsed.delete(locator);
         else collapsed.add(locator);
-        const next = {
-          ...boardSettings,
-          // The schema caps the list; drop the oldest rather than fail the save
-          // and lose the fold the reader just asked for.
-          collapsedEpics: [...collapsed].slice(-200)
-        };
-        setBoardSettings(next);
-        // Across-projects has no row to write to, and a failed save must not
-        // take the fold with it — the board stays folded for this session.
-        if (projectId === null) return;
-        void rpc.call('saveProjectBoardSettings', next).catch(() => {});
+        persist(collapsed);
+      },
+      setMany: (locators: readonly string[], collapse: boolean) => {
+        const collapsed = new Set(boardSettings.collapsedEpics);
+        for (const locator of locators) {
+          if (collapse) collapsed.add(locator);
+          else collapsed.delete(locator);
+        }
+        persist(collapsed);
       }
-    }),
-    [boardSettings, projectId, rpc]
-  );
+    };
+  }, [boardSettings, projectId, rpc]);
 
   useEffect(() => {
     if (projectId === null) {

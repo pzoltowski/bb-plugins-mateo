@@ -9,13 +9,26 @@ export const NO_PRIORITY_FILTER = '__taskboard_no_priority__';
 export const NO_PROJECT_FILTER = '__taskboard_no_project__';
 export const NO_LABELS_FILTER = '__taskboard_no_labels__';
 
+/**
+ * Column order, left to right, for boards with no order of their own. Names
+ * from every tracker live in one list; only the ones a board actually uses
+ * become columns, so the interleaving lets one default serve Linear, Jira and
+ * plain GitHub Issues alike.
+ *
+ * A board bound to a GitHub Project never reaches here: it mirrors the
+ * Project's own column order, because there the Project is the board. Reorder
+ * those columns in the Project's Status field, not here.
+ */
 export const DEFAULT_WORKFLOW_STATUS_ORDER: readonly string[] = [
   'No status',
   'Backlog',
+  'Ready',
   'Todo',
+  'Working',
   'In Progress',
   'In Review',
   'QA',
+  'Needs-you',
   'Ready for Release',
   'Blocked',
   'Duplicate',

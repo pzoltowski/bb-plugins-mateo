@@ -116,15 +116,38 @@ test('defines the complete backlog-first default status order', () => {
     // Items no column has claimed lead the board.
     'No status',
     'Backlog',
+    'Ready',
     'Todo',
+    'Working',
     'In Progress',
     'In Review',
     'QA',
+    'Needs-you',
     'Ready for Release',
     'Blocked',
     'Duplicate',
     'Done',
     'Canceled'
+  ]);
+});
+
+test('one default order serves both status vocabularies', () => {
+  // Only the names a board uses become columns, so interleaving the
+  // vocabularies lets one default serve every tracker that has no order of its
+  // own. A board bound to a GitHub Project does not reach here at all — it
+  // mirrors the Project's own column order, see boardOrdered().
+  const githubColumns = ['Needs-you', 'Done', 'Backlog', 'Ready', 'Working'];
+  const ordered = [...githubColumns].sort(
+    (left, right) =>
+      DEFAULT_WORKFLOW_STATUS_ORDER.indexOf(left) -
+      DEFAULT_WORKFLOW_STATUS_ORDER.indexOf(right)
+  );
+  assert.deepEqual(ordered, [
+    'Backlog',
+    'Ready',
+    'Working',
+    'Needs-you',
+    'Done'
   ]);
 });
 
