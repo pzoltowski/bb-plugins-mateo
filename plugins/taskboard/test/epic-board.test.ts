@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { registerHooks } from 'node:module';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import type { WorkItemChild } from '../contract.js';
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
@@ -27,7 +28,10 @@ const [board, projects] = await Promise.all([
 const {
   cardReference,
   chipLabelText,
+  epicChildCategory,
   epicChildTitle,
+  epicChildTone,
+  epicChildrenNeedingYou,
   epicProgressLabel,
   epicProgressPercent,
   foldedBoardItems,
@@ -200,6 +204,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       title: 'Timeline',
       url: `https://github.com/${REPO}/issues/10`,
       closed: false,
+      status: 'Working',
       parentLocator: null,
       subIssues: { total: 6, completed: 2 },
       pullRequest: { number: 17, state: 'draft', branch: 'feat/timeline' }
@@ -209,6 +214,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       title: 'Timeline: ruler',
       url: `https://github.com/${REPO}/issues/12`,
       closed: true,
+      status: 'Done',
       parentLocator: `${REPO}#10`,
       subIssues: null,
       pullRequest: null
@@ -218,6 +224,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       title: 'Timeline: pure C seams',
       url: `https://github.com/${REPO}/issues/11`,
       closed: true,
+      status: 'Done',
       parentLocator: `${REPO}#10`,
       subIssues: null,
       pullRequest: null
@@ -227,6 +234,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       title: 'Child of an invisible parent',
       url: `https://github.com/${REPO}/issues/30`,
       closed: false,
+      status: 'Needs-you',
       parentLocator: `${REPO}#99`,
       subIssues: null,
       pullRequest: null
@@ -242,6 +250,11 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
   assert.deepEqual(
     parent.children.map(child => child.closed),
     [true, true]
+  );
+  // The board column each child sits in reaches the card, not just open/closed.
+  assert.deepEqual(
+    parent.children.map(child => child.status),
+    ['Done', 'Done']
   );
   // GitHub knows about 6 children; only 2 are on the board.
   assert.equal(parent.totalChildren, 6);
@@ -263,6 +276,7 @@ test('the epic index falls back to visible children when GitHub reports none', (
       title: 'Mobile arc',
       url: `https://github.com/${REPO}/issues/20`,
       closed: false,
+      status: 'Ready',
       parentLocator: null,
       subIssues: null,
       pullRequest: null
@@ -272,6 +286,7 @@ test('the epic index falls back to visible children when GitHub reports none', (
       title: 'Mobile arc: fabric',
       url: `https://github.com/${REPO}/issues/21`,
       closed: false,
+      status: 'Backlog',
       parentLocator: `${REPO}#20`,
       subIssues: null,
       pullRequest: null
@@ -364,5 +379,73 @@ test('the card reference shortens to #N on a single-repository board', () => {
   assert.equal(
     singleRepositoryBoard([{ project: REPO }, { project: 'a/b' }]),
     false
+  );
+});
+
+const child = (over: Partial<WorkItemChild> = {}): WorkItemChild => ({
+  key: `${REPO}#1`,
+  title: 'A child',
+  url: '',
+  closed: false,
+  status: '',
+  ...over
+});
+
+test('a child row reads from its own status, not just open/closed', () => {
+  assert.equal(epicChildTone(child({ status: 'Needs-you' })), 'attention');
+  assert.equal(epicChildTone(child({ status: 'ready-for-human' })), 'attention');
+  assert.equal(epicChildTone(child({ status: 'Working' })), 'progress');
+  assert.equal(epicChildTone(child({ status: 'In progress' })), 'progress');
+  assert.equal(epicChildTone(child({ status: 'Backlog' })), 'backlog');
+  assert.equal(epicChildTone(child({ status: 'ready-for-agent' })), 'todo');
+  assert.equal(epicChildTone(child({ status: 'needs-triage' })), 'triage');
+  // Both vocabularies land on the same tone, which is the point of the table.
+  assert.equal(
+    epicChildTone(child({ status: 'Needs you' })),
+    epicChildTone(child({ status: 'ready-for-human' }))
+  );
+});
+
+test('a closed child reads done however its column is named', () => {
+  // A stale column on a closed issue must never make finished work read as open.
+  assert.equal(
+    epicChildTone(child({ closed: true, status: 'Needs-you' })),
+    'done'
+  );
+  assert.equal(epicChildTone(child({ closed: true, status: '' })), 'done');
+});
+
+test('an unknown status falls back rather than picking a colour at random', () => {
+  assert.equal(epicChildTone(child({ status: 'Marinating' })), 'todo');
+  assert.equal(epicChildTone(child({ status: '' })), 'unset');
+  assert.equal(epicChildTone(child({ status: 'No status' })), 'unset');
+});
+
+test('each tone draws the right glyph category', () => {
+  assert.equal(epicChildCategory('done'), 'done');
+  assert.equal(epicChildCategory('progress'), 'in_progress');
+  assert.equal(epicChildCategory('backlog'), 'backlog');
+  assert.equal(epicChildCategory('triage'), 'backlog');
+  assert.equal(epicChildCategory('attention'), 'todo');
+  assert.equal(epicChildCategory('unset'), 'todo');
+});
+
+test('the epic counts the children waiting on a human', () => {
+  const epic = {
+    parentKey: null,
+    children: [
+      child({ key: `${REPO}#1`, status: 'Needs-you' }),
+      child({ key: `${REPO}#2`, status: 'Working' }),
+      child({ key: `${REPO}#3`, status: 'ready-for-human' }),
+      // Closed wins, so this one does not count despite saying needs-you.
+      child({ key: `${REPO}#4`, status: 'Needs-you', closed: true })
+    ],
+    completedChildren: 1,
+    totalChildren: 4,
+    pullRequest: null
+  };
+  assert.deepEqual(
+    epicChildrenNeedingYou(epic).map(entry => entry.key),
+    [`${REPO}#1`, `${REPO}#3`]
   );
 });

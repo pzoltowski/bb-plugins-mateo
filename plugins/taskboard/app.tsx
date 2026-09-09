@@ -94,6 +94,9 @@ import {
   epicChildTitle,
   epicProgressLabel,
   epicProgressPercent,
+  epicChildCategory,
+  epicChildTone,
+  epicChildrenNeedingYou,
   foldedBoardItems,
   labelChipTone,
   pullRequestFooterText,
@@ -1661,6 +1664,14 @@ function formatUpdatedAt(value: string): string {
   }).format(new Date(timestamp));
 }
 
+/** Eight spokes fading clockwise from the top, inside the r=5.25 ring's box. */
+const SPINNER_SPOKES = Array.from({ length: 8 }, (_, index) => {
+  const angle = (index * Math.PI) / 4;
+  const at = (radius: number) =>
+    `${(8 + radius * Math.sin(angle)).toFixed(2)} ${(8 - radius * Math.cos(angle)).toFixed(2)}`;
+  return { d: `M${at(3.2)}L${at(5.5)}`, opacity: (1 - index * 0.1).toFixed(2) };
+});
+
 function WorkStateGlyph({
   category,
   tone,
@@ -1704,9 +1715,17 @@ function WorkStateGlyph({
       ) : category === 'todo' ? (
         <circle {...common} cx="8" cy="8" r="5.25" />
       ) : category === 'in_progress' ? (
+        // A spinner, not a half-filled ring: "an agent is on this right now" is
+        // motion, and the half ring read as a progress value instead.
         <>
-          <circle {...common} cx="8" cy="8" r="5.25" opacity="0.35" />
-          <path {...common} d="M8 2.75a5.25 5.25 0 0 1 0 10.5" strokeWidth="2" />
+          {SPINNER_SPOKES.map(spoke => (
+            <path
+              {...common}
+              key={spoke.d}
+              d={spoke.d}
+              opacity={spoke.opacity}
+            />
+          ))}
         </>
       ) : category === 'done' ? (
         <>
@@ -3573,11 +3592,15 @@ function EpicSummary({
   const epic = item.epic;
   if (!epic) return null;
   const children = epic.children;
+  const needsYou = epicChildrenNeedingYou(epic);
   const hasProgress = epic.totalChildren > 0;
   if (!hasProgress && !epic.pullRequest) return null;
 
   return (
-    <div className="tb-epic-summary px-3 pb-2">
+    <div
+      className="tb-epic-summary px-3 pb-2"
+      data-needs-you={needsYou.length > 0 ? 'true' : undefined}
+    >
       {hasProgress ? (
         <>
           <div
@@ -3607,6 +3630,16 @@ function EpicSummary({
             <span className="tb-meta text-xs tabular-nums">
               {epicProgressLabel(epic)}
             </span>
+            {needsYou.length > 0 ? (
+              <span className="tb-epic-needs-you inline-flex items-center gap-1">
+                <WorkStateGlyph
+                  category="todo"
+                  tone="attention"
+                  className="size-3"
+                />
+                {`${needsYou.length} need${needsYou.length === 1 ? 's' : ''} you`}
+              </span>
+            ) : null}
             {children.length > 0 ? (
               <Icon
                 name={expanded ? 'ArrowDown' : 'ArrowRight'}
@@ -3622,6 +3655,7 @@ function EpicSummary({
             <li
               key={child.key}
               data-child-state={child.closed ? 'closed' : 'open'}
+              data-child-tone={epicChildTone(child)}
               className="tb-epic-child"
             >
               <a
@@ -3634,9 +3668,11 @@ function EpicSummary({
                 onPointerDown={event => event.stopPropagation()}
                 className="tb-epic-child-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <span aria-hidden="true" className="tb-epic-child-mark">
-                  {child.closed ? '✓' : '○'}
-                </span>{' '}
+                <WorkStateGlyph
+                  category={epicChildCategory(epicChildTone(child))}
+                  tone={epicChildTone(child)}
+                  className="tb-epic-child-glyph size-3"
+                />{' '}
                 <span className="tb-key tabular-nums">
                   {shortItemReference(child.key)}
                 </span>{' '}
@@ -4332,6 +4368,7 @@ function TrackerList({
   const [error, setError] = useState<string | null>(null);
   const requestRevisionRef = useRef(0);
   const stateFilterEnabled = boardSettings.enabledFilters.includes('state');
+
 
   useEffect(() => {
     if (projectId === null) {

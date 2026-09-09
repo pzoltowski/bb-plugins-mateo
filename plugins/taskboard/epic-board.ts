@@ -1,4 +1,10 @@
-import type { WorkItem, WorkItemEpic, WorkItemPullRequest } from './contract.js';
+import type {
+  WorkItem,
+  WorkItemChild,
+  WorkItemEpic,
+  WorkItemPullRequest,
+  WorkStateCategory
+} from './contract.js';
 
 /**
  * Epic folding for the Kanban board.
@@ -131,6 +137,78 @@ export function foldedBoardItems(
 /** True when any item carries hierarchy data, i.e. folding can do something. */
 export function supportsEpicFolding(items: readonly WorkItem[]): boolean {
   return items.some(item => Boolean(item.epic));
+}
+
+/**
+ * How a child row reads. The same tone vocabulary the columns already use, so a
+ * child and the column it belongs to draw the same shape and colour.
+ */
+export type EpicChildTone =
+  | 'done'
+  | 'attention'
+  | 'progress'
+  | 'backlog'
+  | 'triage'
+  | 'todo'
+  | 'unset';
+
+/**
+ * Both vocabularies in one table: the GitHub Project column names and the local
+ * `.scratch` frontmatter values, which are not the same words for the same
+ * states. Unknown names fall back to `todo` rather than being hashed to a
+ * colour — a child row is too small to carry an arbitrary tone.
+ */
+const CHILD_TONES = new Map<string, EpicChildTone>([
+  ['needs you', 'attention'],
+  ['needs human', 'attention'],
+  ['ready for human', 'attention'],
+  ['blocked', 'attention'],
+  ['in progress', 'progress'],
+  ['working', 'progress'],
+  ['started', 'progress'],
+  ['doing', 'progress'],
+  ['backlog', 'backlog'],
+  ['needs info', 'backlog'],
+  ['triage', 'triage'],
+  ['needs triage', 'triage'],
+  ['ready', 'todo'],
+  ['ready for agent', 'todo'],
+  ['todo', 'todo'],
+  ['unstarted', 'todo'],
+  ['done', 'done'],
+  ['closed', 'done'],
+  ['complete', 'done'],
+  ['completed', 'done'],
+  ['shipped', 'done'],
+  ['no status', 'unset'],
+  ['none', 'unset']
+]);
+
+export function epicChildTone(child: WorkItemChild): EpicChildTone {
+  // `closed` is the fact the tracker is certain about; a stale column name on a
+  // closed issue must never make it read as open work.
+  if (child.closed) return 'done';
+  const normalized = child.status.trim().toLowerCase().replace(/[\s_-]+/g, ' ');
+  if (!normalized) return 'unset';
+  return CHILD_TONES.get(normalized) ?? 'todo';
+}
+
+/** The glyph category a tone draws as. */
+export function epicChildCategory(tone: EpicChildTone): WorkStateCategory {
+  if (tone === 'done') return 'done';
+  if (tone === 'progress') return 'in_progress';
+  if (tone === 'backlog' || tone === 'triage') return 'backlog';
+  return 'todo';
+}
+
+/**
+ * The children waiting on a human. The epic card shows the count while folded,
+ * so the board says who is blocked without anything being opened.
+ */
+export function epicChildrenNeedingYou(
+  epic: WorkItemEpic
+): readonly WorkItemChild[] {
+  return epic.children.filter(child => epicChildTone(child) === 'attention');
 }
 
 export function epicProgressLabel(epic: WorkItemEpic): string {

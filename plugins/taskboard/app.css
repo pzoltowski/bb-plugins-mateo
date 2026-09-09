@@ -650,18 +650,63 @@
 
   /* Done children read brighter (≈65% white in the dark theme) but stay below
      the card title; only the rail and the tick are green. */
+  /* Each row takes the tone of its own status, so the rail colours alone say
+     what is left. `closed` keeps the last word: it is the fact the tracker is
+     certain about, so it is declared after the tones. */
+  .tb-epic-child[data-child-tone='attention'] {
+    border-left-color: var(--tb-attention);
+    color: var(--tb-ink-soft);
+  }
+
+  .tb-epic-child[data-child-tone='progress'] {
+    border-left-color: var(--tb-amber);
+  }
+
+  .tb-epic-child[data-child-tone='todo'] {
+    border-left-color: var(--tb-blue);
+  }
+
+  .tb-epic-child[data-child-tone='backlog'],
+  .tb-epic-child[data-child-tone='triage'] {
+    border-left-color: var(--tb-slate);
+  }
+
   .tb-epic-child[data-child-state='closed'] {
     border-left-color: var(--tb-green);
     color: var(--tb-child-done);
   }
 
-  .tb-epic-child[data-child-state='closed'] .tb-epic-child-mark {
+  .tb-epic-child-glyph {
+    display: inline-block;
+    vertical-align: -1px;
+    color: var(--tb-ink-soft);
+  }
+
+  .tb-epic-child[data-child-state='closed'] .tb-epic-child-glyph {
     color: var(--tb-green);
   }
 
-  .tb-epic-child-mark {
-    color: var(--tb-ink-soft);
-    font-variant-numeric: tabular-nums;
+  .tb-epic-child[data-child-tone='attention'] .tb-epic-child-glyph {
+    color: var(--tb-attention);
+  }
+
+  .tb-epic-child[data-child-tone='progress'] .tb-epic-child-glyph {
+    color: var(--tb-amber);
+  }
+
+  .tb-epic-child[data-child-tone='todo'] .tb-epic-child-glyph {
+    color: var(--tb-blue);
+  }
+
+  /* How many folded children are waiting on you, and a rail so the card says so
+     from across the board without being opened. */
+  .tb-epic-needs-you {
+    color: var(--tb-attention);
+    font-size: 11px;
+  }
+
+  .tb-epic-summary[data-needs-you='true'] {
+    box-shadow: inset 2px 0 0 var(--tb-attention);
   }
 
   .tb-epic-child .tb-key {

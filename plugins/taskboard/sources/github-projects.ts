@@ -218,6 +218,7 @@ export interface EpicSourceItem {
   readonly title: string;
   readonly url: string;
   readonly closed: boolean;
+  readonly status: string;
   readonly parentLocator: string | null;
   readonly subIssues: { total: number; completed: number } | null;
   readonly pullRequest: WorkItemPullRequest | null;
@@ -246,6 +247,7 @@ export function epicSourceItems(
         title: content.title,
         url: content.url,
         closed: content.state.toUpperCase() !== 'OPEN',
+        status: item.statusName ?? '',
         parentLocator: content.parent
           ? `${content.parent.repository.nameWithOwner}#${content.parent.number}`
           : null,
@@ -340,7 +342,8 @@ export function buildEpicIndex(
         key: child.locator,
         title: child.title.slice(0, 300),
         url: child.url,
-        closed: child.closed
+        closed: child.closed,
+        status: child.status
       })),
       completedChildren: item.subIssues
         ? item.subIssues.completed

@@ -158,7 +158,11 @@ export const workItemChildSchema = z
     key: z.string().min(1).max(200),
     title: z.string().max(300),
     url: z.string().max(500).default(''),
-    closed: z.boolean()
+    closed: z.boolean(),
+    // The board column the child sits in, when the tracker reports one. Empty
+    // for trackers that only know open/closed, which keeps every existing
+    // source valid — `closed` stays the authority on doneness either way.
+    status: z.string().max(100).default('')
   })
   .strict();
 export type WorkItemChild = z.infer<typeof workItemChildSchema>;
