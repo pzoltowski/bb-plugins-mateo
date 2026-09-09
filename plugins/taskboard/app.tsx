@@ -100,6 +100,7 @@ import {
   epicChildTone,
   epicChildrenNeedingYou,
   foldedBoardItems,
+  workItemNeedsYou,
   labelChipTone,
   pullRequestFooterText,
   shortItemReference,
@@ -3660,10 +3661,7 @@ function EpicSummary({
   if (!hasProgress && !epic.pullRequest) return null;
 
   return (
-    <div
-      className="tb-epic-summary px-3 pb-2"
-      data-needs-you={needsYou.length > 0 ? 'true' : undefined}
-    >
+    <div className="tb-epic-summary px-3 pb-2">
       {hasProgress ? (
         <>
           <div
@@ -3794,7 +3792,10 @@ function KanbanCard({
   const listId = `epic-children-${encodeURIComponent(item.locator)}`;
 
   return (
-    <div className="tb-kanban-card-shell rounded-md">
+    <div
+      className="tb-kanban-card-shell rounded-md"
+      data-needs-you={workItemNeedsYou(item) ? 'true' : undefined}
+    >
       <button
         type="button"
         draggable={!pending && !moveDisabled}

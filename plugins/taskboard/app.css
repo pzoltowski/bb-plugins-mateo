@@ -705,7 +705,9 @@
     font-size: 11px;
   }
 
-  .tb-epic-summary[data-needs-you='true'] {
+  /* The whole card wears the rail, not just its summary — the point is that it
+     reads from across the board, folded, without the title being reached. */
+  .tb-kanban-card-shell[data-needs-you='true'] {
     box-shadow: inset 2px 0 0 var(--tb-attention);
   }
 

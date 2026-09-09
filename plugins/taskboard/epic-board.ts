@@ -211,6 +211,29 @@ export function epicChildrenNeedingYou(
   return epic.children.filter(child => epicChildTone(child) === 'attention');
 }
 
+/**
+ * True when a card should wear the attention rail: either the item is itself
+ * waiting on a human, or it is an epic holding children that are.
+ *
+ * Both cases matter. A standalone bug parked in Needs-you is the work; an epic
+ * in Working whose gate child needs a decision is the same signal one level
+ * down, and folding it away must not hide that.
+ */
+export function workItemNeedsYou(item: WorkItem): boolean {
+  if (item.stateCategory === 'done' || item.stateCategory === 'canceled') {
+    return false;
+  }
+  const own = epicChildTone({
+    key: item.locator,
+    title: item.title,
+    url: item.url,
+    closed: false,
+    status: item.status
+  });
+  if (own === 'attention') return true;
+  return item.epic ? epicChildrenNeedingYou(item.epic).length > 0 : false;
+}
+
 export function epicProgressLabel(epic: WorkItemEpic): string {
   return `${epic.completedChildren} / ${epic.totalChildren} children`;
 }

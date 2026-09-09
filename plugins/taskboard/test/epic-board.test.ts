@@ -32,6 +32,7 @@ const {
   epicChildTitle,
   epicChildTone,
   epicChildrenNeedingYou,
+  workItemNeedsYou,
   epicProgressLabel,
   epicProgressPercent,
   foldedBoardItems,
@@ -447,5 +448,53 @@ test('the epic counts the children waiting on a human', () => {
   assert.deepEqual(
     epicChildrenNeedingYou(epic).map(entry => entry.key),
     [`${REPO}#1`, `${REPO}#3`]
+  );
+});
+
+const card = (over: Record<string, unknown> = {}) =>
+  ({
+    bbProjectId: 'proj_1',
+    source: 'github',
+    locator: `${REPO}#19`,
+    key: `${REPO}#19`,
+    title: 'Mobile tap latency',
+    description: '',
+    url: '',
+    status: 'Needs-you',
+    stateCategory: 'in_progress',
+    priority: null,
+    assignee: null,
+    project: null,
+    labels: [],
+    updatedAt: '',
+    epic: null,
+    ...over
+  }) as never;
+
+test('a card waiting on a human wears the rail, by its own status', () => {
+  assert.equal(workItemNeedsYou(card()), true);
+  assert.equal(workItemNeedsYou(card({ status: 'Working' })), false);
+});
+
+test('an epic wears the rail when a child needs you, folded or not', () => {
+  const epic = {
+    parentKey: null,
+    children: [child({ status: 'Working' }), child({ status: 'Needs-you' })],
+    completedChildren: 0,
+    totalChildren: 2,
+    pullRequest: null
+  };
+  assert.equal(workItemNeedsYou(card({ status: 'Working', epic })), true);
+  assert.equal(
+    workItemNeedsYou(card({ status: 'Working', epic: { ...epic, children: [] } })),
+    false
+  );
+});
+
+test('finished work never wears the rail, whatever its column says', () => {
+  // A closed issue left sitting in Needs-you is not asking for anything.
+  assert.equal(
+    workItemNeedsYou(card({ status: 'Needs-you', stateCategory: 'done' })),
+    false
   );
 });
