@@ -40,7 +40,14 @@ export const projectBoardSettingsSchema = z
     statusOrder: z.array(z.string().trim().min(1).max(80)).min(1).max(50),
     // Fold child issues into their parent's Kanban card. Only trackers that
     // report a hierarchy (today: a bound GitHub Project) can honour it.
-    foldChildren: z.boolean().default(true)
+    foldChildren: z.boolean().default(true),
+    // Epics the reader has folded shut, by locator. Persisted rather than held
+    // in component state: React state is lost on every remount, which silently
+    // re-expanded the whole board.
+    collapsedEpics: z
+      .array(z.string().trim().min(1).max(200))
+      .max(200)
+      .default([])
   })
   .strict()
   .superRefine((settings, context) => {
@@ -69,6 +76,7 @@ export function defaultProjectBoardSettings(
     defaultView: 'list',
     enabledFilters: [...DEFAULT_WORK_ITEM_FILTER_FIELDS],
     statusOrder: [...DEFAULT_WORKFLOW_STATUS_ORDER],
-    foldChildren: true
+    foldChildren: true,
+    collapsedEpics: []
   });
 }

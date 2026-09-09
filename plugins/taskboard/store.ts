@@ -70,6 +70,7 @@ interface ProjectBoardSettingsRow {
   enabled_filters_json: string;
   status_order_json: string;
   fold_children: number;
+  collapsed_epics_json: string;
 }
 
 interface FilterPresetRow {
@@ -144,7 +145,8 @@ function boardSettingsFromRow(
     defaultView: row.default_view,
     enabledFilters: JSON.parse(row.enabled_filters_json),
     statusOrder: JSON.parse(row.status_order_json),
-    foldChildren: row.fold_children === 1
+    foldChildren: row.fold_children === 1,
+    collapsedEpics: JSON.parse(row.collapsed_epics_json)
   });
 }
 
@@ -431,6 +433,10 @@ export function createWorkItemStore(bb: BbPluginApi) {
       ALTER TABLE project_board_settings
         ADD COLUMN fold_children INTEGER NOT NULL DEFAULT 1
         CHECK (fold_children IN (0, 1));
+    `,
+    `
+      ALTER TABLE project_board_settings
+        ADD COLUMN collapsed_epics_json TEXT NOT NULL DEFAULT '[]';
     `
   ]);
 
@@ -542,7 +548,8 @@ export function createWorkItemStore(bb: BbPluginApi) {
       default_view,
       enabled_filters_json,
       status_order_json,
-      fold_children
+      fold_children,
+      collapsed_epics_json
     FROM project_board_settings
     WHERE bb_project_id = ?
   `);
@@ -836,17 +843,18 @@ export function createWorkItemStore(bb: BbPluginApi) {
     },
     saveProjectBoardSettings(input: ProjectBoardSettings): ProjectBoardSettings {
       const settings = projectBoardSettingsSchema.parse(input);
-      db.prepare<[string, string, string, string, number, string]>(
+      db.prepare<[string, string, string, string, number, string, string]>(
         `
         INSERT INTO project_board_settings (
           bb_project_id, default_view, enabled_filters_json, status_order_json,
-          fold_children, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?)
+          fold_children, collapsed_epics_json, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(bb_project_id) DO UPDATE SET
           default_view = excluded.default_view,
           enabled_filters_json = excluded.enabled_filters_json,
           status_order_json = excluded.status_order_json,
           fold_children = excluded.fold_children,
+          collapsed_epics_json = excluded.collapsed_epics_json,
           updated_at = excluded.updated_at
       `
       ).run(
@@ -855,6 +863,7 @@ export function createWorkItemStore(bb: BbPluginApi) {
         JSON.stringify(settings.enabledFilters),
         JSON.stringify(settings.statusOrder),
         settings.foldChildren ? 1 : 0,
+        JSON.stringify(settings.collapsedEpics),
         new Date().toISOString()
       );
       return boardSettingsFromRow(

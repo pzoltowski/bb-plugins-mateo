@@ -1,5 +1,7 @@
 import {
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useId,
   useMemo,
@@ -1663,6 +1665,19 @@ function formatUpdatedAt(value: string): string {
     day: 'numeric'
   }).format(new Date(timestamp));
 }
+
+/**
+ * Which epics are folded shut, and how to toggle one.
+ *
+ * A context rather than a prop drill: the state has to reach EpicSummary four
+ * levels below the component that owns it, and every level in between is
+ * indifferent to it. It used to be `useState` local to EpicSummary, which meant
+ * every remount silently re-expanded the whole board.
+ */
+const EpicFoldContext = createContext<{
+  collapsed: ReadonlySet<string>;
+  toggle: (locator: string) => void;
+}>({ collapsed: new Set<string>(), toggle: () => {} });
 
 /** Eight spokes fading clockwise from the top, inside the r=5.25 ring's box. */
 const SPINNER_SPOKES = Array.from({ length: 8 }, (_, index) => {
@@ -3588,7 +3603,8 @@ function EpicSummary({
   item: WorkItem;
   listId: string;
 }) {
-  const [expanded, setExpanded] = useState(true);
+  const { collapsed, toggle } = useContext(EpicFoldContext);
+  const expanded = !collapsed.has(item.locator);
   const epic = item.epic;
   if (!epic) return null;
   const children = epic.children;
@@ -3623,7 +3639,7 @@ function EpicSummary({
             disabled={children.length === 0}
             onClick={event => {
               event.stopPropagation();
-              setExpanded(current => !current);
+              toggle(item.locator);
             }}
             className="tb-epic-progress-row mt-1 flex w-full items-center gap-2 rounded px-1 py-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
@@ -4369,6 +4385,28 @@ function TrackerList({
   const requestRevisionRef = useRef(0);
   const stateFilterEnabled = boardSettings.enabledFilters.includes('state');
 
+  const epicFold = useMemo(
+    () => ({
+      collapsed: new Set(boardSettings.collapsedEpics),
+      toggle: (locator: string) => {
+        const collapsed = new Set(boardSettings.collapsedEpics);
+        if (collapsed.has(locator)) collapsed.delete(locator);
+        else collapsed.add(locator);
+        const next = {
+          ...boardSettings,
+          // The schema caps the list; drop the oldest rather than fail the save
+          // and lose the fold the reader just asked for.
+          collapsedEpics: [...collapsed].slice(-200)
+        };
+        setBoardSettings(next);
+        // Across-projects has no row to write to, and a failed save must not
+        // take the fold with it — the board stays folded for this session.
+        if (projectId === null) return;
+        void rpc.call('saveProjectBoardSettings', next).catch(() => {});
+      }
+    }),
+    [boardSettings, projectId, rpc]
+  );
 
   useEffect(() => {
     if (projectId === null) {
@@ -4850,6 +4888,7 @@ function TrackerList({
               </div>
             </ListMeasure>
           ) : projectId !== null && view === 'kanban' ? (
+            <EpicFoldContext.Provider value={epicFold}>
             <KanbanBoard
               key={projectId}
               items={visibleItems}
@@ -4860,6 +4899,7 @@ function TrackerList({
               onOpen={onOpen}
               onMove={moveItemStatus}
             />
+            </EpicFoldContext.Provider>
           ) : visibleItems.length === 0 ? (
             <ListMeasure className="h-full">
               <EmptyState filtered={filtered} onClear={clearFilters} />
