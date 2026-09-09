@@ -217,10 +217,21 @@ test('styles epic chips and child rows on theme tokens only', () => {
   const track = ruleBody(/\.tb-epic-bar\s*\{([^}]*)\}/s, 'progress track');
   assert.match(track, /height:\s*4px/);
   assert.match(track, /background:\s*var\(--tb-epic-track\)/);
-  // A board's in-progress column reads yellow.
+  // A board's in-progress column reads yellow — its own token, not --tb-amber,
+  // which resolves to the host's orange --warning and would collide with
+  // attention. Working and Needs-you must never look alike.
   assert.match(
     stylesheet,
-    /\[data-status-tone='progress'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-amber\)/s
+    /\[data-status-tone='progress'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-working\)/s
+  );
+  const tokenBlock = ruleBody(/\.tb-linear\s*\{([^}]*)\}/s, 'taskboard tokens');
+  const working = /--tb-working:\s*(#[0-9a-f]{6})/i.exec(tokenBlock)?.[1];
+  const attention = /--tb-attention:\s*(#[0-9a-f]{6})/i.exec(tokenBlock)?.[1];
+  assert.ok(working && attention, 'both state colours are declared literally');
+  assert.notEqual(
+    working!.toLowerCase(),
+    attention!.toLowerCase(),
+    'working and attention must not share a colour'
   );
 
   const row = ruleBody(/\.tb-epic-progress-row\s*\{([^}]*)\}/s, 'progress row');

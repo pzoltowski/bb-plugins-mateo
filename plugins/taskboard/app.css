@@ -56,6 +56,11 @@
     --tb-card-border: #262626;
     --tb-epic-track: #353535;
     --tb-attention: #e8923a;
+    /* Working is its own yellow, deliberately not --tb-amber: that resolves to
+       the host's --warning, which is the same orange as --tb-attention. "An
+       agent is on this" and "you are blocking this" are opposite messages and
+       must not share a colour. */
+    --tb-working: #d9a23b;
     background: var(--canvas);
   }
 
@@ -269,7 +274,7 @@
   }
 
   [data-state-category='in_progress'] {
-    --tb-state-accent: var(--tb-amber);
+    --tb-state-accent: var(--tb-working);
   }
 
   [data-state-category='done'] {
@@ -285,7 +290,7 @@
   }
 
   [data-status-tone='progress'] {
-    --tb-state-accent: var(--tb-amber);
+    --tb-state-accent: var(--tb-working);
   }
 
   [data-status-tone='unset'] {
@@ -659,7 +664,7 @@
   }
 
   .tb-epic-child[data-child-tone='progress'] {
-    border-left-color: var(--tb-amber);
+    border-left-color: var(--tb-working);
   }
 
   .tb-epic-child[data-child-tone='todo'] {
@@ -691,7 +696,7 @@
   }
 
   .tb-epic-child[data-child-tone='progress'] .tb-epic-child-glyph {
-    color: var(--tb-amber);
+    color: var(--tb-working);
   }
 
   .tb-epic-child[data-child-tone='todo'] .tb-epic-child-glyph {
