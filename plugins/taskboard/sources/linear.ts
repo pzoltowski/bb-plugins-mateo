@@ -242,6 +242,7 @@ function toEpicSourceItem(
 ): EpicSourceItem {
   return {
     locator: value.id,
+    key: value.identifier,
     title: value.title,
     url: value.url,
     closed: stateIsClosed(value.state.type),
@@ -270,7 +271,7 @@ function detailEpic(value: z.infer<typeof issueSchema>): WorkItemEpic {
   return {
     parentKey: value.parent?.id ?? null,
     children: nodes.map(child => ({
-      key: child.id,
+      key: child.identifier,
       title: child.title.slice(0, 300),
       url: child.url,
       closed: stateIsClosed(child.state.type),

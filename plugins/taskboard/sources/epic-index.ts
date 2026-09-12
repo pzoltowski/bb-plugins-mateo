@@ -7,6 +7,8 @@ import type { WorkItemEpic, WorkItemPullRequest } from '../contract.js';
  */
 export interface EpicSourceItem {
   readonly locator: string;
+  /** Human key for the folded child row (`MOV-12`, `repo#12`); never the locator. */
+  readonly key: string;
   readonly title: string;
   readonly url: string;
   readonly closed: boolean;
@@ -49,7 +51,7 @@ export function buildEpicIndex(
           ? item.parentLocator
           : null,
       children: children.map(child => ({
-        key: child.locator,
+        key: child.key,
         title: child.title.slice(0, 300),
         url: child.url,
         closed: child.closed,

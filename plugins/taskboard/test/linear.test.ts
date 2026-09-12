@@ -123,9 +123,9 @@ test('list syncs completed and canceled issues and folds children', async () => 
       assert.deepEqual(
         epic.epic?.children.map(child => [child.key, child.closed, child.status]),
         [
-          ['id-2', false, 'Ready'],
-          ['id-3', true, 'Done'],
-          ['id-4', true, 'Canceled']
+          ['MOV-2', false, 'Ready'],
+          ['MOV-3', true, 'Done'],
+          ['MOV-4', true, 'Canceled']
         ]
       );
       const child = items.find(item => item.locator === 'id-2')!;

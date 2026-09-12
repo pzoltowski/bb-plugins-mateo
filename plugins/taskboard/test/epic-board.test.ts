@@ -204,6 +204,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
   const index = buildEpicIndex([
     {
       locator: `${REPO}#10`,
+      key: `${REPO}#10`,
       title: 'Timeline',
       url: `https://github.com/${REPO}/issues/10`,
       closed: false,
@@ -215,6 +216,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
     },
     {
       locator: `${REPO}#12`,
+      key: `${REPO}#12`,
       title: 'Timeline: ruler',
       url: `https://github.com/${REPO}/issues/12`,
       closed: true,
@@ -226,6 +228,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
     },
     {
       locator: `${REPO}#11`,
+      key: `${REPO}#11`,
       title: 'Timeline: pure C seams',
       url: `https://github.com/${REPO}/issues/11`,
       closed: true,
@@ -237,6 +240,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
     },
     {
       locator: `${REPO}#30`,
+      key: `${REPO}#30`,
       title: 'Child of an invisible parent',
       url: `https://github.com/${REPO}/issues/30`,
       closed: false,
@@ -280,6 +284,7 @@ test('the epic index falls back to visible children when GitHub reports none', (
   const index = buildEpicIndex([
     {
       locator: `${REPO}#20`,
+      key: `${REPO}#20`,
       title: 'Mobile arc',
       url: `https://github.com/${REPO}/issues/20`,
       closed: false,
@@ -291,6 +296,7 @@ test('the epic index falls back to visible children when GitHub reports none', (
     },
     {
       locator: `${REPO}#21`,
+      key: `${REPO}#21`,
       title: 'Mobile arc: fabric',
       url: `https://github.com/${REPO}/issues/21`,
       closed: false,

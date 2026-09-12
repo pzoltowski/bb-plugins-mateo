@@ -233,6 +233,7 @@ export function epicSourceItems(
     return [
       {
         locator: item.locator,
+        key: item.locator,
         title: content.title,
         url: content.url,
         closed: content.state.toUpperCase() !== 'OPEN',
