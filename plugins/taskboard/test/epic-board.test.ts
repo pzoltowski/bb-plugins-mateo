@@ -21,9 +21,10 @@ registerHooks({
   }
 });
 
-const [board, projects] = await Promise.all([
+const [board, projects, epicIndex] = await Promise.all([
   import('../epic-board.ts'),
-  import('../sources/github-projects.ts')
+  import('../sources/github-projects.ts'),
+  import('../sources/epic-index.ts')
 ]);
 const {
   cardReference,
@@ -44,7 +45,8 @@ const {
   supportsEpicFolding,
   visibleChipLabels
 } = board;
-const { buildEpicIndex, pickPullRequest } = projects;
+const { pickPullRequest } = projects;
+const { buildEpicIndex } = epicIndex;
 
 type WorkItem = Parameters<typeof foldedBoardItems>[0][number];
 
@@ -208,7 +210,8 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       status: 'Working',
       parentLocator: null,
       subIssues: { total: 6, completed: 2 },
-      pullRequest: { number: 17, state: 'draft', branch: 'feat/timeline' }
+      pullRequest: { number: 17, state: 'draft', branch: 'feat/timeline' },
+      sortOrder: 10
     },
     {
       locator: `${REPO}#12`,
@@ -218,7 +221,8 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       status: 'Done',
       parentLocator: `${REPO}#10`,
       subIssues: null,
-      pullRequest: null
+      pullRequest: null,
+      sortOrder: 12
     },
     {
       locator: `${REPO}#11`,
@@ -228,7 +232,8 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       status: 'Done',
       parentLocator: `${REPO}#10`,
       subIssues: null,
-      pullRequest: null
+      pullRequest: null,
+      sortOrder: 11
     },
     {
       locator: `${REPO}#30`,
@@ -238,7 +243,8 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       status: 'Needs-you',
       parentLocator: `${REPO}#99`,
       subIssues: null,
-      pullRequest: null
+      pullRequest: null,
+      sortOrder: 30
     }
   ]);
   const parent = index.get(`${REPO}#10`)!;
@@ -280,7 +286,8 @@ test('the epic index falls back to visible children when GitHub reports none', (
       status: 'Ready',
       parentLocator: null,
       subIssues: null,
-      pullRequest: null
+      pullRequest: null,
+      sortOrder: 20
     },
     {
       locator: `${REPO}#21`,
@@ -290,7 +297,8 @@ test('the epic index falls back to visible children when GitHub reports none', (
       status: 'Backlog',
       parentLocator: `${REPO}#20`,
       subIssues: null,
-      pullRequest: null
+      pullRequest: null,
+      sortOrder: 21
     }
   ]);
   const parent = index.get(`${REPO}#20`)!;

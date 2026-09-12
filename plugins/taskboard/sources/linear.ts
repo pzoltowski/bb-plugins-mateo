@@ -1,8 +1,10 @@
 import { z } from 'zod';
 import {
   CREATE_OUTCOME_UNCERTAIN_MARKER,
+  type WorkItemEpic,
   type WorkStateCategory
 } from '../contract.js';
+import { buildEpicIndex, type EpicSourceItem } from './epic-index.js';
 import type {
   ExternalWorkItemCreateInput,
   ExternalWorkItemDetail,
@@ -25,6 +27,7 @@ const issueFields = `
   assignee { id name }
   team { key name }
   project { name }
+  parent { id }
   labels(first: 100) { nodes { name } }
 `;
 
@@ -36,7 +39,6 @@ const teamIssuesQuery = `
       orderBy: updatedAt
       filter: {
         team: { key: { eqIgnoreCase: $teamKey } }
-        state: { type: { nin: ["completed", "canceled"] } }
       }
     ) {
       nodes { ${issueFields} }
@@ -49,6 +51,9 @@ const issueQuery = `
   query TaskboardLinearIssue($id: String!) {
     issue(id: $id) {
       ${issueFields}
+      children(first: 100) {
+        nodes { id identifier title url state { id name type } }
+      }
       comments(first: 50) {
         nodes { body createdAt user { name } }
       }
@@ -158,6 +163,15 @@ const createMetadataTeamSchema = z
     labels: createMetadataConnectionSchema(createOptionSchema)
   })
   .strict();
+const issueChildSchema = z
+  .object({
+    id: z.string().min(1),
+    identifier: z.string().min(1),
+    title: z.string(),
+    url: z.string(),
+    state: stateSchema
+  })
+  .strict();
 const issueSchema = z
   .object({
     id: z.string().min(1),
@@ -171,6 +185,11 @@ const issueSchema = z
     assignee: assigneeSchema.nullable(),
     team: z.object({ key: z.string(), name: z.string() }).strict(),
     project: namedSchema.nullable(),
+    parent: z.object({ id: z.string().min(1) }).strict().nullable(),
+    children: z
+      .object({ nodes: z.array(issueChildSchema) })
+      .strict()
+      .optional(),
     labels: z.object({ nodes: z.array(namedSchema) }).strict(),
     comments: z
       .object({
@@ -209,7 +228,66 @@ function stateCategory(type: string): WorkStateCategory {
   return 'todo';
 }
 
-function toItem(value: z.infer<typeof issueSchema>): ExternalWorkItemDetail {
+function stateIsClosed(type: string): boolean {
+  return type === 'completed' || type === 'canceled';
+}
+
+function identifierNumber(identifier: string): number {
+  const raw = Number(identifier.slice(identifier.lastIndexOf('-') + 1));
+  return Number.isSafeInteger(raw) ? raw : 0;
+}
+
+function toEpicSourceItem(
+  value: z.infer<typeof issueSchema>
+): EpicSourceItem {
+  return {
+    locator: value.id,
+    title: value.title,
+    url: value.url,
+    closed: stateIsClosed(value.state.type),
+    status: value.state.name,
+    parentLocator: value.parent?.id ?? null,
+    subIssues: null,
+    pullRequest: null,
+    sortOrder: identifierNumber(value.identifier)
+  };
+}
+
+/** An issue with no hierarchy facts still reports it supports them. */
+function emptyEpic(parentId: string | null): WorkItemEpic {
+  return {
+    parentKey: parentId,
+    children: [],
+    completedChildren: 0,
+    totalChildren: 0,
+    pullRequest: null
+  };
+}
+
+/** Epic record for one issue read on its own, from its own parent/children. */
+function detailEpic(value: z.infer<typeof issueSchema>): WorkItemEpic {
+  const nodes = value.children?.nodes ?? [];
+  return {
+    parentKey: value.parent?.id ?? null,
+    children: nodes.map(child => ({
+      key: child.id,
+      title: child.title.slice(0, 300),
+      url: child.url,
+      closed: stateIsClosed(child.state.type),
+      status: child.state.name
+    })),
+    completedChildren: nodes.filter(child =>
+      stateIsClosed(child.state.type)
+    ).length,
+    totalChildren: nodes.length,
+    pullRequest: null
+  };
+}
+
+function toItem(
+  value: z.infer<typeof issueSchema>,
+  epic: WorkItemEpic | null
+): ExternalWorkItemDetail {
   return {
     source: 'linear',
     locator: value.id,
@@ -224,6 +302,7 @@ function toItem(value: z.infer<typeof issueSchema>): ExternalWorkItemDetail {
     project: value.project?.name ?? value.team.name,
     labels: value.labels.nodes.map(label => label.name),
     updatedAt: value.updatedAt,
+    epic,
     comments: (value.comments?.nodes ?? []).map(comment => ({
       author: comment.user?.name ?? 'Unknown',
       body: comment.body,
@@ -287,7 +366,7 @@ export function createLinearAdapter(options: {
         `Linear issue ${locator} is outside the configured scope`
       );
     }
-    return toItem(issue);
+    return toItem(issue, detailEpic(issue));
   }
 
   async function statusOptions(
@@ -486,7 +565,10 @@ export function createLinearAdapter(options: {
         seenCursors.add(cursor);
         after = cursor;
       }
-      return issues.map(issue => withoutComments(toItem(issue)));
+      const epics = buildEpicIndex(issues.map(toEpicSourceItem));
+      return issues.map(issue =>
+        withoutComments(toItem(issue, epics.get(issue.id) ?? null))
+      );
     },
     async get(locator) {
       if (!configured) throw new Error('Linear is not configured');
@@ -598,7 +680,7 @@ export function createLinearAdapter(options: {
           throw new Error('Linear created the issue outside the configured team');
         }
         return {
-          item: toItem(created.issue),
+          item: toItem(created.issue, emptyEpic(created.issue.parent?.id ?? null)),
           warnings: [],
           assigneeConfirmation: {
             confirmed: true,
@@ -639,7 +721,9 @@ export function createLinearAdapter(options: {
       ) {
         throw new Error('Linear returned an invalid status update result');
       }
-      return toItem(update.issue);
+      // The mutation answer carries no children; re-read so the epic record
+      // stays complete.
+      return loadIssue(locator);
     }
   };
 }

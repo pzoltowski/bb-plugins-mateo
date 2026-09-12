@@ -69,6 +69,7 @@ function linearIssue(overrides: Record<string, unknown> = {}) {
     assignee: { id: 'user-1', name: 'Mateo' },
     team: { key: 'ENG', name: 'Engineering' },
     project: null,
+    parent: null,
     labels: { nodes: [{ name: 'Bug' }] },
     ...overrides
   };
