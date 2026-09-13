@@ -65,7 +65,7 @@ function linearIssue(overrides: Record<string, unknown> = {}) {
     url: 'https://linear.app/example/issue/ENG-1',
     priorityLabel: 'High',
     updatedAt: '2026-08-26T12:00:00.000Z',
-    state: { id: 'state-started', name: 'In Progress', type: 'started' },
+    state: { id: 'state-started', name: 'In Progress', type: 'started', position: 2 },
     assignee: { id: 'user-1', name: 'Mateo' },
     team: { key: 'ENG', name: 'Engineering' },
     project: null,
@@ -102,11 +102,17 @@ test('Linear maps native metadata and sends it in IssueCreateInput', async () =>
                   name: 'Engineering',
                   states: {
                     nodes: [
-                      { id: 'state-backlog', name: 'Backlog', type: 'backlog' },
+                      {
+                        id: 'state-backlog',
+                        name: 'Backlog',
+                        type: 'backlog',
+                        position: 0
+                      },
                       {
                         id: 'state-todo',
                         name: 'Todo',
-                        type: 'unstarted'
+                        type: 'unstarted',
+                        position: 1
                       }
                     ],
                     pageInfo: { hasNextPage: false, endCursor: null }
@@ -223,7 +229,8 @@ test('Linear paginates create options independently and preserves the native def
                             {
                               id: 'state-started',
                               name: 'In Progress',
-                              type: 'started'
+                              type: 'started',
+                              position: 2
                             }
                           ],
                           pageInfo: { hasNextPage: false, endCursor: null }
@@ -233,7 +240,8 @@ test('Linear paginates create options independently and preserves the native def
                             {
                               id: 'state-todo',
                               name: 'Todo',
-                              type: 'unstarted'
+                              type: 'unstarted',
+                              position: 1
                             }
                           ],
                           pageInfo: {
@@ -296,7 +304,12 @@ test('Linear paginates create options independently and preserves the native def
             issueCreate: {
               success: true,
               issue: linearIssue({
-                state: { id: 'state-todo', name: 'Todo', type: 'unstarted' }
+                state: {
+                  id: 'state-todo',
+                  name: 'Todo',
+                  type: 'unstarted',
+                  position: 1
+                }
               })
             }
           }

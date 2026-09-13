@@ -116,6 +116,7 @@ test('defines the complete backlog-first default status order', () => {
     // Items no column has claimed lead the board.
     'No status',
     'Backlog',
+    'Shaping',
     'Ready',
     'Todo',
     'Working',
@@ -255,6 +256,7 @@ test('keeps the complete provider workflow ordered before and after a move', () 
     stateCategory,
     current: name === 'In Review'
   }));
+  // Canceled and Duplicate are tracker bookkeeping — they never get lanes.
   const expected = [
     'Backlog',
     'Todo',
@@ -262,9 +264,7 @@ test('keeps the complete provider workflow ordered before and after a move', () 
     'In Review',
     'QA',
     'Ready for Release',
-    'Duplicate',
-    'Done',
-    'Canceled'
+    'Done'
   ];
 
   assert.deepEqual(
@@ -299,7 +299,7 @@ test('keeps the complete provider workflow ordered before and after a move', () 
   ];
   assert.deepEqual(
     workflowStatusLanes(items, statuses, customOrder).map(lane => lane.name),
-    customOrder
+    customOrder.filter(name => name !== 'Canceled' && name !== 'Duplicate')
   );
 });
 

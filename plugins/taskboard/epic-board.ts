@@ -171,6 +171,7 @@ const CHILD_TONES = new Map<string, EpicChildTone>([
   ['needs info', 'backlog'],
   ['triage', 'triage'],
   ['needs triage', 'triage'],
+  ['shaping', 'backlog'],
   ['ready', 'todo'],
   ['ready for agent', 'todo'],
   ['todo', 'todo'],

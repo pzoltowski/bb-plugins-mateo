@@ -23,7 +23,7 @@ const issueFields = `
   url
   priorityLabel
   updatedAt
-  state { id name type }
+  state { id name type position }
   assignee { id name }
   team { key name }
   project { name }
@@ -52,7 +52,7 @@ const issueQuery = `
     issue(id: $id) {
       ${issueFields}
       children(first: 100) {
-        nodes { id identifier title url state { id name type } }
+        nodes { id identifier title url state { id name type position } }
       }
       comments(first: 50) {
         nodes { body createdAt user { name } }
@@ -65,10 +65,10 @@ const issueStatusOptionsQuery = `
   query TaskboardLinearStatusOptions($id: String!) {
     issue(id: $id) {
       id
-      state { id name type }
+      state { id name type position }
       team {
         key
-        states { nodes { id name type } }
+        states { nodes { id name type position } }
       }
     }
   }
@@ -104,7 +104,7 @@ const createMetadataQuery = `
         key
         name
         states(first: 50, after: $statesAfter) {
-          nodes { id name type }
+          nodes { id name type position }
           pageInfo { hasNextPage endCursor }
         }
         members(first: 50, after: $membersAfter) {
@@ -134,7 +134,12 @@ const assigneeSchema = z
   .object({ id: z.string().min(1), name: z.string() })
   .strict();
 const stateSchema = z
-  .object({ id: z.string().min(1), name: z.string(), type: z.string() })
+  .object({
+    id: z.string().min(1),
+    name: z.string(),
+    type: z.string(),
+    position: z.number()
+  })
   .strict();
 const createOptionSchema = z
   .object({ id: z.string().min(1), name: z.string().min(1) })
@@ -223,13 +228,13 @@ const issueConnectionSchema = z
 function stateCategory(type: string): WorkStateCategory {
   if (type === 'started') return 'in_progress';
   if (type === 'completed') return 'done';
-  if (type === 'canceled') return 'canceled';
+  if (type === 'canceled' || type === 'duplicate') return 'canceled';
   if (type === 'backlog') return 'backlog';
   return 'todo';
 }
 
 function stateIsClosed(type: string): boolean {
-  return type === 'completed' || type === 'canceled';
+  return type === 'completed' || type === 'canceled' || type === 'duplicate';
 }
 
 function identifierNumber(identifier: string): number {
@@ -405,7 +410,9 @@ export function createLinearAdapter(options: {
       ...new Map(
         result.team.states.nodes.map(state => [state.id, state])
       ).values()
-    ].map(state => ({
+    ]
+      .sort((left, right) => left.position - right.position)
+      .map(state => ({
       id: state.id,
       name: state.name,
       stateCategory: stateCategory(state.type),
@@ -496,10 +503,12 @@ export function createLinearAdapter(options: {
     }
 
     return {
-      statusOptions: [...states.values()].map(state => ({
-        id: state.id,
-        label: state.name
-      })),
+      statusOptions: [...states.values()]
+        .sort((left, right) => left.position - right.position)
+        .map(state => ({
+          id: state.id,
+          label: state.name
+        })),
       assigneeOptions: [...members.values()].map(member => ({
         id: member.id,
         label: member.name
@@ -579,6 +588,7 @@ export function createLinearAdapter(options: {
       if (!configured) throw new Error('Linear is not configured');
       return statusOptions(locator);
     },
+    boardOrdered: () => true,
     async createMetadata(input) {
       if (!configured) throw new Error('Linear is not configured');
       if (input.destinationId.toLowerCase() !== teamKey.toLowerCase()) {

@@ -22,6 +22,7 @@ export const NO_LABELS_FILTER = '__taskboard_no_labels__';
 export const DEFAULT_WORKFLOW_STATUS_ORDER: readonly string[] = [
   'No status',
   'Backlog',
+  'Shaping',
   'Ready',
   'Todo',
   'Working',
@@ -183,6 +184,7 @@ const EXACT_STATUS_TONES = new Map<string, WorkflowStatusTone>([
   ['unstarted', 'todo'],
   ['duplicate', 'duplicate'],
   ['triage', 'triage'],
+  ['shaping', 'backlog'],
   ['backlog', 'backlog'],
   ['done', 'done'],
   ['completed', 'done'],
@@ -310,9 +312,16 @@ export function workflowStatusLanes(
       category: status.stateCategory
     });
   }
-  return [...lanes.values()].sort((left, right) =>
-    compareWorkflowStatuses(left, right, statusOrder)
-  );
+  return [...lanes.values()]
+    .filter(
+      lane =>
+        lane.category !== 'canceled' &&
+        normalizedStatus(lane.name) !== 'duplicate' &&
+        normalizedStatus(lane.name) !== 'triage'
+    )
+    .sort((left, right) =>
+      compareWorkflowStatuses(left, right, statusOrder)
+    );
 }
 
 function normalizedOptionalValue(

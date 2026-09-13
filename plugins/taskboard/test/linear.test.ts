@@ -27,10 +27,11 @@ const TEAM = { key: TEAM_KEY, name: 'Mock HighGUI' };
 interface StateSpec {
   name: string;
   type: string;
+  position?: number;
 }
 
 function state(spec: StateSpec) {
-  return { id: `st-${spec.name.toLowerCase()}`, ...spec };
+  return { id: `st-${spec.name.toLowerCase()}`, position: 0, ...spec };
 }
 
 function issue(
@@ -165,24 +166,26 @@ test('get carries the epic record built from parent and children', async () => {
   );
 });
 
-test('statusOptions exposes every workflow state as a column', async () => {
+test('statusOptions returns the workflow states in Linear board order', async () => {
   await withFetch(
     body => {
       if (body.query.includes('TaskboardLinearStatusOptions')) {
         return {
           issue: {
             id: 'id-1',
-            state: state({ name: 'In Progress', type: 'started' }),
+            state: state({ name: 'In Progress', type: 'started', position: 2 }),
             team: {
               key: TEAM_KEY,
               states: {
+                // Scrambled on purpose: the answer must follow `position`.
                 nodes: [
-                  state({ name: 'Backlog', type: 'backlog' }),
-                  state({ name: 'Ready', type: 'unstarted' }),
-                  state({ name: 'In Progress', type: 'started' }),
-                  state({ name: 'Needs-you', type: 'started' }),
-                  state({ name: 'Done', type: 'completed' }),
-                  state({ name: 'Canceled', type: 'canceled' })
+                  state({ name: 'Canceled', type: 'canceled', position: 5 }),
+                  state({ name: 'Ready', type: 'unstarted', position: 2 }),
+                  state({ name: 'Done', type: 'completed', position: 4 }),
+                  state({ name: 'Backlog', type: 'backlog', position: 0 }),
+                  state({ name: 'Duplicate', type: 'duplicate', position: 6 }),
+                  state({ name: 'Shaping', type: 'unstarted', position: 1 }),
+                  state({ name: 'In Progress', type: 'started', position: 3 })
                 ]
               }
             }
@@ -197,13 +200,17 @@ test('statusOptions exposes every workflow state as a column', async () => {
         options.map(option => [option.name, option.stateCategory]),
         [
           ['Backlog', 'backlog'],
+          ['Shaping', 'todo'],
           ['Ready', 'todo'],
           ['In Progress', 'in_progress'],
-          ['Needs-you', 'in_progress'],
           ['Done', 'done'],
-          ['Canceled', 'canceled']
+          ['Canceled', 'canceled'],
+          // A duplicate is a cancelled issue in Linear's own UI.
+          ['Duplicate', 'canceled']
         ]
       );
+      // The team's state order drives the Kanban columns.
+      assert.equal(adapter().boardOrdered?.(), true);
     }
   );
 });
