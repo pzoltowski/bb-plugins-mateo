@@ -29,7 +29,7 @@ export const DEFAULT_WORKFLOW_STATUS_ORDER: readonly string[] = [
   'In Progress',
   'In Review',
   'QA',
-  'Needs-you',
+  'Needs You',
   'Ready for Release',
   'Blocked',
   'Duplicate',

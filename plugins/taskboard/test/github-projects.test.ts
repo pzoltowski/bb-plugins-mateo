@@ -38,7 +38,7 @@ const STATUS_OPTIONS = [
   { id: 'opt-backlog', name: 'Backlog' },
   { id: 'opt-ready', name: 'Ready' },
   { id: 'opt-progress', name: 'In progress' },
-  { id: 'opt-needs-you', name: 'Needs-you' },
+  { id: 'opt-needs-you', name: 'Needs You' },
   { id: 'opt-done', name: 'Done' }
 ];
 
@@ -208,7 +208,7 @@ function ghIssue(number: number, title: string) {
 test('project columns map onto BB state categories', () => {
   assert.equal(categorizeStatusOption('Backlog', 0, 5), 'backlog');
   assert.equal(categorizeStatusOption('Ready', 1, 5), 'todo');
-  assert.equal(categorizeStatusOption('Needs-you', 3, 5), 'in_progress');
+  assert.equal(categorizeStatusOption('Needs You', 3, 5), 'in_progress');
   assert.equal(categorizeStatusOption('Done', 4, 5), 'done');
   // Position decides for names the plugin does not recognise.
   assert.equal(categorizeStatusOption('Marinating', 2, 5), 'in_progress');
@@ -235,7 +235,7 @@ test('statusOptions returns the board columns in project order', async () => {
       ['opt-backlog', 'Backlog', 'backlog'],
       ['opt-ready', 'Ready', 'todo'],
       ['opt-progress', 'In progress', 'in_progress'],
-      ['opt-needs-you', 'Needs-you', 'in_progress'],
+      ['opt-needs-you', 'Needs You', 'in_progress'],
       ['opt-done', 'Done', 'done']
     ]
   );

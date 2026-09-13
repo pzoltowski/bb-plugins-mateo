@@ -216,7 +216,7 @@ export function epicChildrenNeedingYou(
  * True when a card should wear the attention rail: either the item is itself
  * waiting on a human, or it is an epic holding children that are.
  *
- * Both cases matter. A standalone bug parked in Needs-you is the work; an epic
+ * Both cases matter. A standalone bug parked in Needs You is the work; an epic
  * in Working whose gate child needs a decision is the same signal one level
  * down, and folding it away must not hide that.
  */

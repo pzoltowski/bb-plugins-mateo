@@ -244,7 +244,7 @@ test('the epic index nests children and prefers GitHub sub-issue counts', () => 
       title: 'Child of an invisible parent',
       url: `https://github.com/${REPO}/issues/30`,
       closed: false,
-      status: 'Needs-you',
+      status: 'Needs You',
       parentLocator: `${REPO}#99`,
       subIssues: null,
       pullRequest: null,
@@ -407,7 +407,7 @@ const child = (over: Partial<WorkItemChild> = {}): WorkItemChild => ({
 });
 
 test('a child row reads from its own status, not just open/closed', () => {
-  assert.equal(epicChildTone(child({ status: 'Needs-you' })), 'attention');
+  assert.equal(epicChildTone(child({ status: 'Needs You' })), 'attention');
   assert.equal(epicChildTone(child({ status: 'ready-for-human' })), 'attention');
   assert.equal(epicChildTone(child({ status: 'Working' })), 'progress');
   assert.equal(epicChildTone(child({ status: 'In progress' })), 'progress');
@@ -424,7 +424,7 @@ test('a child row reads from its own status, not just open/closed', () => {
 test('a closed child reads done however its column is named', () => {
   // A stale column on a closed issue must never make finished work read as open.
   assert.equal(
-    epicChildTone(child({ closed: true, status: 'Needs-you' })),
+    epicChildTone(child({ closed: true, status: 'Needs You' })),
     'done'
   );
   assert.equal(epicChildTone(child({ closed: true, status: '' })), 'done');
@@ -449,11 +449,11 @@ test('the epic counts the children waiting on a human', () => {
   const epic = {
     parentKey: null,
     children: [
-      child({ key: `${REPO}#1`, status: 'Needs-you' }),
+      child({ key: `${REPO}#1`, status: 'Needs You' }),
       child({ key: `${REPO}#2`, status: 'Working' }),
       child({ key: `${REPO}#3`, status: 'ready-for-human' }),
-      // Closed wins, so this one does not count despite saying needs-you.
-      child({ key: `${REPO}#4`, status: 'Needs-you', closed: true })
+      // Closed wins, so this one does not count despite saying Needs You.
+      child({ key: `${REPO}#4`, status: 'Needs You', closed: true })
     ],
     completedChildren: 1,
     totalChildren: 4,
@@ -474,7 +474,7 @@ const card = (over: Record<string, unknown> = {}) =>
     title: 'Mobile tap latency',
     description: '',
     url: '',
-    status: 'Needs-you',
+    status: 'Needs You',
     stateCategory: 'in_progress',
     priority: null,
     assignee: null,
@@ -493,7 +493,7 @@ test('a card waiting on a human wears the rail, by its own status', () => {
 test('an epic wears the rail when a child needs you, folded or not', () => {
   const epic = {
     parentKey: null,
-    children: [child({ status: 'Working' }), child({ status: 'Needs-you' })],
+    children: [child({ status: 'Working' }), child({ status: 'Needs You' })],
     completedChildren: 0,
     totalChildren: 2,
     pullRequest: null
@@ -506,9 +506,9 @@ test('an epic wears the rail when a child needs you, folded or not', () => {
 });
 
 test('finished work never wears the rail, whatever its column says', () => {
-  // A closed issue left sitting in Needs-you is not asking for anything.
+  // A closed issue left sitting in Needs You is not asking for anything.
   assert.equal(
-    workItemNeedsYou(card({ status: 'Needs-you', stateCategory: 'done' })),
+    workItemNeedsYou(card({ status: 'Needs You', stateCategory: 'done' })),
     false
   );
 });

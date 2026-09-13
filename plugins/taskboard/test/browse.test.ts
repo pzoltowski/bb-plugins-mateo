@@ -123,7 +123,7 @@ test('defines the complete backlog-first default status order', () => {
     'In Progress',
     'In Review',
     'QA',
-    'Needs-you',
+    'Needs You',
     'Ready for Release',
     'Blocked',
     'Duplicate',
@@ -137,7 +137,7 @@ test('one default order serves both status vocabularies', () => {
   // vocabularies lets one default serve every tracker that has no order of its
   // own. A board bound to a GitHub Project does not reach here at all — it
   // mirrors the Project's own column order, see boardOrdered().
-  const githubColumns = ['Needs-you', 'Done', 'Backlog', 'Ready', 'Working'];
+  const githubColumns = ['Needs You', 'Done', 'Backlog', 'Ready', 'Working'];
   const ordered = [...githubColumns].sort(
     (left, right) =>
       DEFAULT_WORKFLOW_STATUS_ORDER.indexOf(left) -
@@ -147,7 +147,7 @@ test('one default order serves both status vocabularies', () => {
     'Backlog',
     'Ready',
     'Working',
-    'Needs-you',
+    'Needs You',
     'Done'
   ]);
 });
@@ -437,7 +437,7 @@ test('leads the board with No status and reads in-progress by category', () => {
 });
 
 test('reads attention and backlog columns by name, whatever their category', () => {
-  for (const name of ['Needs-you', 'needs you', 'Needs human', 'Blocked']) {
+  for (const name of ['Needs You', 'Needs-you', 'needs you', 'Needs human', 'Blocked']) {
     assert.equal(workflowStatusTone(name, 'in_progress'), 'attention');
   }
   assert.equal(workflowStatusTone('Backlog', 'backlog'), 'backlog');
