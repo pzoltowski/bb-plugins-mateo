@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "sequence": 5,
+  "previousDigest": "sha256:3b8ad94c8675fd3d0824a33984615a6be75a540201b763bf70f9cf4065f57267",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "Fixed chip weight and flush-right placement: ProjectGhostMark now carries tb-key + text-xs (identical --tb-ink-soft/12px as the issue key on both surfaces); Kanban grip ml-auto made conditional so the chip sits immediately adjacent at the right edge; row trailing meta pinned to the last grid column via col-start-[-2] closing the 8px shortfall. Live-verified with pixel probes and screenshots: chipRight equals innerRight on both card and row; font/color computed styles identical to key. npm run check green; taskboard@0.5.11 live from the main checkout.",
+  "createdAt": "2026-09-16T10:41:24.872Z",
+  "stateBeforeDigest": "sha256:b5a396b891233ed1279d409effbab0e0618e78947b596aed6b011f441d62afad",
+  "stateAfterDigest": "sha256:7f84f373f6b1795a97713ab148bf14b9641d83c70878036b620720bd89c381cd",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "move-the-taskboard-project-indicator-to-the-top-line-of",
+    "request": "Move the taskboard project indicator to the top line of each issue row/card: top line becomes 'ISSUE-KEY' left with the ghost Cube+project chip pushed to the right (all-muted tone); title drops to its own line; chip removed from bottom/trailing meta. Applies to WorkItemRow and KanbanCard in plugins/taskboard/app.tsx. Approved variant from mockup grid: key-first, chip-right, muted.",
+    "profile": "fast",
+    "workflow": "fast",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Fixed chip weight and flush-right placement: ProjectGhostMark now carries tb-key + text-xs (identical --tb-ink-soft/12px as the issue key on both surfaces); Kanban grip ml-auto made conditional so the chip sits immediately adjacent at the right edge; row trailing meta pinned to the last grid column via col-start-[-2] closing the 8px shortfall. Live-verified with pixel probes and screenshots: chipRight equals innerRight on both card and row; font/color computed styles identical to key. npm run check green; taskboard@0.5.11 live from the main checkout.",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:0118c243aebd41c46db54fe8927ab56b1c1a31c77b8c0a921ff717757657d81b",
+    "approvedSpecRevision": 1,
+    "capabilityArchiveRequired": false,
+    "capabilityDeltaDigest": null,
+    "impactDigest": "sha256:5a36738fe03cf3c7a31850830de1353c696eab5602fa8691908fa56dc917cfef",
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-16T10:41:24.872Z",
+    "lifecycle": {
+      "stage": "iteration",
+      "iteration": 1,
+      "awaitingFeedback": false
+    }
+  },
+  "digest": "sha256:8a54d4bf62533cf39c11dd9dbcc7413f1c16889612b93842480f027361504782"
+}
