@@ -83,10 +83,10 @@ export function DocksideSettingsSection() {
         <p className="mt-1 text-2xs leading-relaxed text-muted-foreground">
           Choose Default to reset the active palette. Custom color fields are
           used only when Custom is selected, and accept six-digit hex values.
-          Icon shape, animation, labels, and tooltips always remain.
+          Icon shapes and tooltips remain available in both status display modes.
         </p>
       </div>
-      <StatePreview />
+      <StatePreview statusDisplay={preferences.statusDisplay} />
       <ProjectColorEditor
         projects={projects}
         overrides={projectColors.overrides}
@@ -99,6 +99,7 @@ export function DocksideSettingsSection() {
       />
       <PalettePreview title="Pull requests" items={PR_SWATCHES} preferences={preferences} />
       <p className="text-2xs text-muted-foreground">
+        {preferences.statusDisplay} status ·{" "}
         {preferences.density === "compact" ? "Compact" : "Comfortable"} rows ·
         children {preferences.defaultChildrenExpanded ? "expanded" : "collapsed"} ·
         providers {preferences.showProviderIcons ? "shown" : "hidden"} · PR metadata{" "}
@@ -377,7 +378,7 @@ function ProjectColorRow({
   );
 }
 
-function StatePreview() {
+function StatePreview({ statusDisplay }: Pick<DocksidePreferences, "statusDisplay">) {
   return (
     <div>
       <p className="text-2xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -392,7 +393,11 @@ function StatePreview() {
               className="flex min-w-0 items-center gap-1 rounded border border-border/70 bg-background/50 px-1.5 py-1.5"
             >
               <FamilyStatusIcon status={status} />
-              <FamilyStatusBadge status={status} preview />
+              {statusDisplay === "Verbose" ? (
+                <FamilyStatusBadge status={status} preview />
+              ) : (
+                <span className="text-2xs text-muted-foreground">{status.label}</span>
+              )}
             </li>
           );
         })}

@@ -26,6 +26,7 @@ import {
   CUSTOM_COLOR_DEFAULTS,
   PALETTE_PRESET_OPTIONS,
   ROW_DENSITY_OPTIONS,
+  STATUS_DISPLAY_OPTIONS,
 } from "./lib/preferences.ts";
 import {
   MAX_ICON_DATA_URL_LENGTH,
@@ -364,6 +365,13 @@ export default function plugin(bb: BbPluginApi) {
       "Custom · PR closed",
       CUSTOM_COLOR_DEFAULTS.prClosed,
     ),
+    statusDisplay: {
+      type: "select",
+      label: "Status display",
+      description: "Icons for compact status; Verbose also shows status labels. Hover or focus an icon for details.",
+      options: [...STATUS_DISPLAY_OPTIONS],
+      default: "Icons",
+    },
     rowDensity: {
       type: "select",
       label: "Row density",
