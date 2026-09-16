@@ -6,15 +6,15 @@ Extend Dockside's project badge from a single fixed letter into a configurable
 project avatar: one or two letters, a color that belongs to the rendered
 letters, and an opt-out preference for the repository's own favicon.
 
-## MODIFIED Requirements
+## ADDED Requirements
 
-### Requirement: Project letter badges have stable accessible colors
+### Requirement: Project letter badges have stable letter-keyed colors
 
 Dockside SHALL assign every project letter badge a deterministic background
 from a curated palette derived from the **rendered badge letters**, not the
 project id or raw display name. It SHALL derive a readable foreground color
 and SHALL preserve the existing project name, count, controls, order, and
-thread-state semantics.
+thread-state semantics. This supersedes the earlier id-keyed automatic color.
 
 #### Scenario: Same letters, same color
 
@@ -31,7 +31,32 @@ thread-state semantics.
 - **AND** its automatic background color follows the new letters (changed from
   id-keyed stability)
 
-## ADDED Requirements
+### Requirement: Users can override each project color in settings
+
+Dockside SHALL list current projects in its settings section with badge
+previews, accessible native color inputs, Save behavior, and per-project
+Reset. Overrides SHALL persist by project ID in bounded plugin storage and
+update mounted settings/sidebar surfaces through realtime invalidation.
+
+#### Scenario: User saves one project color
+
+- **WHEN** the user selects a valid six-digit color for project A
+- **THEN** project A's preview and sidebar badge update without reload
+- **AND** the override survives reload and project rename
+- **AND** project B is unchanged
+
+### Requirement: Project color persistence fails closed
+
+Dockside SHALL accept only bounded project IDs belonging to current BB
+projects and canonical six-digit hex colors. It SHALL cap stored rows and RPC
+payloads, ignore malformed persisted rows, and never interpolate arbitrary
+stored text into CSS.
+
+#### Scenario: Invalid color reaches the server
+
+- **WHEN** an RPC supplies an alpha color, CSS expression, oversized value, or
+  unknown project ID
+- **THEN** the request is rejected without changing stored colors
 
 ### Requirement: Badge letter count is configurable
 
