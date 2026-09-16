@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "workflow": "fast",
+  "classification": "behavioral",
+  "request": "Taskboard toolbar: merge 'Expand all'/'Collapse all' into ONE toggle button (anything collapsed incl. mixed → offers 'Expand all'; all expanded → 'Collapse all'; label+icon reflect next action) AND add project quick-filter chips in the same toolbar row after the toggle — one small ghost-style chip per distinct item.project in the loaded issues (single-select toggle driving the same preferences.externalProjects filter the filter UI uses; aria-pressed active state; only render chips when >1 project exists). Surgical: reuse icon registry + component vocabulary, no theme/layout drift.",
+  "capabilities": [],
+  "surfaces": [
+    "request-scoped-implementation"
+  ],
+  "canonical": false,
+  "verification": "skipped",
+  "digest": "sha256:241be7501659c57948eeeb9dcec700c89d354b9a7b95fb893df8b91c525ff495"
+}
