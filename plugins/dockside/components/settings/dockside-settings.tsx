@@ -286,7 +286,7 @@ function ProjectColorRow({
         <span
           aria-hidden
           className={cn(
-            "flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-md border border-black/15 font-semibold uppercase shadow-sm",
+            "flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-md font-semibold uppercase shadow-sm",
             badgeText.length === 1
               ? "text-2xs"
               : "text-[8px] tracking-[-0.02em]",
