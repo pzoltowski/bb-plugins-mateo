@@ -181,6 +181,34 @@ test('marks tracker projects as ghost text on List rows and Kanban cards', async
   assert.match(iconRegistry, /Cube: CubeIcon/u);
 });
 
+test('merges fold controls into one toggle and quick-filters by project', () => {
+  const toolbar = app.match(
+    /function EpicFoldToolbar[\s\S]*?\n\/\*\* Eight spokes/u
+  )?.[0];
+  assert.ok(toolbar, 'Missing EpicFoldToolbar');
+  assert.match(toolbar, /const allOpen = keys\.every\(key => !collapsed\.has\(key\)\)/u);
+  assert.match(toolbar, /name=\{allOpen \? 'ChevronUp' : 'ChevronDown'\}/u);
+  assert.match(toolbar, /\{allOpen \? 'Collapse all' : 'Expand all'\}/u);
+  assert.match(toolbar, /setMany\(keys, allOpen\)/u);
+  assert.doesNotMatch(toolbar, /disabled=/u);
+
+  assert.match(toolbar, /projectOptions\.length > 1/u);
+  assert.match(toolbar, /aria-pressed=\{active\}/u);
+  assert.match(toolbar, /isFilterOptionSelected\(\s*externalProjects,\s*option\.value\s*\)/u);
+  assert.match(toolbar, /onExternalProjectsChange\(active \? \[\] : \[option\.value\]\)/u);
+  assert.match(toolbar, /name="Cube"/u);
+
+  const board = app.match(
+    /function KanbanBoard[\s\S]*?\nfunction TrackerList/u
+  )?.[0];
+  assert.ok(board, 'Missing KanbanBoard');
+  assert.match(board, /projectOptions: readonly FilterOption\[\]/u);
+  assert.match(board, /<EpicFoldToolbar[\s\S]*?onExternalProjectsChange=\{onExternalProjectsChange\}/u);
+
+  assert.match(app, /boardSettings\.enabledFilters\.includes\('project'\)\s*\?\s*availableExternalProjects\.filter\(\s*option => option\.value !== NO_PROJECT_FILTER/u);
+  assert.match(app, /projectOptions=\{quickProjectOptions\}/u);
+});
+
 test('uses an explicit constrained filter composition', () => {
   assert.match(app, /data-taskboard-filter-mode="constrained"/u);
   assert.match(app, /Search filter values/u);

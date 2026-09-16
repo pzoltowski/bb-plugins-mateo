@@ -126,6 +126,7 @@ import {
   filterWorkItemsByAttributes,
   isFilterOptionSelected,
   labelFilterOptions,
+  NO_PROJECT_FILTER,
   priorityFilterOptions,
   projectFilterOptions,
   sortWorkItemsByWorkflow,
@@ -1686,13 +1687,32 @@ const EpicFoldContext = createContext<{
 });
 
 /**
- * Expand-all / collapse-all.
+ * Expand-all / collapse-all, plus per-project quick-filter chips.
  *
  * Folding is per-epic and persists, so on a board with a dozen epics setting
  * them all one way is a dozen clicks. Epics with no children are ignored: they
- * have nothing to fold, and counting them would leave the buttons looking stuck.
+ * have nothing to fold, and counting them would leave the toggle looking stuck.
+ * The single toggle reads the fold state and offers whichever action applies:
+ * anything collapsed — including a mixed board — means 'Expand all'.
+ *
+ * The project chips are a fast path onto the same `externalProjects`
+ * preference the filter UI edits — single-select, so tapping a chip replaces
+ * the selection and tapping the active chip clears it. They only appear when
+ * more than one project exists in the loaded items; a lone project would make
+ * the row a no-op. Deriving from the unfiltered items keeps the chips stable
+ * while a filter is active.
  */
-function EpicFoldToolbar({ items }: { items: readonly WorkItem[] }) {
+function EpicFoldToolbar({
+  items,
+  projectOptions,
+  externalProjects,
+  onExternalProjectsChange
+}: {
+  items: readonly WorkItem[];
+  projectOptions: readonly FilterOption[];
+  externalProjects: readonly string[];
+  onExternalProjectsChange: (projects: string[]) => void;
+}) {
   const { collapsed, setMany } = useContext(EpicFoldContext);
   const keys = useMemo(
     () =>
@@ -1701,28 +1721,46 @@ function EpicFoldToolbar({ items }: { items: readonly WorkItem[] }) {
         .map(item => item.locator),
     [items]
   );
-  if (keys.length === 0) return null;
-  const openCount = keys.filter(key => !collapsed.has(key)).length;
+  if (keys.length === 0 && projectOptions.length <= 1) return null;
+  const allOpen = keys.every(key => !collapsed.has(key));
   return (
     <div className="tb-epic-fold-toolbar mb-2 flex w-fit items-center gap-1.5">
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={openCount === keys.length}
-        onClick={() => setMany(keys, false)}
-      >
-        <Icon name="ChevronDown" className="size-3" />
-        Expand all
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={openCount === 0}
-        onClick={() => setMany(keys, true)}
-      >
-        <Icon name="ChevronUp" className="size-3" />
-        Collapse all
-      </Button>
+      {keys.length > 0 ? (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setMany(keys, allOpen)}
+        >
+          <Icon
+            name={allOpen ? 'ChevronUp' : 'ChevronDown'}
+            className="size-3"
+          />
+          {allOpen ? 'Collapse all' : 'Expand all'}
+        </Button>
+      ) : null}
+      {projectOptions.length > 1
+        ? projectOptions.map(option => {
+            const active = isFilterOptionSelected(
+              externalProjects,
+              option.value
+            );
+            return (
+              <Button
+                key={option.value}
+                variant="ghost"
+                size="sm"
+                aria-pressed={active}
+                className="max-w-44 text-muted-foreground"
+                onClick={() =>
+                  onExternalProjectsChange(active ? [] : [option.value])
+                }
+              >
+                <Icon name="Cube" className="size-3 shrink-0" />
+                <span className="truncate">{option.label}</span>
+              </Button>
+            );
+          })
+        : null}
     </div>
   );
 }
@@ -3901,6 +3939,9 @@ function KanbanBoard({
   statusOrder,
   foldChildren,
   composerDragEnabled,
+  projectOptions,
+  externalProjects,
+  onExternalProjectsChange,
   onOpen,
   onMove
 }: {
@@ -3909,6 +3950,9 @@ function KanbanBoard({
   statusOrder: readonly string[];
   foldChildren: boolean;
   composerDragEnabled: boolean;
+  projectOptions: readonly FilterOption[];
+  externalProjects: readonly string[];
+  onExternalProjectsChange: (projects: string[]) => void;
   onOpen: (item: WorkItem) => void;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
 }) {
@@ -4146,7 +4190,12 @@ function KanbanBoard({
       >
         {announcement}
       </p>
-      <EpicFoldToolbar items={items} />
+      <EpicFoldToolbar
+        items={items}
+        projectOptions={projectOptions}
+        externalProjects={externalProjects}
+        onExternalProjectsChange={onExternalProjectsChange}
+      />
       {visibleMessage ? (
         <div
           role="alert"
@@ -4617,6 +4666,18 @@ function TrackerList({
     () => projectFilterOptions(items ?? [], externalProjects),
     [externalProjects, items]
   );
+  // Toolbar quick-filter chips: real projects only (no 'No project' token),
+  // and only when the project filter is enabled for this board — the chips
+  // drive that same selection, so a disabled filter would make them dead UI.
+  const quickProjectOptions = useMemo(
+    () =>
+      boardSettings.enabledFilters.includes('project')
+        ? availableExternalProjects.filter(
+            option => option.value !== NO_PROJECT_FILTER
+          )
+        : [],
+    [availableExternalProjects, boardSettings.enabledFilters]
+  );
   const availableLabels = useMemo(
     () => labelFilterOptions(items ?? [], labels),
     [items, labels]
@@ -4976,6 +5037,14 @@ function TrackerList({
               statusOrder={boardSettings.statusOrder}
               foldChildren={boardSettings.foldChildren}
               composerDragEnabled={surfaceMode === 'constrained'}
+              projectOptions={quickProjectOptions}
+              externalProjects={externalProjects}
+              onExternalProjectsChange={nextExternalProjects =>
+                updatePreferences(current => ({
+                  ...current,
+                  externalProjects: nextExternalProjects
+                }))
+              }
               onOpen={onOpen}
               onMove={moveItemStatus}
             />

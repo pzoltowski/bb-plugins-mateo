@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sequence": 3,
+  "previousDigest": "sha256:94fb3b780fda1549d7418cf58d6895240f5c4c5d03c0580e02af9e6aaf65e497",
+  "actor": "empirical-complete",
+  "type": "compaction-boundary",
+  "summary": "Compacted through journal event 2",
+  "createdAt": "2026-09-16T10:53:04.380Z",
+  "stateBeforeDigest": "sha256:a886617b2f4752b3ef99783ede0d6437db45fd4cbd862f0557758dc7be784682",
+  "stateAfterDigest": "sha256:a886617b2f4752b3ef99783ede0d6437db45fd4cbd862f0557758dc7be784682",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 2,
+    "activeFeature": "taskboard-toolbar-merge-expand-all-collapse-all-into-one-toggle",
+    "request": "Taskboard toolbar: merge 'Expand all'/'Collapse all' into ONE toggle button (anything collapsed incl. mixed → offers 'Expand all'; all expanded → 'Collapse all'; label+icon reflect next action) AND add project quick-filter chips in the same toolbar row after the toggle — one small ghost-style chip per distinct item.project in the loaded issues (single-select toggle driving the same preferences.externalProjects filter the filter UI uses; aria-pressed active state; only render chips when >1 project exists). Surgical: reuse icon registry + component vocabulary, no theme/layout drift.",
+    "profile": "fast",
+    "workflow": "fast",
+    "mode": "normal",
+    "phase": "done",
+    "status": "done",
+    "repairAttempts": 0,
+    "message": "Merged EpicFoldToolbar's two buttons into ONE toggle: allOpen (keys.every uncollapsed) → offers 'Collapse all'/ChevronUp, anything collapsed incl. mixed → 'Expand all'/ChevronDown, setMany(keys, allOpen), no disabled state. Added project quick-filter chips in the same row: ghost-variant sm Buttons with Cube icon + truncated label, aria-pressed active state, single-select onExternalProjectsChange(active ? [] : [option.value]) writing the same preferences.externalProjects the filter UI uses; rendered only when >1 real project (NO_PROJECT_FILTER token excluded; gated on enabledFilters.includes('project')); options derived from unfiltered loaded items so chips stay stable while filtering. Plumbed through KanbanBoard props; chips appear only in per-project Kanban view (the toolbar's only surface — list view has no fold toolbar). Verified live on proj_iu2ivecrkf: 4 projects → 4 chips, toggleCount=1 'Collapse all', click cv-supa → 80→31 cards + chip active + Project dropdown shows cv-supa (same filter), re-click → cleared to 80/0 pressed. Screenshots committed. npm run check green (155 taskboard tests incl. new contract assertions).",
+    "implementationActor": "agent",
+    "workStartedAt": null,
+    "specDigest": "sha256:28439f8977aa6fdb1a85d71f41dad57ab4dca4466e2d6114fb15b4a296952c3e",
+    "approvedSpecRevision": 1,
+    "capabilityArchiveRequired": false,
+    "capabilityDeltaDigest": null,
+    "impactDigest": "sha256:241be7501659c57948eeeb9dcec700c89d354b9a7b95fb893df8b91c525ff495",
+    "capabilityClaimId": null,
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": true,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "implemented",
+      "reasons": {
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-16T10:53:04.168Z"
+  },
+  "digest": "sha256:0310409e7d573395dd3e89e29dda298cb96d0477e5aa01e102090b706942f7d9"
+}
