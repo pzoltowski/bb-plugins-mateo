@@ -620,7 +620,7 @@ function ThreadLocation({ thread }: { thread: PluginSidebarThread }) {
     return (
       <span
         title={`Branch: ${branch}`}
-        className="flex min-w-0 flex-1 items-center gap-1 truncate text-muted-foreground/60"
+        className="flex min-w-0 flex-1 items-center gap-1 truncate text-muted-foreground/40"
       >
         <Icon
           name="GitBranch"
