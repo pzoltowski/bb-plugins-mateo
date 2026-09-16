@@ -43,7 +43,7 @@
         "id": "taskboard-browser",
         "argv": [
           "node",
-          ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
+          "plugins/taskboard/scripts/browser-qa.mjs"
         ],
         "cwd": ".",
         "timeoutMs": 120000,
