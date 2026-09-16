@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 5,
+  "revision": 1,
+  "activeFeature": "upgrade-the-dockside-project-badge-in-plugins-dockside-1-add",
+  "request": "Upgrade the Dockside project badge in plugins/dockside: (1) add a plugin setting for one- vs two-letter badges, default two letters — two-letter rendering uses initials for multi-word project names (first letter of the first two words) and the first two characters for single-word names; (2) key the automatic badge color on the rendered badge letters instead of the project id so the same letters always get the same palette color, while existing per-project color overrides keep working and still win; (3) add a prefer-favicon setting (default ON) that shows a favicon/icon file found in the project's repository — resolved by the plugin server via project sources path — and falls back to the letter badge when no icon exists or the setting is off.",
+  "profile": "complex",
+  "workflow": "complex",
+  "mode": "normal",
+  "phase": "specify",
+  "status": "waiting",
+  "repairAttempts": 0,
+  "message": null,
+  "implementationActor": null,
+  "workStartedAt": null,
+  "specDigest": "sha256:574390802a9e2b29ffdcb333b63ec14b3b315a7dd07a6d444ad275cce5a8a846",
+  "approvedSpecRevision": null,
+  "capabilityArchiveRequired": true,
+  "capabilityDeltaDigest": null,
+  "impactDigest": null,
+  "capabilityClaimId": null,
+  "authorizationDigest": null,
+  "evidence": [],
+  "evidenceReceiptIds": [],
+  "legacyEvidenceCount": 0,
+  "completion": {
+    "implemented": false,
+    "verified": false,
+    "integrated": false,
+    "delivered": false,
+    "published": false,
+    "highest": "none",
+    "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
+      "verified": "verified has not been proven by a durable receipt.",
+      "integrated": "integrated has not been proven by a durable receipt.",
+      "delivered": "delivered has not been proven by a durable receipt.",
+      "published": "published has not been proven by a durable receipt."
+    }
+  },
+  "updatedAt": "2026-09-16T16:23:55.292Z"
+}
