@@ -151,6 +151,35 @@ test('renders assignees as deterministic accessible avatars', () => {
   assert.match(app, /<span aria-hidden="true">\{identity\.initials\}<\/span>/u);
 });
 
+test('marks tracker projects as ghost text on List rows and Kanban cards', async () => {
+  const mark = app.match(/function ProjectGhostMark[\s\S]*?\nfunction /u)?.[0];
+  assert.ok(mark, 'Missing ProjectGhostMark');
+  assert.match(mark, /name="Cube"/u);
+  assert.match(mark, /aria-hidden="true"/u);
+  assert.match(mark, /truncate/u);
+  assert.doesNotMatch(mark, /tb-label-chip|rounded-full/u);
+
+  const row = app
+    .match(/function WorkItemRow[\s\S]*?\nfunction ListStateGroups/u)?.[0];
+  assert.ok(row, 'Missing WorkItemRow');
+  assert.match(row, /<ProjectGhostMark project=\{item\.project\} \/>/u);
+  assert.match(row, /` Project \$\{item\.project\}\.`/u);
+
+  const card = app.match(/function KanbanCard[\s\S]*?\nfunction KanbanBoard/u)?.[0];
+  assert.ok(card, 'Missing KanbanCard');
+  assert.match(card, /\{pending \|\| assignee \|\| item\.project \? \(/u);
+  assert.match(card, /<ProjectGhostMark project=\{item\.project\} \/>/u);
+  assert.match(card, /` Project \$\{item\.project\}\.`/u);
+  assert.match(card, /ml-auto flex shrink-0/u);
+
+  const iconRegistry = await readFile(
+    new URL('../components/ui/icon.tsx', import.meta.url),
+    'utf8'
+  );
+  assert.match(iconRegistry, /CubeIcon,\n/u);
+  assert.match(iconRegistry, /Cube: CubeIcon/u);
+});
+
 test('uses an explicit constrained filter composition', () => {
   assert.match(app, /data-taskboard-filter-mode="constrained"/u);
   assert.match(app, /Search filter values/u);

@@ -3364,7 +3364,7 @@ function WorkItemRow({
       <button
         type="button"
         draggable={composerDragEnabled}
-        aria-label={`Open ${item.key}: ${item.title}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}`}
+        aria-label={`Open ${item.key}: ${item.title}.${priority ? ` Priority ${priority}.` : ''}${item.project ? ` Project ${item.project}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}`}
         onDragStart={event => {
           if (
             !composerDragEnabled ||
@@ -3403,6 +3403,7 @@ function WorkItemRow({
             {project.name}
           </span>
         ) : null}
+        {item.project ? <ProjectGhostMark project={item.project} /> : null}
         {assignee ? <AssigneeMark assignee={assignee} /> : null}
         <time className="tb-row-time ml-auto shrink-0 tabular-nums">
           {formatUpdatedAt(item.updatedAt)}
@@ -3644,6 +3645,18 @@ function AssigneeMark({ assignee }: { assignee: string }) {
   );
 }
 
+function ProjectGhostMark({ project }: { project: string }) {
+  return (
+    <span
+      className="tb-project-mark flex min-w-0 max-w-28 items-center gap-1"
+      title={project}
+    >
+      <Icon name="Cube" aria-hidden="true" className="size-3 shrink-0" />
+      <span className="truncate">{project}</span>
+    </span>
+  );
+}
+
 function EpicSummary({
   item,
   listId
@@ -3801,7 +3814,7 @@ function KanbanCard({
         draggable={!pending && !moveDisabled}
         aria-grabbed={pickedUp}
         aria-busy={pending}
-        aria-label={`${item.key}: ${item.title}. Status ${item.status}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}${moveDisabled ? ' Workflow statuses are loading. Press Enter to open.' : ' Press Space to move, or Enter to open.'}`}
+        aria-label={`${item.key}: ${item.title}. Status ${item.status}.${priority ? ` Priority ${priority}.` : ''}${item.project ? ` Project ${item.project}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}${moveDisabled ? ' Workflow statuses are loading. Press Enter to open.' : ' Press Space to move, or Enter to open.'}`}
         data-state-category={item.stateCategory}
         data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
         data-picked-up={pickedUp ? 'true' : 'false'}
@@ -3857,8 +3870,11 @@ function KanbanCard({
             ))}
           </span>
         ) : null}
-        {pending || assignee ? (
+        {pending || assignee || item.project ? (
           <span className="tb-meta mt-1.5 flex min-w-0 items-center gap-2 text-xs">
+            {item.project ? (
+              <ProjectGhostMark project={item.project} />
+            ) : null}
             {pending ? (
               <span className="min-w-0 truncate">Updating…</span>
             ) : assignee ? (

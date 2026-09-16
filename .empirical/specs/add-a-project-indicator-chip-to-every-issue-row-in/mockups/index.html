@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Taskboard project indicator — ghost text mockup</title>
+<style>
+  :root {
+    --bg: #1b1d21;
+    --panel: #202329;
+    --hairline: #2c2f36;
+    --ink: #e4e6ea;
+    --ink-soft: #9ba0a8;
+    --ink-subtle: #6f747d;
+    --chip-bg: #2a2d34;
+    --chip-fg: #b8bcc4;
+  }
+  * { box-sizing: border-box; margin: 0; font-family: -apple-system, "SF Pro Text", sans-serif; }
+  body { background: var(--bg); color: var(--ink); padding: 28px; font-size: 13px; }
+  h1 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  p.note { color: var(--ink-subtle); font-size: 12px; margin-bottom: 20px; }
+  h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-subtle); margin: 22px 0 8px; }
+
+  /* List row */
+  .row {
+    display: grid;
+    grid-template-columns: 20px minmax(84px,104px) minmax(0,1fr) auto;
+    gap: 8px;
+    align-items: center;
+    min-height: 36px;
+    padding: 4px 10px;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--panel);
+    max-width: 56rem;
+  }
+  .state { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #d29922; justify-self: center; }
+  .key { color: var(--ink-soft); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .meta { display: flex; align-items: center; gap: 8px; color: var(--ink-subtle); font-size: 12px; }
+  .prio { color: #d29922; font-size: 11px; }
+  .project {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--ink-subtle); max-width: 112px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .project svg { width: 12px; height: 12px; flex: none; }
+  .avatar {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #3b4a5f; color: #cdd6e4;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600; letter-spacing: .02em;
+    box-shadow: 0 0 0 1px var(--hairline);
+  }
+  time { font-variant-numeric: tabular-nums; margin-left: auto; }
+
+  /* Kanban card */
+  .card {
+    background: var(--panel); border: 1px solid var(--hairline);
+    border-radius: 6px; padding: 8px 12px 6px; width: 260px;
+  }
+  .card .title { font-size: 14px; line-height: 1.35; }
+  .card .key { font-weight: 400; margin-right: 4px; }
+  .labels { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .label-chip {
+    background: var(--chip-bg); color: var(--chip-fg);
+    border-radius: 999px; padding: 1px 8px; font-size: 11px;
+  }
+  .card .meta { margin-top: 6px; }
+  .card .meta .avatar { margin-left: auto; }
+
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+</style>
+</head>
+<body>
+  <h1>Project indicator — approved direction B: ghost text</h1>
+  <p class="note">Cube glyph + project name in the row's existing muted meta color. No container — the absence of a pill is what differentiates it from label chips.</p>
+
+  <h2>List view — WorkItemRow trailing meta</h2>
+  <div class="row">
+    <span class="state"></span>
+    <span class="key">MOV-12</span>
+    <span class="title">Fold Linear children under their epic on the board</span>
+    <span class="meta">
+      <span class="prio">●●</span>
+      <span class="project" title="bb-plugins">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8.5 4.9v9.8L12 21.6l-8.5-4.9V6.9L12 2z"/><path d="M12 21.6v-9.8"/><path d="M3.5 6.9l8.5 4.9 8.5-4.9"/></svg>
+        bb-plugins
+      </span>
+      <span class="avatar">PZ</span>
+      <time>2h</time>
+    </span>
+  </div>
+  <div class="row">
+    <span class="state" style="border-color:#57ab5a"></span>
+    <span class="key">ENG-481</span>
+    <span class="title">Project filter chips lose checked state after reload</span>
+    <span class="meta">
+      <span class="project" title="Taskboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8.5 4.9v9.8L12 21.6l-8.5-4.9V6.9L12 2z"/><path d="M12 21.6v-9.8"/><path d="M3.5 6.9l8.5 4.9 8.5-4.9"/></svg>
+        Taskboard
+      </span>
+      <span class="avatar">MC</span>
+      <time>1d</time>
+    </span>
+  </div>
+
+  <h2>Kanban view — KanbanCard bottom meta row</h2>
+  <div class="card">
+    <span class="title"><span class="key">ENG-502</span>Read Kanban columns from a GitHub Project board</span>
+    <div class="labels">
+      <span class="label-chip">feature</span>
+      <span class="label-chip">github</span>
+    </div>
+    <div class="meta">
+      <span class="project" title="MateoCerquetella/bb-plugins">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8.5 4.9v9.8L12 21.6l-8.5-4.9V6.9L12 2z"/><path d="M12 21.6v-9.8"/><path d="M3.5 6.9l8.5 4.9 8.5-4.9"/></svg>
+        MateoCerquetella/bb-plugins
+      </span>
+      <span class="avatar">PZ</span>
+    </div>
+  </div>
+
+  <h2>Contrast — what it is not</h2>
+  <p class="note">
+    <span class="swatch" style="background:var(--chip-bg)"></span>label chip = pill container, brighter fg ·
+    <span class="project" style="vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8.5 4.9v9.8L12 21.6l-8.5-4.9V6.9L12 2z"/><path d="M12 21.6v-9.8"/><path d="M3.5 6.9l8.5 4.9 8.5-4.9"/></svg> project</span> = containerless ghost text, single muted tone
+  </p>
+</body>
+</html>
