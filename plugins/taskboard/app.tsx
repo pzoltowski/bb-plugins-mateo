@@ -3396,7 +3396,7 @@ function WorkItemRow({
       <span className="pointer-events-none relative z-[1] col-span-full row-start-2 min-w-0 truncate text-[13px] font-medium text-foreground">
         {item.title}
       </span>
-      <span className="tb-row-trailing tb-meta pointer-events-none relative z-[1] flex min-w-0 items-center gap-2 overflow-hidden text-xs">
+      <span className="tb-row-trailing tb-meta pointer-events-none relative z-[1] col-start-[-2] flex min-w-0 items-center gap-2 overflow-hidden text-xs">
         {priority ? <PriorityMark priority={priority} /> : null}
         {showProject && project ? (
           <span className="max-w-28 truncate" title={project.name}>
