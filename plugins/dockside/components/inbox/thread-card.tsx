@@ -262,7 +262,7 @@ export function ThreadCard({
                   title={threadDisplayTitle(thread)}
                   className={cn(
                     "min-w-0 flex-1 truncate text-sm",
-                    thread.isUnread ? "font-semibold" : "font-medium",
+                    thread.isUnread ? "font-bold" : "font-semibold",
                     !familyState.receded
                       ? "text-foreground"
                       : "text-muted-foreground/65",
@@ -620,7 +620,7 @@ function ThreadLocation({ thread }: { thread: PluginSidebarThread }) {
     return (
       <span
         title={`Branch: ${branch}`}
-        className="flex min-w-0 flex-1 items-center gap-1 truncate text-muted-foreground"
+        className="flex min-w-0 flex-1 items-center gap-1 truncate text-muted-foreground/60"
       >
         <Icon
           name="GitBranch"
