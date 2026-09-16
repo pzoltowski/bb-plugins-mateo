@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -8,112 +9,119 @@ const npmRoot = execFileSync('npm', ['root', '--global'], {
 const { chromium } = await import(
   pathToFileURL(join(npmRoot, 'playwright', 'index.mjs')).href
 );
-const context = JSON.parse(
-  execFileSync('bb', ['status', '--json'], { encoding: 'utf8' })
-);
-const projectId = context.project?.id ?? 'proj_ykxahiys47';
-const threadId = context.thread?.id ?? 'thr_axt3ycmenc';
 const baseUrl = process.env.BB_SERVER_URL ?? 'http://127.0.0.1:38886';
-const actionTitle = 'Taskboard Drag Preview';
-const screenshotRoot =
-  '.empirical/specs/taskboard-new-thread-drag-to-composer/qa';
 
-async function openPreview(page, kind) {
-  const newTab = page.locator('button[aria-label^="Open new tab"]');
-  await newTab.waitFor({ state: 'attached', timeout: 15_000 });
-  await newTab.dispatchEvent('click');
-  const action = page
-    .locator('[data-testid="new-tab-actions"]')
-    .getByText(actionTitle, { exact: true });
-  await action.waitFor({ state: 'visible', timeout: 15_000 });
-  await action.click();
-  const panelTestId =
-    kind === 'new-thread'
-      ? 'plugin-new-thread-panel-tab-content'
-      : 'plugin-panel-tab-content';
-  return page.locator(`[data-testid="${panelTestId}"]`);
+function screenshotRoot() {
+  const claimsDir = '.git/empirical/claims';
+  const cwd = process.cwd();
+  if (existsSync(claimsDir)) {
+    for (const file of readdirSync(claimsDir)) {
+      try {
+        const claim = JSON.parse(readFileSync(join(claimsDir, file), 'utf8'));
+        if (claim.worktree === cwd && typeof claim.feature === 'string') {
+          const dir = `.empirical/specs/${claim.feature}/qa`;
+          mkdirSync(dir, { recursive: true });
+          return dir;
+        }
+      } catch {
+        // Ignore unreadable claim files.
+      }
+    }
+  }
+  const dir = '.empirical/evidence/taskboard-browser';
+  mkdirSync(dir, { recursive: true });
+  return dir;
 }
 
-async function dragPreviewTicket(page, panel, editor, initialText) {
-  await editor.fill(initialText);
-  const ticket = panel.locator('button[draggable="true"]');
-  await ticket.waitFor({ state: 'visible', timeout: 15_000 });
-  const transfer = await page.evaluateHandle(() => new DataTransfer());
-  await ticket.dispatchEvent('dragstart', { dataTransfer: transfer });
-  await editor.dispatchEvent('dragover', { dataTransfer: transfer });
-  await page.waitForTimeout(100);
-  if (
-    (await page.getByText('Drop to add ticket to chat', { exact: true }).count()) !==
-      1 ||
-    (await page.locator(
-      'form[data-taskboard-composer-drop-target="active"]'
-    ).count()) !== 1
-  ) {
-    throw new Error('The visible composer did not enter the accepted-drop state');
+function projectWithWorkItems() {
+  const projects = JSON.parse(
+    execFileSync('bb', ['project', 'list', '--json'], { encoding: 'utf8' })
+  );
+  for (const project of projects) {
+    try {
+      const listed = execFileSync(
+        'bb',
+        ['taskboard', 'list', '--project', project.id],
+        { encoding: 'utf8', timeout: 30_000 }
+      );
+      if (listed.trim().length > 0) return project.id;
+    } catch {
+      // Project has no configured taskboard source.
+    }
   }
-  await page.screenshot({
-    path: `${screenshotRoot}/new-thread-drag-active.png`,
-    fullPage: true
-  });
-  await editor.dispatchEvent('drop', { dataTransfer: transfer });
-  await page.waitForTimeout(200);
-  const text = await editor.innerText();
-  if (!text.includes(initialText) || !text.includes('TEST-1')) {
-    throw new Error(`Composer did not preserve the draft and mention: ${text}`);
-  }
-  const status = await panel.getByRole('status').innerText();
-  if (status !== 'Added TEST-1 to chat') {
-    throw new Error(`Unexpected polite status: ${status}`);
-  }
-  return text;
+  throw new Error('No bb project has taskboard work items to verify against');
 }
 
+const projectId = projectWithWorkItems();
+const outDir = screenshotRoot();
 const browser = await chromium.launch({ headless: true });
 try {
-  const newThreadPage = await browser.newPage({
+  const page = await browser.newPage({
     viewport: { width: 1440, height: 900 }
   });
-  await newThreadPage.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
-  const newThreadEditor = newThreadPage
-    .locator('[contenteditable="true"][role="textbox"]')
-    .first();
-  await newThreadEditor.waitFor({ state: 'visible', timeout: 15_000 });
-  const newThreadPanel = await openPreview(newThreadPage, 'new-thread');
-  const newThreadText = await dragPreviewTicket(
-    newThreadPage,
-    newThreadPanel,
-    newThreadEditor,
-    'Keep this draft'
-  );
-  await newThreadPage.screenshot({
-    path: `${screenshotRoot}/new-thread-drop.png`,
-    fullPage: true
+  await page.goto(`${baseUrl}/plugins/taskboard/tasks/${projectId}`, {
+    waitUntil: 'domcontentloaded'
   });
+  const firstRow = page.locator('.tb-item-row').first();
+  await firstRow.waitFor({ state: 'visible', timeout: 20_000 });
 
-  const threadPage = await browser.newPage({
-    viewport: { width: 1440, height: 900 }
-  });
-  await threadPage.goto(
-    `${baseUrl}/projects/${projectId}/threads/${threadId}`,
-    { waitUntil: 'domcontentloaded' }
+  const rowCount = await page.locator('.tb-item-row').count();
+  const markCount = await page.locator('.tb-item-row .tb-project-mark').count();
+  if (markCount < 1) {
+    throw new Error(`List view rendered ${rowCount} rows but no project mark`);
+  }
+  const mark = page.locator('.tb-item-row .tb-project-mark').first();
+  const markText = (await mark.innerText()).trim();
+  if (markText.length === 0) {
+    throw new Error('Project mark rendered without any project name text');
+  }
+  const iconHidden = await mark
+    .locator('svg[aria-hidden="true"], [aria-hidden="true"] svg')
+    .count();
+  if (iconHidden < 1) {
+    throw new Error('Project mark icon is not aria-hidden');
+  }
+  const pillClasses = await mark.evaluate((el) =>
+    ['tb-label-chip', 'rounded-full', 'border', 'bg-'].some((c) =>
+      (el.getAttribute('class') ?? '').includes(c)
+    )
   );
-  const threadEditor = threadPage
-    .locator('[contenteditable="true"][role="textbox"]')
-    .first();
-  await threadEditor.waitFor({ state: 'visible', timeout: 15_000 });
-  const threadPanel = await openPreview(threadPage, 'thread');
-  const threadText = await dragPreviewTicket(
-    threadPage,
-    threadPanel,
-    threadEditor,
-    'Existing thread draft'
-  );
+  if (pillClasses) {
+    throw new Error('Project mark uses pill/chip styling instead of ghost text');
+  }
+  const label =
+    (await firstRow
+      .locator('button[aria-label]')
+      .first()
+      .getAttribute('aria-label')) ?? '';
+  const labelText = markText.replace(/…$/, '').slice(0, 12);
+  if (!label.includes(labelText)) {
+    throw new Error(`Row aria-label "${label}" does not name project "${markText}"`);
+  }
+  await page.screenshot({ path: `${outDir}/project-chip-list.png` });
+
+  await page.getByText('Kanban', { exact: true }).first().click();
+  const firstCard = page.locator('.tb-kanban-card').first();
+  await firstCard.waitFor({ state: 'visible', timeout: 15_000 });
+  const cardMarkCount = await page
+    .locator('.tb-kanban-card .tb-project-mark')
+    .count();
+  if (cardMarkCount < 1) {
+    throw new Error('Kanban view rendered cards but no project mark');
+  }
+  await page.screenshot({ path: `${outDir}/project-chip-kanban.png` });
 
   process.stdout.write(
     `${JSON.stringify({
-      newThread: newThreadText,
-      existingThread: threadText,
-      submitted: false
+      projectId,
+      listRows: rowCount,
+      listProjectMarks: markCount,
+      kanbanProjectMarks: cardMarkCount,
+      sampleProject: markText,
+      screenshots: [
+        `${outDir}/project-chip-list.png`,
+        `${outDir}/project-chip-kanban.png`
+      ]
     })}\n`
   );
 } finally {

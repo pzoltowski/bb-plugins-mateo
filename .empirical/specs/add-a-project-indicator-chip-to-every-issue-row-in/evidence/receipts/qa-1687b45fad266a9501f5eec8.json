@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-1687b45fad266a9501f5eec8",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Run the Playwright taskboard browser script against the live bb UI after reloading the plugin carrying the project chip.",
+  "passed": false,
+  "startedAt": "2026-09-16T01:13:04.652Z",
+  "completedAt": "2026-09-16T01:13:57.411Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+    "specRevision": 2,
+    "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
+    "treeDigest": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b",
+    "workflowRevision": 6,
+    "gitCommit": "c62e4f9b19266634746a2f42e634cdb71b05993d"
+  },
+  "digest": "sha256:a975a1c2fa4cb8bc122f5868d13df19e0255f0e8c062e2723e604443e145ce5e",
+  "kind": "qa",
+  "matrixDigest": "sha256:6c7fca1ff9c620651ecaa4e9e553f3f94ddce55785e12c344039ecfbff785fe6",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "arm64",
+    "node": "24.20.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "failed",
+      "summary": "Run the Playwright taskboard browser script against the live bb UI after reloading the plugin carrying the project chip.",
+      "startedAt": "2026-09-16T01:13:04.652Z",
+      "completedAt": "2026-09-16T01:13:05.092Z",
+      "durationMs": 440,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:afadded812b9cd8ba6a52a18f2ed300919f44b65dbf5eba517462ed68410e4d1",
+        "argv": [
+          "node",
+          ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrDigest": "sha256:2aee1f444f6fa9da2c762456c6afc2fcb04bd01981007e909602ccf0dd5dca39",
+        "stdoutTail": "",
+        "stderrTail": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nbrowserType.launch: Executable doesn't exist at /Users/patryk/Library/Caches/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-mac-arm64/chrome-headless-shell\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝\n    at /Users/patryk/Developer/workspace/ideas/ai/bb-plugins-mateo/.empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs:71:32 {\n  log: [],\n  name: 'Error'\n}\n\nNode.js v24.20.0\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+      "sourceTreeAfter": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+      "artifacts": []
+    },
+    {
+      "number": 2,
+      "outcome": "failed",
+      "summary": "Run the Playwright taskboard browser script against the live bb UI after reloading the plugin carrying the project chip.",
+      "startedAt": "2026-09-16T01:13:38.562Z",
+      "completedAt": "2026-09-16T01:13:57.411Z",
+      "durationMs": 18849,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:afadded812b9cd8ba6a52a18f2ed300919f44b65dbf5eba517462ed68410e4d1",
+        "argv": [
+          "node",
+          ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrDigest": "sha256:1474603bb5f23004a7c3b8315174a5e8a54d7f319713ed36b07495fc543e1fda",
+        "stdoutTail": "",
+        "stderrTail": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nlocator.waitFor: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator('[data-testid=\"new-tab-actions\"]').getByText('Taskboard Drag Preview', { exact: true }) to be visible\n\n    at openPreview (/Users/patryk/Developer/workspace/ideas/ai/bb-plugins-mateo/.empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs:28:16)\n    at async file:///Users/patryk/Developer/workspace/ideas/ai/bb-plugins-mateo/.empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs:81:26 {\n  log: [\n    `  - waiting for locator('[data-testid=\"new-tab-actions\"]').getByText('Taskboard Drag Preview', { exact: true }) to be visible`\n  ],\n  name: 'TimeoutError'\n}\n\nNode.js v24.20.0\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+      "sourceTreeAfter": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+      "artifacts": []
+    }
+  ],
+  "anomalies": [
+    "outcome-failed",
+    "prior-nonpassing-attempt",
+    "retry-history-present"
+  ]
+}

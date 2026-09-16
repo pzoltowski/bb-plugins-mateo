@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-834835a07c6ee4085ad1d9ca",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Fresh-context QA over committed files at c62e4f9 plus live-browser captures: all eight criteria pass. List and Kanban render Cube ghost-text project marks; aria-labels name the project; null projects render nothing; Cube registered via ICON_MAP; no data-layer diff.",
+  "passed": true,
+  "startedAt": "2026-09-16T01:27:21.222Z",
+  "completedAt": "2026-09-16T01:27:21.222Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+    "specRevision": 2,
+    "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
+    "treeDigest": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b",
+    "workflowRevision": 6,
+    "gitCommit": "c62e4f9b19266634746a2f42e634cdb71b05993d"
+  },
+  "digest": "sha256:4cdec9ffc1b3a8f6267ae04eb030553111f3a03e9bee902924177dad2e0ad75f",
+  "kind": "qa",
+  "matrixDigest": "sha256:6c7fca1ff9c620651ecaa4e9e553f3f94ddce55785e12c344039ecfbff785fe6",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "arm64",
+    "node": "24.20.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Fresh-context QA over committed files at c62e4f9 plus live-browser captures: all eight criteria pass. List and Kanban render Cube ghost-text project marks; aria-labels name the project; null projects render nothing; Cube registered via ICON_MAP; no data-layer diff.",
+      "startedAt": "2026-09-16T01:27:21.222Z",
+      "completedAt": "2026-09-16T01:27:21.222Z",
+      "durationMs": 0,
+      "collector": "agent",
+      "command": null,
+      "result": null,
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+      "sourceTreeAfter": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/fresh-context-final.md",
+          "mediaType": "text/markdown",
+          "bytes": 2279,
+          "digest": "sha256:572396db8a27d6ae47eb925f1555ade5670c2457951b9b6c03db1882c3ad4305"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generator": "empirical-0.31.0",
-  "sourceDigest": "sha256:239ea129c6f18179983a2daf5558f7220be4f92142552e9b3f11e5c8c66b21e2",
+  "generator": "empirical-0.35.0",
+  "sourceDigest": "sha256:fec8b789785bd1452bedcd71e7390c5e2b9a0b9ede2177d08ce97c3c1d36ca38",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -81,7 +81,7 @@
     {
       "path": "README.md",
       "size": 13404,
-      "digest": "sha256:e43fd01c63893c622be0c4647f8165c7b85bbffe4bfed70db120ef149c224bf4"
+      "digest": "sha256:bd9c9d5d848c2e92e5104954a0fcdc77d3f44d25f855f1cbce4afbda840c5c53"
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -100,8 +100,8 @@
     },
     {
       "path": "package-lock.json",
-      "size": 298190,
-      "digest": "sha256:ade780293289402116c161c2d6e2205ff22513d1579a1886991fabc9c6eeadf2"
+      "size": 358783,
+      "digest": "sha256:4453806924d88fe05fc30428a42717c83fb8220d198958a4cdfa23e370c295a0"
     },
     {
       "path": "package.json",
@@ -940,8 +940,8 @@
     },
     {
       "path": "plugins/taskboard/README.md",
-      "size": 12111,
-      "digest": "sha256:86c8f17782907f39460e780a75758fca58de3bb397f8785ef5f9966cf07b84a6"
+      "size": 14344,
+      "digest": "sha256:2096d38eb39e31c4f763add751599b7549989f80a65939b84ad4f4fe3b668d69"
     },
     {
       "path": "plugins/taskboard/THIRD_PARTY_NOTICES.md",
@@ -950,13 +950,13 @@
     },
     {
       "path": "plugins/taskboard/app.css",
-      "size": 15627,
-      "digest": "sha256:ec6496296b47595f09f955c0bbed2cd5c7a8fa7da0ce400ba778574890220eba"
+      "size": 22449,
+      "digest": "sha256:b638399005ea8067e5713fd88f22d8c1c6f3999fcfd1a1ed31d196be8ab7b81e"
     },
     {
       "path": "plugins/taskboard/app.tsx",
-      "size": 245828,
-      "digest": "sha256:a07f6aa10c4d0e3a3bb991bc00be9a165da75fece84f378943a3df2307219316"
+      "size": 258540,
+      "digest": "sha256:06b916620a5772db476cfc9997d6459e7b4919357b7569c81e9ffb52c1344c93"
     },
     {
       "path": "plugins/taskboard/assets/icon.svg",
@@ -965,8 +965,8 @@
     },
     {
       "path": "plugins/taskboard/board-settings.ts",
-      "size": 2013,
-      "digest": "sha256:f1554d8f745cb3af4326b765f002623c272a9d2ede7db4b0cbe55771fdb814a5"
+      "size": 2558,
+      "digest": "sha256:a47fca29edbbc99558d0a0863878b79d1457ab9d4379ae8c1e3859ce05284d0b"
     },
     {
       "path": "plugins/taskboard/browse-preferences.ts",
@@ -975,8 +975,8 @@
     },
     {
       "path": "plugins/taskboard/browse.ts",
-      "size": 16018,
-      "digest": "sha256:cd756a8ad01e1af0002e666f33f47f489ed53e5ccf1c013aad924849ab137c4e"
+      "size": 17263,
+      "digest": "sha256:3368ea776389c088c3fc531f99d9d1b5489564b3226cd80af32ef098691a8dcd"
     },
     {
       "path": "plugins/taskboard/components.json",
@@ -1030,8 +1030,8 @@
     },
     {
       "path": "plugins/taskboard/components/ui/icon.tsx",
-      "size": 12501,
-      "digest": "sha256:b546d26b707d20787fe5a4bc30c542c8493f1a4857b98c944fb50ef95c9ad6f9"
+      "size": 12531,
+      "digest": "sha256:20a06656b95c3eff3bbe02c1709856162ac612c35512541d3edeacb9b009b5cb"
     },
     {
       "path": "plugins/taskboard/components/ui/input.tsx",
@@ -1085,13 +1085,18 @@
     },
     {
       "path": "plugins/taskboard/contract.ts",
-      "size": 16712,
-      "digest": "sha256:9385246862b7c0c1b3bda2b3f21d97d3505bab1a3efd8476509859655c8fa491"
+      "size": 19252,
+      "digest": "sha256:1beb36d0d505feefa015052c46cde667538d002221ddec2549423647e4b76ea5"
     },
     {
       "path": "plugins/taskboard/create-issue.ts",
       "size": 1553,
       "digest": "sha256:a8890400be739b897eebee623b5b67a37cb7075b091193ce6c6eef026d1c5018"
+    },
+    {
+      "path": "plugins/taskboard/epic-board.ts",
+      "size": 8957,
+      "digest": "sha256:60a7baee748adeb211225fc2082bf440f90e33bd569f99ec982bd7d5652176f8"
     },
     {
       "path": "plugins/taskboard/filter-presets.ts",
@@ -1115,8 +1120,8 @@
     },
     {
       "path": "plugins/taskboard/package.json",
-      "size": 2292,
-      "digest": "sha256:9599b3c0bca8e61345445b59585e03a49a59c4f20aea75e93b0ad0d2d963d2fa"
+      "size": 2293,
+      "digest": "sha256:4b845e8a5118096cd88603624fa336ccd397a7fdcc3c7ad6852e739fa97db952"
     },
     {
       "path": "plugins/taskboard/project-selection.ts",
@@ -1130,13 +1135,23 @@
     },
     {
       "path": "plugins/taskboard/server.ts",
-      "size": 82370,
-      "digest": "sha256:e84f85bd81d4d89d53d4ecdc697bdaaa59bcbf1a8341abbea3d19ed73ff4630b"
+      "size": 85271,
+      "digest": "sha256:521144118f9cce7e913117066452248ca611a822161f43189597f7005489351d"
+    },
+    {
+      "path": "plugins/taskboard/sources/epic-index.ts",
+      "size": 2608,
+      "digest": "sha256:35cbe446fb611dae7a2556eb0df08a94e9db17e374162d794869560dd34d71f1"
+    },
+    {
+      "path": "plugins/taskboard/sources/github-projects.ts",
+      "size": 19963,
+      "digest": "sha256:e242dc82969b2d4cc43e2159bf705819d8f2c54c05b9736579e8efcde5d945b2"
     },
     {
       "path": "plugins/taskboard/sources/github.ts",
-      "size": 17116,
-      "digest": "sha256:b187d990a7ad8b4fe3791ae4158b49d1501d307951ae0566d77c23b1f95ef6ac"
+      "size": 19812,
+      "digest": "sha256:117acb8b4c1bceb7bdec0f10c4f84e84567ec344aea7eb9f4c3276c3cc8d855d"
     },
     {
       "path": "plugins/taskboard/sources/jira-scope.ts",
@@ -1150,23 +1165,23 @@
     },
     {
       "path": "plugins/taskboard/sources/linear.ts",
-      "size": 19640,
-      "digest": "sha256:83437de923c42a81dcc446b587dfe21bf04fa49edd8109d52ebf484e420a5265"
+      "size": 22355,
+      "digest": "sha256:a1a67c14ad70ac72fc018bf9b1699d1ef3a7a695c5c885a435c2d456a833d34c"
     },
     {
       "path": "plugins/taskboard/sources/types.ts",
-      "size": 1694,
-      "digest": "sha256:879ad494bea24aedeb102fd9dc5ff0e581168e297dda2e41971f2b0dfd98dc17"
+      "size": 1885,
+      "digest": "sha256:90d6f2b05a7ca3b5bc5fc1b26f1cc0ecd7c089e13455dae786dba055697614fe"
     },
     {
       "path": "plugins/taskboard/store.ts",
-      "size": 34366,
-      "digest": "sha256:b55ad7e9229126d0b88fbc2c8521c1ac7c744e4f91c38340a59dd9c949e30b6c"
+      "size": 36480,
+      "digest": "sha256:c8517b81711b1a16e2698c4c94a71a8ef7625fea71f022657bef97cfd98f8701"
     },
     {
       "path": "plugins/taskboard/test/app-ui.test.ts",
-      "size": 14489,
-      "digest": "sha256:4f9b69015e5093d17568b3558a93cfd81760699d4239523ece9b1d7b1fc3a9b5"
+      "size": 15748,
+      "digest": "sha256:08d6df5022293cd12317990821a0314ffae7aa4f38dfbe12c9841a38589f4e92"
     },
     {
       "path": "plugins/taskboard/test/browse-preferences.test.ts",
@@ -1175,8 +1190,8 @@
     },
     {
       "path": "plugins/taskboard/test/browse.test.ts",
-      "size": 10275,
-      "digest": "sha256:682922384c33b8f87ce811078c8ac66d67e11710a2febd819cb301ab91ddcf82"
+      "size": 12598,
+      "digest": "sha256:3596007202d7987b5cf5277b738f9006ef2e52082040bd274124d54e1f4230e2"
     },
     {
       "path": "plugins/taskboard/test/composer-handoff.test.ts",
@@ -1185,18 +1200,23 @@
     },
     {
       "path": "plugins/taskboard/test/contract.test.ts",
-      "size": 12579,
-      "digest": "sha256:5a169c5fef534c957845fa960674a28034a5fcead794c4f28aedf54b9e0d038e"
+      "size": 12595,
+      "digest": "sha256:d4a2457323a7905e74d8c14236a7c3b14138db6993cda7ca8a7c27bbdd29440b"
     },
     {
       "path": "plugins/taskboard/test/create-metadata.test.ts",
-      "size": 49321,
-      "digest": "sha256:1b9a2dd3421057117ff6a3df284c1fbffb7f281d29259260dc64b3931bbcffd8"
+      "size": 49707,
+      "digest": "sha256:95cd933e8d77215bf7c6daf3c7a1aec4754ebf0a82bea1d7acbc258377cce5cc"
     },
     {
       "path": "plugins/taskboard/test/distribution.test.ts",
-      "size": 6759,
-      "digest": "sha256:f94572780a9e7b3c68c928b61a12170f9678551c9a9dbf9db305953d9b08da74"
+      "size": 6831,
+      "digest": "sha256:fddd59de6f460f8a5b3cc4fc7d98a630eb3446efe6ebbef52bce9b854581c91f"
+    },
+    {
+      "path": "plugins/taskboard/test/epic-board.test.ts",
+      "size": 16925,
+      "digest": "sha256:87ff57c6e6f256fe174a9e0c6ae70488a5ac66b55d514c1ef30dcb76b558fa75"
     },
     {
       "path": "plugins/taskboard/test/filter-presets-backend.test.ts",
@@ -1207,6 +1227,16 @@
       "path": "plugins/taskboard/test/filter-presets.test.ts",
       "size": 6818,
       "digest": "sha256:acfd2867b81df3b3991f2395c01925cebde79d46800202303a1eb7e768442d38"
+    },
+    {
+      "path": "plugins/taskboard/test/github-projects.test.ts",
+      "size": 13941,
+      "digest": "sha256:4d9d2a8290eaf4059bac26d06fd03e1474a903e04d8b362cb322de29ca4aebe2"
+    },
+    {
+      "path": "plugins/taskboard/test/linear.test.ts",
+      "size": 6962,
+      "digest": "sha256:4067434dc2261dff8a63e4934e6a7d0b19f20b13c70e4e8b580749f8dbd4f1d7"
     },
     {
       "path": "plugins/taskboard/test/project-selection.test.ts",
@@ -1220,8 +1250,8 @@
     },
     {
       "path": "plugins/taskboard/test/theme-css.test.ts",
-      "size": 4491,
-      "digest": "sha256:ea0a8d862fe9617f55d736a0afc30862d4422bd6918bd2a3fd4c5fec6ccb25fd"
+      "size": 8912,
+      "digest": "sha256:e7d6cc1e5a008025b585397080c75616a41ecbee99d52865e3251d304d87fc0e"
     },
     {
       "path": "plugins/taskboard/tsconfig.json",
@@ -1241,7 +1271,7 @@
     {
       "path": "plugins/touchbar/README.md",
       "size": 8519,
-      "digest": "sha256:5b6594fb787db8d870088667404a968269f560ba5a56dbf6784e3f2122ee5b6e"
+      "digest": "sha256:3c037867896b4f5aeb18f262b2436e1088204ef924e4a12be9cd5f563803cbe7"
     },
     {
       "path": "plugins/touchbar/assets/icon.svg",
@@ -1391,7 +1421,7 @@
     {
       "path": "plugins/touchbar/package.json",
       "size": 1336,
-      "digest": "sha256:a127ab88239b0c29a8efec0c66fc2c578f42e7fefa374d933f3f8b90bc02dd9f"
+      "digest": "sha256:9d1b41140cda7563941410e7d48576ec54c5bf8acc5b17f3978304311a520e45"
     },
     {
       "path": "plugins/touchbar/server.ts",
@@ -1577,7 +1607,7 @@
   "pages": [
     {
       "path": ".empirical/context/index.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.35.0",
       "managed": false,
       "dependencies": [
         ".agents/skills/empirical/SKILL.md",
@@ -1798,6 +1828,7 @@
         "plugins/taskboard/composer-handoff.ts",
         "plugins/taskboard/contract.ts",
         "plugins/taskboard/create-issue.ts",
+        "plugins/taskboard/epic-board.ts",
         "plugins/taskboard/filter-presets.ts",
         "plugins/taskboard/hooks/useBrowserDimmingModal.ts",
         "plugins/taskboard/lib/portal-scope.ts",
@@ -1806,6 +1837,8 @@
         "plugins/taskboard/project-selection.ts",
         "plugins/taskboard/scripts/verify-build.mjs",
         "plugins/taskboard/server.ts",
+        "plugins/taskboard/sources/epic-index.ts",
+        "plugins/taskboard/sources/github-projects.ts",
         "plugins/taskboard/sources/github.ts",
         "plugins/taskboard/sources/jira-scope.ts",
         "plugins/taskboard/sources/jira.ts",
@@ -1819,8 +1852,11 @@
         "plugins/taskboard/test/contract.test.ts",
         "plugins/taskboard/test/create-metadata.test.ts",
         "plugins/taskboard/test/distribution.test.ts",
+        "plugins/taskboard/test/epic-board.test.ts",
         "plugins/taskboard/test/filter-presets-backend.test.ts",
         "plugins/taskboard/test/filter-presets.test.ts",
+        "plugins/taskboard/test/github-projects.test.ts",
+        "plugins/taskboard/test/linear.test.ts",
         "plugins/taskboard/test/project-selection.test.ts",
         "plugins/taskboard/test/source-types.test.ts",
         "plugins/taskboard/test/theme-css.test.ts",
@@ -1895,13 +1931,13 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:239ea129c6f18179983a2daf5558f7220be4f92142552e9b3f11e5c8c66b21e2",
+      "sourceDigest": "sha256:fec8b789785bd1452bedcd71e7390c5e2b9a0b9ede2177d08ce97c3c1d36ca38",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/overview.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.35.0",
       "managed": false,
       "dependencies": [
         "README.md",
@@ -1932,13 +1968,13 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:c99a0c20f49cf68d97062ca317334d591a8d08407b13230a315d87a1d488aa5d",
+      "sourceDigest": "sha256:81d31685a624fbacc2aac91be9f03c42bcf9de9a58f7f4ac095ea3747fb8b921",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/architecture.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.35.0",
       "managed": false,
       "dependencies": [
         "package.json",
@@ -1951,13 +1987,13 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:842609399b970981507f83cc34f893b8146fc676f478ebf525b58847571d0b63",
+      "sourceDigest": "sha256:c8b520b8464a586f1f49d3f47d652776e9d161cfc63e139475930e2c14ae0f74",
       "digest": "sha256:6a3333fdbbcffff93c96400aab0596932dc23cce823061cdedacad5e44ef7bd7",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/commands.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.35.0",
       "managed": false,
       "dependencies": [
         ".github/workflows/ci.yml",
@@ -1971,13 +2007,13 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:b8a72a9e4c0606b2c5567d72c1c6fb7b6d6df8100b2e28785ebd5b0639bba88b",
+      "sourceDigest": "sha256:78c7fa31aa9515f30bce1b827187a652290db33ad4ebdeb1f2e41a1678bdaa34",
       "digest": "sha256:06a7a6d07d2649e2d00a93cf62beef749d2f5dada25077c225726f81ec2eeed3",
       "freshness": "fresh"
     },
     {
       "path": ".empirical/context/conventions.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.35.0",
       "managed": false,
       "dependencies": [
         "AGENTS.md",
@@ -1996,7 +2032,7 @@
     },
     {
       "path": ".empirical/context/design-language.md",
-      "generator": "empirical-0.31.0",
+      "generator": "empirical-0.35.0",
       "managed": false,
       "dependencies": [
         "plugins/action-topbar/app.css",
@@ -2047,11 +2083,11 @@
         "plugins/usage-tracker/app.css",
         "plugins/usage-tracker/app.tsx"
       ],
-      "sourceDigest": "sha256:007db7655fb06377fc181f23c1905af6b73e53fe1a581b887164aafa93922e44",
+      "sourceDigest": "sha256:e4f0567817eaaefc535a774446072233b0fee1489bd062f3714bcf7407293669",
       "digest": "sha256:23f355d733d86c584f760d4a0c0136ee7bb2c3a3aa12edfc199b29b55a480ca2",
       "freshness": "fresh"
     }
   ],
   "truncated": false,
-  "digest": "sha256:efb636128ca25ec11eba2ace420b6bb293ab7c0addbe1ab13ffefc865128bc8c"
+  "digest": "sha256:0b20c979006a4b6e0e90435c27593fb1b199de382fd1360b77ac01df258fe12e"
 }
