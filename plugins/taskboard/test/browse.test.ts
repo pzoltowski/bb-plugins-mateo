@@ -113,16 +113,42 @@ test('uses the backlog-first default before provider-specific states', () => {
 
 test('defines the complete backlog-first default status order', () => {
   assert.deepEqual(DEFAULT_WORKFLOW_STATUS_ORDER, [
+    // Items no column has claimed lead the board.
+    'No status',
     'Backlog',
+    'Shaping',
+    'Ready',
     'Todo',
+    'Working',
     'In Progress',
     'In Review',
     'QA',
+    'Needs You',
     'Ready for Release',
     'Blocked',
     'Duplicate',
     'Done',
     'Canceled'
+  ]);
+});
+
+test('one default order serves both status vocabularies', () => {
+  // Only the names a board uses become columns, so interleaving the
+  // vocabularies lets one default serve every tracker that has no order of its
+  // own. A board bound to a GitHub Project does not reach here at all — it
+  // mirrors the Project's own column order, see boardOrdered().
+  const githubColumns = ['Needs You', 'Done', 'Backlog', 'Ready', 'Working'];
+  const ordered = [...githubColumns].sort(
+    (left, right) =>
+      DEFAULT_WORKFLOW_STATUS_ORDER.indexOf(left) -
+      DEFAULT_WORKFLOW_STATUS_ORDER.indexOf(right)
+  );
+  assert.deepEqual(ordered, [
+    'Backlog',
+    'Ready',
+    'Working',
+    'Needs You',
+    'Done'
   ]);
 });
 
@@ -230,6 +256,7 @@ test('keeps the complete provider workflow ordered before and after a move', () 
     stateCategory,
     current: name === 'In Review'
   }));
+  // Canceled and Duplicate are tracker bookkeeping — they never get lanes.
   const expected = [
     'Backlog',
     'Todo',
@@ -237,9 +264,7 @@ test('keeps the complete provider workflow ordered before and after a move', () 
     'In Review',
     'QA',
     'Ready for Release',
-    'Duplicate',
-    'Done',
-    'Canceled'
+    'Done'
   ];
 
   assert.deepEqual(
@@ -274,7 +299,7 @@ test('keeps the complete provider workflow ordered before and after a move', () 
   ];
   assert.deepEqual(
     workflowStatusLanes(items, statuses, customOrder).map(lane => lane.name),
-    customOrder
+    customOrder.filter(name => name !== 'Canceled' && name !== 'Duplicate')
   );
 });
 
@@ -387,4 +412,35 @@ test('combines different filter fields with AND and values within a field with O
     }).map(workItem => workItem.key),
     ['NO-METADATA']
   );
+});
+
+test('leads the board with No status and reads in-progress by category', () => {
+  const items = [
+    item('DONE', 'Done', 'done', null),
+    item('WORK', 'Working', 'in_progress', null),
+    item('BACK', 'Backlog', 'backlog', null),
+    item('NONE', 'No status', 'backlog', null)
+  ];
+  assert.deepEqual(
+    workflowStatusLanes(items, []).map(lane => lane.name),
+    ['No status', 'Backlog', 'Working', 'Done']
+  );
+  // A saved order that predates the synthetic column still puts it first.
+  assert.equal(
+    workflowStatusLanes(items, [], ['Backlog', 'Working', 'Done'])[0]?.name,
+    'No status'
+  );
+  assert.equal(workflowStatusTone('No status', 'backlog'), 'unset');
+  // The board names its own column; the tone follows the category.
+  assert.equal(workflowStatusTone('Working', 'in_progress'), 'progress');
+  assert.equal(workflowStatusTone('In Progress', 'in_progress'), 'progress');
+});
+
+test('reads attention and backlog columns by name, whatever their category', () => {
+  for (const name of ['Needs You', 'Needs-you', 'needs you', 'Needs human', 'Blocked']) {
+    assert.equal(workflowStatusTone(name, 'in_progress'), 'attention');
+  }
+  assert.equal(workflowStatusTone('Backlog', 'backlog'), 'backlog');
+  assert.equal(workflowStatusTone('No status', 'backlog'), 'unset');
+  assert.equal(workflowStatusTone('Working', 'in_progress'), 'progress');
 });

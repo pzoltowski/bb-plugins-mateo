@@ -16,8 +16,12 @@ Kanban cards SHALL use compact, accessible initials avatars whose
 provider-neutral tone is derived deterministically from the normalized assignee
 name. The avatar SHALL retain a 20px footprint, theme-safe contrast, a visible
 ring, and the full assignee name for assistive technology and tooltip
-disclosure. Unassigned work SHALL continue to omit the marker. Kanban SHALL
-retain full available width and existing movement behavior.
+disclosure. Unassigned work SHALL continue to omit the marker. List rows and
+Kanban cards SHALL identify the tracker-side project (`WorkItem.project`) with
+a ghost-text indicator — the registered Cube glyph followed by the project
+name in the shared muted meta color, without a pill container or per-project
+color — whenever the value is non-empty. Kanban SHALL retain full available
+width and existing movement behavior.
 
 #### Scenario: Wide List and Kanban
 
@@ -40,6 +44,31 @@ retain full available width and existing movement behavior.
 - **WHEN** assistive technology reads the marker or the user opens its tooltip
 - **THEN** Taskboard exposes `Assigned to <full name>`
 - **AND** initials or palette color are not the sole identity signal
+
+#### Scenario: Identify the tracker project in List
+
+- **GIVEN** a visible work item has a non-empty `project` value
+- **WHEN** the item renders in List
+- **THEN** the row's trailing meta shows the Cube glyph followed by the
+  project name in muted ghost text
+- **AND** the row's accessible label names the project alongside priority and
+  assignee
+
+#### Scenario: Identify the tracker project in Kanban
+
+- **GIVEN** a visible work item has a non-empty `project` value
+- **WHEN** the item renders as a Kanban card
+- **THEN** the card's bottom meta row shows the Cube glyph followed by the
+  project name in muted ghost text
+- **AND** the assignee mark remains right-aligned and the card keeps existing
+  movement behavior
+
+#### Scenario: Item without a tracker project
+
+- **GIVEN** a work item has a null or empty `project` value
+- **WHEN** it renders in List or Kanban
+- **THEN** no project indicator, empty slot, or extra gap appears
+- **AND** all other metadata is unchanged
 
 #### Scenario: Preserve provider behavior
 

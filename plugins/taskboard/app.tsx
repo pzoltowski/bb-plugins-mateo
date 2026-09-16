@@ -1,5 +1,7 @@
 import {
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useId,
   useMemo,
@@ -88,6 +90,23 @@ import {
   type FilterPreset,
   formatWorkItemHandoffPrompt
 } from './contract.js';
+import {
+  cardReference,
+  chipLabelText,
+  epicChildTitle,
+  epicProgressLabel,
+  epicProgressPercent,
+  epicChildCategory,
+  epicChildTone,
+  epicChildrenNeedingYou,
+  foldedBoardItems,
+  workItemNeedsYou,
+  labelChipTone,
+  pullRequestFooterText,
+  shortItemReference,
+  singleRepositoryBoard,
+  visibleChipLabels
+} from './epic-board.js';
 import {
   defaultProjectBoardSettings,
   projectBoardSettingsSchema,
@@ -1648,11 +1667,83 @@ function formatUpdatedAt(value: string): string {
   }).format(new Date(timestamp));
 }
 
+/**
+ * Which epics are folded shut, and how to toggle one.
+ *
+ * A context rather than a prop drill: the state has to reach EpicSummary four
+ * levels below the component that owns it, and every level in between is
+ * indifferent to it. It used to be `useState` local to EpicSummary, which meant
+ * every remount silently re-expanded the whole board.
+ */
+const EpicFoldContext = createContext<{
+  collapsed: ReadonlySet<string>;
+  toggle: (locator: string) => void;
+  setMany: (locators: readonly string[], collapsed: boolean) => void;
+}>({
+  collapsed: new Set<string>(),
+  toggle: () => {},
+  setMany: () => {}
+});
+
+/**
+ * Expand-all / collapse-all.
+ *
+ * Folding is per-epic and persists, so on a board with a dozen epics setting
+ * them all one way is a dozen clicks. Epics with no children are ignored: they
+ * have nothing to fold, and counting them would leave the buttons looking stuck.
+ */
+function EpicFoldToolbar({ items }: { items: readonly WorkItem[] }) {
+  const { collapsed, setMany } = useContext(EpicFoldContext);
+  const keys = useMemo(
+    () =>
+      items
+        .filter(item => (item.epic?.children.length ?? 0) > 0)
+        .map(item => item.locator),
+    [items]
+  );
+  if (keys.length === 0) return null;
+  const openCount = keys.filter(key => !collapsed.has(key)).length;
+  return (
+    <div className="tb-epic-fold-toolbar mb-2 flex w-fit items-center gap-1.5">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={openCount === keys.length}
+        onClick={() => setMany(keys, false)}
+      >
+        <Icon name="ChevronDown" className="size-3" />
+        Expand all
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={openCount === 0}
+        onClick={() => setMany(keys, true)}
+      >
+        <Icon name="ChevronUp" className="size-3" />
+        Collapse all
+      </Button>
+    </div>
+  );
+}
+
+/** Eight spokes fading clockwise from the top, inside the r=5.25 ring's box. */
+const SPINNER_SPOKES = Array.from({ length: 8 }, (_, index) => {
+  const angle = (index * Math.PI) / 4;
+  const at = (radius: number) =>
+    `${(8 + radius * Math.sin(angle)).toFixed(2)} ${(8 - radius * Math.cos(angle)).toFixed(2)}`;
+  return { d: `M${at(3.2)}L${at(5.5)}`, opacity: (1 - index * 0.1).toFixed(2) };
+});
+
 function WorkStateGlyph({
   category,
+  tone,
   className = 'size-4'
 }: {
   category: WorkStateCategory;
+  // Two workflow tones own their own shape: a board's attention column reads
+  // as a question, its backlog as a clock. Everything else draws its category.
+  tone?: 'attention' | 'backlog' | (string & {});
   className?: string;
 }) {
   const common = {
@@ -1667,17 +1758,37 @@ function WorkStateGlyph({
       aria-hidden="true"
       data-state-category={category}
       data-taskboard-state-glyph={category}
+      data-glyph-tone={tone}
       className={cn('tb-state-glyph shrink-0', className)}
       viewBox="0 0 16 16"
     >
-      {category === 'backlog' ? (
+      {tone === 'attention' ? (
+        <>
+          <circle {...common} cx="8" cy="8" r="5.25" strokeWidth={1.25} />
+          <path {...common} strokeWidth={1.25} d="M6.4 6.35a1.6 1.6 0 1 1 2.35 1.45c-.5.28-.75.6-.75 1.05v.25" />
+          <path {...common} strokeWidth={1.25} d="M8 11.4h.01" />
+        </>
+      ) : tone === 'backlog' ? (
+        <>
+          <circle {...common} cx="8" cy="8" r="5.25" strokeWidth={1.25} />
+          <path {...common} strokeWidth={1.25} d="M8 5.15V8l1.95 1.15" />
+        </>
+      ) : category === 'backlog' ? (
         <circle {...common} cx="8" cy="8" r="5.25" strokeDasharray="1.6 2.1" />
       ) : category === 'todo' ? (
         <circle {...common} cx="8" cy="8" r="5.25" />
       ) : category === 'in_progress' ? (
+        // A spinner, not a half-filled ring: "an agent is on this right now" is
+        // motion, and the half ring read as a progress value instead.
         <>
-          <circle {...common} cx="8" cy="8" r="5.25" opacity="0.35" />
-          <path {...common} d="M8 2.75a5.25 5.25 0 0 1 0 10.5" strokeWidth="2" />
+          {SPINNER_SPOKES.map(spoke => (
+            <path
+              {...common}
+              key={spoke.d}
+              d={spoke.d}
+              opacity={spoke.opacity}
+            />
+          ))}
         </>
       ) : category === 'done' ? (
         <>
@@ -3149,7 +3260,10 @@ function WorkItemStatusMenu({
         aria-label={`Change status for ${item.key}. Current status: ${item.status}`}
         disabled={pendingStatusId !== null}
       >
-        <WorkStateGlyph category={item.stateCategory} />
+        <WorkStateGlyph
+          category={item.stateCategory}
+          tone={workflowStatusTone(item.status, item.stateCategory)}
+        />
       </Button>
     ) : (
       <Button
@@ -3165,7 +3279,10 @@ function WorkItemStatusMenu({
         )}
         disabled={pendingStatusId !== null}
       >
-        <WorkStateGlyph category={item.stateCategory} />
+        <WorkStateGlyph
+          category={item.stateCategory}
+          tone={workflowStatusTone(item.status, item.stateCategory)}
+        />
         {pendingStatusId === null ? item.status : 'Updating…'}
         <Icon name="ChevronDown" className="size-3 opacity-60" />
       </Button>
@@ -3203,7 +3320,10 @@ function WorkItemStatusMenu({
                 disabled={current || pendingStatusId !== null}
                 onSelect={() => void changeStatus(option)}
               >
-                <WorkStateGlyph category={option.stateCategory} />
+                <WorkStateGlyph
+                  category={option.stateCategory}
+                  tone={workflowStatusTone(option.name, option.stateCategory)}
+                />
                 <span className="min-w-0 flex-1 truncate">{option.name}</span>
                 {current ? <Icon name="Check" className="size-3.5" /> : null}
               </DropdownMenuItem>
@@ -3244,7 +3364,7 @@ function WorkItemRow({
       <button
         type="button"
         draggable={composerDragEnabled}
-        aria-label={`Open ${item.key}: ${item.title}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}`}
+        aria-label={`Open ${item.key}: ${item.title}.${priority ? ` Priority ${priority}.` : ''}${item.project ? ` Project ${item.project}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}`}
         onDragStart={event => {
           if (
             !composerDragEnabled ||
@@ -3273,7 +3393,7 @@ function WorkItemRow({
       <span className="tb-key pointer-events-none relative z-[1] min-w-0 truncate text-xs font-medium tabular-nums">
         {item.key}
       </span>
-      <span className="pointer-events-none relative z-[1] min-w-0 truncate text-[13px] font-medium text-foreground">
+      <span className="pointer-events-none relative z-[1] col-span-full row-start-2 min-w-0 truncate text-[13px] font-medium text-foreground">
         {item.title}
       </span>
       <span className="tb-row-trailing tb-meta pointer-events-none relative z-[1] flex min-w-0 items-center gap-2 overflow-hidden text-xs">
@@ -3287,6 +3407,7 @@ function WorkItemRow({
         <time className="tb-row-time ml-auto shrink-0 tabular-nums">
           {formatUpdatedAt(item.updatedAt)}
         </time>
+        {item.project ? <ProjectGhostMark project={item.project} /> : null}
       </span>
     </div>
   );
@@ -3360,7 +3481,10 @@ function ListStateGroups({
                 collapsed && '-rotate-90'
               )}
             />
-            <WorkStateGlyph category={group.category} />
+            <WorkStateGlyph
+              category={group.category}
+              tone={workflowStatusTone(group.name, group.category)}
+            />
             <span className="truncate">{group.name}</span>
             <span className="tb-count-chip ml-auto rounded-full px-1.5 py-0.5 text-xs font-normal tabular-nums text-subtle-foreground">
               {group.items.length}
@@ -3521,11 +3645,133 @@ function AssigneeMark({ assignee }: { assignee: string }) {
   );
 }
 
+function ProjectGhostMark({ project }: { project: string }) {
+  return (
+    <span
+      className="tb-project-mark tb-key flex min-w-0 max-w-28 items-center gap-1 text-xs"
+      title={project}
+    >
+      <Icon name="Cube" aria-hidden="true" className="size-3 shrink-0" />
+      <span className="truncate">{project}</span>
+    </span>
+  );
+}
+
+function EpicSummary({
+  item,
+  listId
+}: {
+  item: WorkItem;
+  listId: string;
+}) {
+  const { collapsed, toggle } = useContext(EpicFoldContext);
+  const expanded = !collapsed.has(item.locator);
+  const epic = item.epic;
+  if (!epic) return null;
+  const children = epic.children;
+  const needsYou = epicChildrenNeedingYou(epic);
+  const hasProgress = epic.totalChildren > 0;
+  if (!hasProgress && !epic.pullRequest) return null;
+
+  return (
+    <div className="tb-epic-summary px-3 pb-2">
+      {hasProgress ? (
+        <>
+          <div
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={epic.totalChildren}
+            aria-valuenow={epic.completedChildren}
+            aria-label={epicProgressLabel(epic)}
+            className="tb-epic-bar overflow-hidden rounded-full"
+          >
+            <div
+              className="tb-epic-bar-fill"
+              style={{ width: `${epicProgressPercent(epic)}%` }}
+            />
+          </div>
+          <button
+            type="button"
+            aria-expanded={expanded}
+            aria-controls={listId}
+            disabled={children.length === 0}
+            onClick={event => {
+              event.stopPropagation();
+              toggle(item.locator);
+            }}
+            className="tb-epic-progress-row mt-1 flex w-full items-center gap-2 rounded px-1 py-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span className="tb-meta text-xs tabular-nums">
+              {epicProgressLabel(epic)}
+            </span>
+            {needsYou.length > 0 ? (
+              <span className="tb-epic-needs-you inline-flex items-center gap-1">
+                <WorkStateGlyph
+                  category="todo"
+                  tone="attention"
+                  className="size-3"
+                />
+                {`${needsYou.length} need${needsYou.length === 1 ? 's' : ''} you`}
+              </span>
+            ) : null}
+            {children.length > 0 ? (
+              <Icon
+                name={expanded ? 'ArrowDown' : 'ArrowRight'}
+                className="tb-epic-chevron ml-auto size-3 shrink-0"
+              />
+            ) : null}
+          </button>
+        </>
+      ) : null}
+      {expanded && children.length > 0 ? (
+        <ul id={listId} className="tb-epic-children mt-1">
+          {children.map(child => (
+            <li
+              key={child.key}
+              data-child-state={child.closed ? 'closed' : 'open'}
+              data-child-tone={epicChildTone(child)}
+              className="tb-epic-child"
+            >
+              <a
+                href={child.url}
+                target="_blank"
+                rel="noreferrer"
+                title={child.key}
+                draggable={false}
+                onClick={event => event.stopPropagation()}
+                onPointerDown={event => event.stopPropagation()}
+                className="tb-epic-child-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <WorkStateGlyph
+                  category={epicChildCategory(epicChildTone(child))}
+                  tone={epicChildTone(child)}
+                  className="tb-epic-child-glyph size-3"
+                />{' '}
+                <span className="tb-key tabular-nums">
+                  {shortItemReference(child.key)}
+                </span>{' '}
+                <span>{epicChildTitle(child.title, item.title)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {epic.pullRequest ? (
+        <p className="tb-epic-pr mt-1.5 truncate text-xs">
+          {pullRequestFooterText(epic.pullRequest)}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function KanbanCard({
   item,
   pickedUp,
   pending,
   moveDisabled,
+  singleRepository,
+  hideStatusLabels,
   composerDragEnabled,
   onOpen,
   onPrepare,
@@ -3537,6 +3783,8 @@ function KanbanCard({
   pickedUp: boolean;
   pending: boolean;
   moveDisabled: boolean;
+  singleRepository: boolean;
+  hideStatusLabels: boolean;
   composerDragEnabled: boolean;
   onOpen: () => void;
   onPrepare: () => void;
@@ -3546,92 +3794,112 @@ function KanbanCard({
 }) {
   const priority = visiblePriority(item.priority);
   const assignee = visibleAssignee(item.assignee);
-  const labels = item.labels
-    .map(label => label.trim())
-    .filter(Boolean)
-    .slice(0, 2);
+  const epic = item.epic ?? null;
+  // A bound workflow board already says the status in the column header, for
+  // every card on it — including the ones the board itself has not claimed.
+  const labels = visibleChipLabels(item.labels, {
+    hideStatusLabels,
+    limit: 4
+  });
+  const reference = cardReference(item.key, singleRepository);
+  const listId = `epic-children-${encodeURIComponent(item.locator)}`;
 
   return (
-    <button
-      type="button"
-      draggable={!pending && !moveDisabled}
-      aria-grabbed={pickedUp}
-      aria-busy={pending}
-      aria-label={`${item.key}: ${item.title}. Status ${item.status}.${priority ? ` Priority ${priority}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}${moveDisabled ? ' Workflow statuses are loading. Press Enter to open.' : ' Press Space to move, or Enter to open.'}`}
-      data-state-category={item.stateCategory}
-      data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
-      data-picked-up={pickedUp ? 'true' : 'false'}
-      data-pending={pending ? 'true' : 'false'}
-      data-move-disabled={moveDisabled ? 'true' : 'false'}
-      data-composer-drag={composerDragEnabled ? 'true' : undefined}
-      onPointerDown={onPrepare}
-      onFocus={onPrepare}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onKeyDown={onKeyDown}
-      onClick={onOpen}
-      className={cn(
-        'tb-kanban-card group w-full rounded-md px-3 py-2.5 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        composerDragEnabled && 'cursor-grab active:cursor-grabbing'
-      )}
+    <div
+      className="tb-kanban-card-shell rounded-md"
+      data-needs-you={workItemNeedsYou(item) ? 'true' : undefined}
     >
-      <span className="flex items-center gap-2 text-xs">
-        <span className="tb-priority-slot flex size-4 items-center justify-center">
-          {priority ? <PriorityMark priority={priority} /> : null}
-        </span>
-        <span className="tb-key min-w-0 truncate font-medium tabular-nums">
-          {item.key}
-        </span>
-        {composerDragEnabled ? (
+      <button
+        type="button"
+        draggable={!pending && !moveDisabled}
+        aria-grabbed={pickedUp}
+        aria-busy={pending}
+        aria-label={`${item.key}: ${item.title}. Status ${item.status}.${priority ? ` Priority ${priority}.` : ''}${item.project ? ` Project ${item.project}.` : ''}${assignee ? ` Assigned to ${assignee}.` : ''}${moveDisabled ? ' Workflow statuses are loading. Press Enter to open.' : ' Press Space to move, or Enter to open.'}`}
+        data-state-category={item.stateCategory}
+        data-status-tone={workflowStatusTone(item.status, item.stateCategory)}
+        data-picked-up={pickedUp ? 'true' : 'false'}
+        data-pending={pending ? 'true' : 'false'}
+        data-move-disabled={moveDisabled ? 'true' : 'false'}
+        data-composer-drag={composerDragEnabled ? 'true' : undefined}
+        onPointerDown={onPrepare}
+        onFocus={onPrepare}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onKeyDown={onKeyDown}
+        onClick={onOpen}
+        className={cn(
+          'tb-kanban-card group w-full rounded-md px-3 pb-1.5 pt-2 text-left transition-[border-color,background-color,opacity,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          composerDragEnabled && 'cursor-grab active:cursor-grabbing'
+        )}
+      >
+        <span className="flex items-center gap-1.5">
+          {priority ? (
+            <span className="tb-priority-slot flex size-4 shrink-0 items-center justify-center">
+              <PriorityMark priority={priority} />
+            </span>
+          ) : null}
           <span
-            aria-hidden="true"
-            className="tb-composer-drag-grip ml-auto flex items-center justify-center text-muted-foreground"
+            className="tb-key min-w-0 truncate text-xs font-normal tabular-nums"
+            title={item.key}
           >
-            <Icon name="DragDropVertical" className="size-3.5" />
+            {reference}
           </span>
-        ) : null}
-      </span>
-      <span className="mt-1.5 flex items-start gap-1.5">
-        <span className="mt-1 flex shrink-0">
-          <WorkStateGlyph category={item.stateCategory} />
+          {item.project ? (
+            <span className="ml-auto flex min-w-0">
+              <ProjectGhostMark project={item.project} />
+            </span>
+          ) : null}
+          {composerDragEnabled ? (
+            <span
+              aria-hidden="true"
+              className={cn(
+                'tb-composer-drag-grip flex shrink-0 items-center justify-center text-muted-foreground',
+                !item.project && 'ml-auto'
+              )}
+            >
+              <Icon name="DragDropVertical" className="size-3.5" />
+            </span>
+          ) : null}
         </span>
-        <span className="line-clamp-2 block text-sm font-medium leading-snug text-foreground">
+        <span className="tb-kanban-card-title line-clamp-3 block text-sm font-medium leading-snug">
           {item.title}
         </span>
-      </span>
-      {labels.length > 0 ? (
-        <span className="mt-2 flex min-w-0 gap-1 overflow-hidden">
-          {labels.map((label, index) => (
-            <span
-              key={`${label}-${index}`}
-              className="tb-label-chip min-w-0 truncate rounded-full px-2 py-0.5 text-xs"
-              title={label}
-            >
-              {label}
-            </span>
-          ))}
-        </span>
-      ) : null}
-      <span className="tb-meta mt-2 flex min-w-0 items-center gap-2 text-xs">
-        <time className="shrink-0 tabular-nums" dateTime={item.updatedAt}>
-          Updated {formatUpdatedAt(item.updatedAt)}
-        </time>
-        {pending ? (
-          <span className="ml-auto min-w-0 truncate">Updating…</span>
-        ) : assignee ? (
-          <span className="ml-auto flex shrink-0">
-            <AssigneeMark assignee={assignee} />
+        {labels.length > 0 ? (
+          <span className="mt-1.5 flex min-w-0 flex-wrap gap-1">
+            {labels.map((label, index) => (
+              <span
+                key={`${label}-${index}`}
+                data-chip-tone={labelChipTone(label)}
+                className="tb-label-chip"
+                title={label}
+              >
+                {chipLabelText(label)}
+              </span>
+            ))}
           </span>
         ) : null}
-      </span>
-    </button>
+        {pending || assignee ? (
+          <span className="tb-meta mt-1.5 flex min-w-0 items-center gap-2 text-xs">
+            {pending ? (
+              <span className="min-w-0 truncate">Updating…</span>
+            ) : assignee ? (
+              <span className="ml-auto flex shrink-0">
+                <AssigneeMark assignee={assignee} />
+              </span>
+            ) : null}
+          </span>
+        ) : null}
+      </button>
+      <EpicSummary item={item} listId={listId} />
+    </div>
   );
 }
 
 function KanbanBoard({
-  items,
+  items: allItems,
   workflowItems,
   statusOrder,
+  foldChildren,
   composerDragEnabled,
   onOpen,
   onMove
@@ -3639,17 +3907,31 @@ function KanbanBoard({
   items: readonly WorkItem[];
   workflowItems: readonly WorkItem[];
   statusOrder: readonly string[];
+  foldChildren: boolean;
   composerDragEnabled: boolean;
   onOpen: (item: WorkItem) => void;
   onMove: (item: WorkItem, option: WorkStatusOption) => Promise<void>;
 }) {
   const rpc = useRpc<TaskboardRpcContract>();
+  // Folding only removes cards whose parent is on the board; children keep
+  // existing in the data, and dropping a parent moves the parent alone.
+  const items = useMemo(
+    () => foldedBoardItems(allItems, foldChildren),
+    [allItems, foldChildren]
+  );
+  const singleRepository = useMemo(
+    () => singleRepositoryBoard(allItems),
+    [allItems]
+  );
   const optionsRef = useRef(
     new Map<string, Promise<readonly WorkStatusOption[]>>()
   );
   const draggedItemRef = useRef<WorkItem | null>(null);
   const suppressOpenRef = useRef<string | null>(null);
   const [discovered, setDiscovered] = useState<WorkStatusOption[]>([]);
+  // A tracker that owns its board (a bound GitHub Project) supplies both the
+  // column order and the fact that a status label would only repeat a column.
+  const [boardOrder, setBoardOrder] = useState<readonly string[] | null>(null);
   const [pickup, setPickup] = useState<{
     item: WorkItem;
     options: readonly WorkStatusOption[];
@@ -3664,8 +3946,13 @@ function KanbanBoard({
   const [announcement, setAnnouncement] = useState('');
   const [visibleMessage, setVisibleMessage] = useState<string | null>(null);
   const lanes = useMemo(
-    () => workflowStatusLanes(items, discovered, statusOrder),
-    [discovered, items, statusOrder]
+    () =>
+      workflowStatusLanes(
+        items,
+        discovered,
+        boardOrder && boardOrder.length > 0 ? boardOrder : statusOrder
+      ),
+    [boardOrder, discovered, items, statusOrder]
   );
   const preloadItems = useMemo(() => {
     const representatives = new Map<string, WorkItem>();
@@ -3689,7 +3976,12 @@ function KanbanBoard({
           source: item.source,
           locator: item.locator
         })
-        .then(result => result.options)
+        .then(result => {
+          if (result.boardOrdered && result.options.length > 0) {
+            setBoardOrder(result.options.map(option => option.name));
+          }
+          return result.options;
+        })
         .catch((error: unknown) => {
           optionsRef.current.delete(itemId);
           throw error;
@@ -3854,6 +4146,7 @@ function KanbanBoard({
       >
         {announcement}
       </p>
+      <EpicFoldToolbar items={items} />
       {visibleMessage ? (
         <div
           role="alert"
@@ -3933,7 +4226,10 @@ function KanbanBoard({
                 className="tb-kanban-column flex w-[264px] min-w-[264px] flex-col rounded-lg border border-transparent"
               >
                 <div className="tb-kanban-column-header sticky top-0 z-10 flex h-8 items-center gap-2 px-1">
-                  <WorkStateGlyph category={lane.category} />
+                  <WorkStateGlyph
+                    category={lane.category}
+                    tone={workflowStatusTone(lane.name, lane.category)}
+                  />
                   <h3
                     id={headingId}
                     className="min-w-0 truncate text-xs font-semibold"
@@ -3947,7 +4243,7 @@ function KanbanBoard({
                     {columnItems.length}
                   </span>
                 </div>
-                <div className="min-h-20 flex-1 space-y-1.5 p-1.5 pt-1">
+                <div className="tb-kanban-lane min-h-20 flex-1 space-y-1.5 p-3">
                   {columnItems.length > 0 ? (
                     columnItems.map(item => {
                       const itemId = kanbanItemId(item);
@@ -3962,6 +4258,8 @@ function KanbanBoard({
                           }
                           pending={pending === itemId}
                           moveDisabled={!workflowReady}
+                          singleRepository={singleRepository}
+                          hideStatusLabels={boardOrder !== null}
                           composerDragEnabled={composerDragEnabled}
                           onPrepare={() => {
                             void loadOptions(item).catch(() => undefined);
@@ -4156,6 +4454,39 @@ function TrackerList({
   const [error, setError] = useState<string | null>(null);
   const requestRevisionRef = useRef(0);
   const stateFilterEnabled = boardSettings.enabledFilters.includes('state');
+
+  const epicFold = useMemo(() => {
+    const persist = (collapsed: Set<string>) => {
+      const next = {
+        ...boardSettings,
+        // The schema caps the list; drop the oldest rather than fail the save
+        // and lose the fold the reader just asked for.
+        collapsedEpics: [...collapsed].slice(-200)
+      };
+      setBoardSettings(next);
+      // Across-projects has no row to write to, and a failed save must not take
+      // the fold with it — the board stays folded for this session either way.
+      if (projectId === null) return;
+      void rpc.call('saveProjectBoardSettings', next).catch(() => {});
+    };
+    return {
+      collapsed: new Set(boardSettings.collapsedEpics),
+      toggle: (locator: string) => {
+        const collapsed = new Set(boardSettings.collapsedEpics);
+        if (collapsed.has(locator)) collapsed.delete(locator);
+        else collapsed.add(locator);
+        persist(collapsed);
+      },
+      setMany: (locators: readonly string[], collapse: boolean) => {
+        const collapsed = new Set(boardSettings.collapsedEpics);
+        for (const locator of locators) {
+          if (collapse) collapsed.add(locator);
+          else collapsed.delete(locator);
+        }
+        persist(collapsed);
+      }
+    };
+  }, [boardSettings, projectId, rpc]);
 
   useEffect(() => {
     if (projectId === null) {
@@ -4637,15 +4968,18 @@ function TrackerList({
               </div>
             </ListMeasure>
           ) : projectId !== null && view === 'kanban' ? (
+            <EpicFoldContext.Provider value={epicFold}>
             <KanbanBoard
               key={projectId}
               items={visibleItems}
               workflowItems={items}
               statusOrder={boardSettings.statusOrder}
+              foldChildren={boardSettings.foldChildren}
               composerDragEnabled={surfaceMode === 'constrained'}
               onOpen={onOpen}
               onMove={moveItemStatus}
             />
+            </EpicFoldContext.Provider>
           ) : visibleItems.length === 0 ? (
             <ListMeasure className="h-full">
               <EmptyState filtered={filtered} onClear={clearFilters} />
@@ -5707,6 +6041,31 @@ function ProjectBoardSettingsForm({
             </label>
           ))}
         </div>
+      </fieldset>
+
+      <fieldset disabled={saving} className="space-y-2">
+        <legend className="text-xs font-medium">Kanban cards</legend>
+        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border px-3 py-3">
+          <input
+            type="checkbox"
+            checked={settings.foldChildren}
+            className="mt-0.5 size-4 accent-primary"
+            onChange={event => {
+              const foldChildren = event.target.checked;
+              setSettings(current => ({ ...current, foldChildren }));
+              setSaved(false);
+            }}
+          />
+          <span className="min-w-0">
+            <span className="text-sm font-medium">
+              Fold children under parent
+            </span>
+            <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+              Show one card per epic with its children listed inside it.
+              Trackers without a parent/child hierarchy are unaffected.
+            </span>
+          </span>
+        </label>
       </fieldset>
 
       <fieldset disabled={saving} className="space-y-2">

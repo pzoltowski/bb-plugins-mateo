@@ -130,6 +130,28 @@ bb taskboard config --project <proj_id> --source github \
   board first when needed. It does not open or close the issue.
 - `--github-project-number 0` clears the binding and restores Open/Closed.
 
+#### Epic folding
+
+With a GitHub Project bound, the Kanban shows one card per epic and folds its
+children into it. Turn it off per project in **Manage → Board preferences →
+Kanban cards → Fold children under parent**.
+
+- A card reads `#9 Title`, then label chips (`type:epic` renders as `epic`;
+  `status:*` is dropped because the column already says it), a
+  `completed / total children` progress bar (GitHub's own sub-issue summary)
+  with a chevron that collapses the child list, the child list itself (`✓`
+  when a child is closed, each row linking to its issue), and the linked pull
+  request as `PR #17 · draft · feat/timeline`.
+- The reference is short (`#9`) while one repository is mapped, and
+  `repo#9` once several are; the full `owner/repo#9` stays in the tooltip and
+  the detail view.
+- An item whose parent is not on the board stays a top-level card, so nothing
+  disappears. Issues without children render as plain cards.
+- Children keep existing everywhere else: list view, search and detail still
+  find them, and they are still moved from the list.
+- Dropping an epic card in another column moves only that epic; its children
+  keep their own status.
+
 ### Linear
 
 Choose Linear in **Manage**, then provide the project's Linear personal API key

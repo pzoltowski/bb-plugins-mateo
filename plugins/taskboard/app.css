@@ -29,6 +29,38 @@
     --tb-slate: color-mix(in oklch, var(--ink) 52%, var(--canvas));
     --tb-rose: color-mix(in oklch, var(--tb-violet) 56%, var(--tb-red));
     --tb-coral: color-mix(in oklch, var(--tb-red) 62%, var(--tb-amber));
+    /* Approved board palette (prototype A). These four badge pairs and the
+       child-number blue are hand-picked literals on purpose: deriving them
+       from theme tokens drifted into saturated fills. This block is the only
+       place in the stylesheet that carries literal colours. */
+    --tb-chip-type-bg: #1f2432;
+    --tb-chip-type-fg: #8ea8ff;
+    --tb-chip-area-bg: #202020;
+    --tb-chip-area-fg: #979eaa;
+    --tb-chip-bug-bg: #2b1e1b;
+    --tb-chip-bug-fg: #e0705a;
+    --tb-chip-decision-bg: #271f2a;
+    --tb-chip-decision-fg: #be84cf;
+    --tb-chip-feature-bg: #1a2a29;
+    --tb-chip-feature-fg: #6fc3b8;
+    --tb-chip-spike-bg: #2a2418;
+    --tb-chip-spike-fg: #d9b45a;
+    --tb-chip-polish-bg: #2a1f26;
+    --tb-chip-polish-fg: #d08fb0;
+    --tb-child-number: #3b82c4;
+    --tb-epic-title: #c1c1c1;
+    --tb-child-done: #b7b7b7;
+    --tb-child-open: #858585;
+    --tb-epic-footer: #b7b7b7;
+    --tb-card-surface: #161616;
+    --tb-card-border: #262626;
+    --tb-epic-track: #353535;
+    --tb-attention: #e8923a;
+    /* Working is its own yellow, deliberately not --tb-amber: that resolves to
+       the host's --warning, which is the same orange as --tb-attention. "An
+       agent is on this" and "you are blocking this" are opposite messages and
+       must not share a colour. */
+    --tb-working: #d9a23b;
     background: var(--canvas);
   }
 
@@ -242,7 +274,7 @@
   }
 
   [data-state-category='in_progress'] {
-    --tb-state-accent: var(--tb-amber);
+    --tb-state-accent: var(--tb-working);
   }
 
   [data-state-category='done'] {
@@ -258,11 +290,19 @@
   }
 
   [data-status-tone='progress'] {
-    --tb-state-accent: var(--tb-blue);
+    --tb-state-accent: var(--tb-working);
+  }
+
+  [data-status-tone='unset'] {
+    --tb-state-accent: var(--tb-slate);
   }
 
   [data-status-tone='blocked'] {
     --tb-state-accent: var(--tb-red);
+  }
+
+  [data-status-tone='attention'] {
+    --tb-state-accent: var(--tb-attention);
   }
 
   [data-status-tone='qa'] {
@@ -282,7 +322,7 @@
   }
 
   [data-status-tone='backlog'] {
-    --tb-state-accent: var(--tb-rose);
+    --tb-state-accent: var(--tb-slate);
   }
 
   [data-status-tone='done'] {
@@ -295,6 +335,22 @@
 
   .tb-state-glyph {
     color: var(--tb-state-accent);
+  }
+
+  /* The glyph carries its own category, so a tone-owned shape states its
+     colour here too. */
+  .tb-state-glyph[data-glyph-tone='attention'] {
+    color: var(--tb-attention);
+  }
+
+  .tb-state-glyph[data-glyph-tone='backlog'] {
+    color: var(--tb-slate);
+  }
+
+  /* The glyph carries its own state category, so the neutral no-status tone
+     has to reach past it to stay grey next to a purple Backlog. */
+  [data-status-tone='unset'] .tb-state-glyph {
+    color: var(--tb-slate);
   }
 
   .tb-source-mark[data-source='linear'],
@@ -381,10 +437,24 @@
     color: color-mix(in oklch, var(--tb-source-accent) 66%, var(--ink));
   }
 
+  /* Badge shape borrowed from Dockside: tinted fill, no border, tight pill. */
+  /* Badge shape and palette borrowed from Dockside (prototype A). */
   .tb-label-chip {
-    border: 1px solid var(--border-hairline);
-    background: color-mix(in oklch, var(--ink) 3.5%, var(--canvas));
-    color: var(--tb-ink-soft);
+    --tb-chip-bg: var(--tb-chip-area-bg);
+    --tb-chip-fg: var(--tb-chip-area-fg);
+    display: inline-block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    padding: 1px 6px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--tb-chip-bg);
+    color: var(--tb-chip-fg);
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: 400;
+    line-height: 15px;
+    letter-spacing: 0.01em;
   }
 
   .tb-lane-count {
@@ -494,8 +564,8 @@
   }
 
   .tb-kanban-card {
-    border: 1px solid var(--border-hairline);
-    background: var(--canvas);
+    border: 1px solid var(--tb-card-border);
+    background: var(--tb-card-surface);
     box-shadow: none;
   }
 
@@ -516,6 +586,191 @@
     border-color: var(--tb-border-strong);
     opacity: 0.64;
     transform: scale(0.985);
+  }
+
+  .tb-kanban-card-shell {
+    border: 1px solid var(--tb-card-border);
+    background: var(--tb-card-surface);
+  }
+
+  .tb-kanban-card-shell:has(> .tb-kanban-card) > .tb-kanban-card {
+    border: 0;
+    background: transparent;
+  }
+
+  .tb-kanban-card-shell:hover {
+    border-color: var(--input);
+  }
+
+  .tb-epic-bar {
+    height: 4px;
+    background: var(--tb-epic-track);
+  }
+
+  .tb-epic-bar-fill {
+    height: 100%;
+    background: var(--tb-green);
+  }
+
+  .tb-epic-pr {
+    color: var(--tb-epic-footer);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tb-epic-toggle {
+    color: var(--tb-ink-soft);
+  }
+
+  .tb-epic-toggle:hover {
+    color: var(--ink);
+  }
+
+  .tb-epic-children {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tb-epic-child {
+    margin: 4px 0 4px 2px;
+    padding: 1px 7px;
+    border-left: 2px solid var(--tb-border);
+    color: var(--tb-child-open);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .tb-kanban-card-shell .tb-kanban-card-title {
+    color: var(--tb-epic-title);
+  }
+
+  .tb-epic-child-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .tb-epic-child-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Done children read brighter (≈65% white in the dark theme) but stay below
+     the card title; only the rail and the tick are green. */
+  /* Each row takes the tone of its own status, so the rail colours alone say
+     what is left. `closed` keeps the last word: it is the fact the tracker is
+     certain about, so it is declared after the tones. */
+  .tb-epic-child[data-child-tone='attention'] {
+    border-left-color: var(--tb-attention);
+    color: var(--tb-ink-soft);
+  }
+
+  .tb-epic-child[data-child-tone='progress'] {
+    border-left-color: var(--tb-working);
+  }
+
+  .tb-epic-child[data-child-tone='todo'] {
+    border-left-color: var(--tb-blue);
+  }
+
+  .tb-epic-child[data-child-tone='backlog'],
+  .tb-epic-child[data-child-tone='triage'] {
+    border-left-color: var(--tb-slate);
+  }
+
+  .tb-epic-child[data-child-state='closed'] {
+    border-left-color: var(--tb-green);
+    color: var(--tb-child-done);
+  }
+
+  .tb-epic-child-glyph {
+    display: inline-block;
+    vertical-align: -1px;
+    color: var(--tb-ink-soft);
+  }
+
+  .tb-epic-child[data-child-state='closed'] .tb-epic-child-glyph {
+    color: var(--tb-green);
+  }
+
+  .tb-epic-child[data-child-tone='attention'] .tb-epic-child-glyph {
+    color: var(--tb-attention);
+  }
+
+  .tb-epic-child[data-child-tone='progress'] .tb-epic-child-glyph {
+    color: var(--tb-working);
+  }
+
+  .tb-epic-child[data-child-tone='todo'] .tb-epic-child-glyph {
+    color: var(--tb-blue);
+  }
+
+  /* How many folded children are waiting on you, and a rail so the card says so
+     from across the board without being opened. */
+  .tb-epic-needs-you {
+    color: var(--tb-attention);
+    font-size: 11px;
+  }
+
+  /* The whole card wears the rail, not just its summary — the point is that it
+     reads from across the board, folded, without the title being reached. */
+  .tb-kanban-card-shell[data-needs-you='true'] {
+    box-shadow: inset 2px 0 0 var(--tb-attention);
+  }
+
+  .tb-epic-child .tb-key {
+    color: var(--tb-child-number);
+  }
+
+  .tb-epic-progress-row {
+    color: var(--tb-ink-soft);
+    cursor: pointer;
+  }
+
+  .tb-epic-progress-row:hover:not(:disabled) {
+    background: var(--state-hover);
+    color: var(--ink);
+  }
+
+  .tb-epic-progress-row:disabled {
+    cursor: default;
+  }
+
+  .tb-epic-chevron {
+    color: var(--tb-ink-soft);
+  }
+
+  .tb-label-chip[data-chip-tone='type'] {
+    --tb-chip-bg: var(--tb-chip-type-bg);
+    --tb-chip-fg: var(--tb-chip-type-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='area'] {
+    --tb-chip-bg: var(--tb-chip-area-bg);
+    --tb-chip-fg: var(--tb-chip-area-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='bug'] {
+    --tb-chip-bg: var(--tb-chip-bug-bg);
+    --tb-chip-fg: var(--tb-chip-bug-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='decision'] {
+    --tb-chip-bg: var(--tb-chip-decision-bg);
+    --tb-chip-fg: var(--tb-chip-decision-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='feature'] {
+    --tb-chip-bg: var(--tb-chip-feature-bg);
+    --tb-chip-fg: var(--tb-chip-feature-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='spike'] {
+    --tb-chip-bg: var(--tb-chip-spike-bg);
+    --tb-chip-fg: var(--tb-chip-spike-fg);
+  }
+
+  .tb-label-chip[data-chip-tone='polish'] {
+    --tb-chip-bg: var(--tb-chip-polish-bg);
+    --tb-chip-fg: var(--tb-chip-polish-fg);
   }
 
   .tb-kanban-card[data-pending='true'] {

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-551be786de22c0d2f263240c",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Real-browser captures of the live Taskboard plugin (reloaded from the main checkout) on project rn-datagui: List view shows Cube ghost-text project marks on all 333 rows; Kanban view shows marks on 80 cards. fidelity.md records the build as loyal to the approved Ghost text mockup.",
+  "passed": true,
+  "startedAt": "2026-09-16T01:27:13.677Z",
+  "completedAt": "2026-09-16T01:27:13.677Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+    "specRevision": 2,
+    "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
+    "treeDigest": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b"
+  },
+  "digest": "sha256:03b474ee1d8d191bab459a21b0455578ae2f487f012b4446008694e25a015f3d",
+  "kind": "collected",
+  "collector": "agent",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/mockups/fidelity.md",
+      "mediaType": "text/markdown",
+      "bytes": 1157,
+      "digest": "sha256:49435d1d20cd0472211390c6e9527e7652f07cc570284127f8e01b05bd94ff43"
+    },
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-kanban.png",
+      "mediaType": "image/png",
+      "bytes": 315984,
+      "digest": "sha256:4107d80535a56c51aaecba0dd673d8b10f3bf20d8f541751fdd5e4767e285be7"
+    },
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-list.png",
+      "mediaType": "image/png",
+      "bytes": 266306,
+      "digest": "sha256:3db7b1412b1b740cd12b74383ae7355d8d7894ed449c2cacb57e9c5f30e19e0d"
+    }
+  ]
+}

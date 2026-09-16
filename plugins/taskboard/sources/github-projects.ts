@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import type { WorkStateCategory } from '../contract.js';
+import type {
+  WorkItemEpic,
+  WorkItemPullRequest,
+  WorkStateCategory
+} from '../contract.js';
+import { buildEpicIndex, type EpicSourceItem } from './epic-index.js';
 import type {
   ExternalWorkItem,
   ExternalWorkItemDetail,
@@ -68,7 +73,40 @@ const contentSchema = z
     assignees: z
       .object({ nodes: z.array(z.object({ login: z.string() }).strict()) })
       .strict()
+      .nullable(),
+    // Sub-issue hierarchy, only present on Issue content.
+    parent: z
+      .object({
+        number: z.number().int().positive(),
+        repository: z.object({ nameWithOwner: z.string().min(1) }).strict()
+      })
+      .strict()
       .nullable()
+      .default(null),
+    subIssuesSummary: z
+      .object({
+        total: z.number().int().nonnegative(),
+        completed: z.number().int().nonnegative()
+      })
+      .strict()
+      .nullable()
+      .default(null),
+    closedByPullRequestsReferences: z
+      .object({
+        nodes: z.array(
+          z
+            .object({
+              number: z.number().int().positive(),
+              isDraft: z.boolean(),
+              state: z.string(),
+              headRefName: z.string()
+            })
+            .strict()
+        )
+      })
+      .strict()
+      .nullable()
+      .default(null)
   })
   .strict();
 
@@ -133,6 +171,11 @@ const ITEMS_QUERY = `query($owner:String!,$number:Int!,$after:String){
               repository { nameWithOwner }
               labels(first:20){ nodes { name } }
               assignees(first:10){ nodes { login } }
+              parent { number repository { nameWithOwner } }
+              subIssuesSummary { total completed }
+              closedByPullRequestsReferences(first:5, includeClosedPrs:true){
+                nodes { number isDraft state headRefName }
+              }
             }
             ... on PullRequest {
               number title state url updatedAt body
@@ -177,7 +220,83 @@ export interface GithubProjectSnapshot {
   readonly options: readonly GithubProjectStatusOption[];
   readonly items: readonly GithubProjectItem[];
   readonly itemsByLocator: ReadonlyMap<string, GithubProjectItem>;
+  readonly epicsByLocator: ReadonlyMap<string, WorkItemEpic>;
   readonly fetchedAt: number;
+}
+
+export function epicSourceItems(
+  items: readonly GithubProjectItem[]
+): EpicSourceItem[] {
+  return items.flatMap(item => {
+    const content = item.content;
+    if (!content) return [];
+    return [
+      {
+        locator: item.locator,
+        key: item.locator,
+        title: content.title,
+        url: content.url,
+        closed: content.state.toUpperCase() !== 'OPEN',
+        status: item.statusName ?? '',
+        parentLocator: content.parent
+          ? `${content.parent.repository.nameWithOwner}#${content.parent.number}`
+          : null,
+        subIssues:
+          content.subIssuesSummary && content.subIssuesSummary.total > 0
+            ? {
+                total: content.subIssuesSummary.total,
+                completed: content.subIssuesSummary.completed
+              }
+            : null,
+        pullRequest: pickPullRequest(
+          content.closedByPullRequestsReferences?.nodes ?? []
+        ),
+        sortOrder: issueNumber(item.locator)
+      }
+    ];
+  });
+}
+
+function issueNumber(locator: string): number {
+  const raw = Number(locator.slice(locator.indexOf('#') + 1));
+  return Number.isSafeInteger(raw) ? raw : 0;
+}
+
+/**
+ * Choose the pull request a card should show. An open or draft PR is the one
+ * the reader acts on; a merged one is the record of a finished epic.
+ */
+export function pickPullRequest(
+  nodes: readonly {
+    number: number;
+    isDraft: boolean;
+    state: string;
+    headRefName: string;
+  }[]
+): WorkItemPullRequest | null {
+  const ranked = [...nodes].sort((left, right) => {
+    const rank = (node: (typeof nodes)[number]) =>
+      node.state.toUpperCase() === 'OPEN'
+        ? 0
+        : node.state.toUpperCase() === 'MERGED'
+          ? 1
+          : 2;
+    return rank(left) - rank(right) || right.number - left.number;
+  });
+  const chosen = ranked[0];
+  if (!chosen) return null;
+  const state = chosen.state.toUpperCase();
+  return {
+    number: chosen.number,
+    state: chosen.isDraft
+      ? 'draft'
+      : state === 'MERGED'
+        ? 'merged'
+        : state === 'CLOSED'
+          ? 'closed'
+          : 'open',
+    branch: chosen.headRefName
+  };
 }
 
 const DONE_NAMES = new Set([
@@ -367,6 +486,7 @@ export async function loadGithubProjectSnapshot(
     })),
     items,
     itemsByLocator: new Map(items.map(item => [item.locator, item])),
+    epicsByLocator: buildEpicIndex(epicSourceItems(items)),
     fetchedAt: now
   };
   snapshotCache.set(key, snapshot);
@@ -387,7 +507,7 @@ export function projectStatusOptions(
     options.unshift({
       id: NO_STATUS_ID,
       name: NO_STATUS_NAME,
-      stateCategory: 'todo',
+      stateCategory: 'backlog',
       current: true
     });
   }
@@ -403,7 +523,7 @@ export function statusForOption(
     : undefined;
   return option
     ? { id: option.id, name: option.name, stateCategory: option.stateCategory }
-    : { id: NO_STATUS_ID, name: NO_STATUS_NAME, stateCategory: 'todo' };
+    : { id: NO_STATUS_ID, name: NO_STATUS_NAME, stateCategory: 'backlog' };
 }
 
 /** Build a work item for a card whose repository is not mapped to the BB project. */
@@ -430,6 +550,7 @@ export function workItemFromProjectItem(
     project: content.repository.nameWithOwner,
     labels: (content.labels?.nodes ?? []).map(node => node.name),
     updatedAt: content.updatedAt,
+    epic: snapshot.epicsByLocator.get(item.locator) ?? null,
     comments: []
   };
 }
@@ -441,7 +562,12 @@ export function withProjectStatus<T extends ExternalWorkItem>(
 ): T {
   const projectItem = snapshot.itemsByLocator.get(item.locator);
   const status = statusForOption(snapshot, projectItem?.statusOptionId ?? null);
-  return { ...item, status: status.name, stateCategory: status.stateCategory };
+  return {
+    ...item,
+    status: status.name,
+    stateCategory: status.stateCategory,
+    epic: snapshot.epicsByLocator.get(item.locator) ?? null
+  };
 }
 
 async function resolveContentNodeId(

@@ -38,12 +38,35 @@ const STATUS_OPTIONS = [
   { id: 'opt-backlog', name: 'Backlog' },
   { id: 'opt-ready', name: 'Ready' },
   { id: 'opt-progress', name: 'In progress' },
-  { id: 'opt-needs-you', name: 'Needs-you' },
+  { id: 'opt-needs-you', name: 'Needs You' },
   { id: 'opt-done', name: 'Done' }
 ];
 
-function content(number: number, title: string) {
+function content(
+  number: number,
+  title: string,
+  hierarchy: {
+    parent?: number;
+    subIssues?: { total: number; completed: number };
+    prs?: {
+      number: number;
+      isDraft: boolean;
+      state: string;
+      headRefName: string;
+    }[];
+  } = {}
+) {
   return {
+    parent: hierarchy.parent
+      ? {
+          number: hierarchy.parent,
+          repository: { nameWithOwner: REPO }
+        }
+      : null,
+    subIssuesSummary: hierarchy.subIssues ?? null,
+    closedByPullRequestsReferences: hierarchy.prs
+      ? { nodes: hierarchy.prs }
+      : null,
     __typename: 'Issue',
     number,
     title,
@@ -185,7 +208,7 @@ function ghIssue(number: number, title: string) {
 test('project columns map onto BB state categories', () => {
   assert.equal(categorizeStatusOption('Backlog', 0, 5), 'backlog');
   assert.equal(categorizeStatusOption('Ready', 1, 5), 'todo');
-  assert.equal(categorizeStatusOption('Needs-you', 3, 5), 'in_progress');
+  assert.equal(categorizeStatusOption('Needs You', 3, 5), 'in_progress');
   assert.equal(categorizeStatusOption('Done', 4, 5), 'done');
   // Position decides for names the plugin does not recognise.
   assert.equal(categorizeStatusOption('Marinating', 2, 5), 'in_progress');
@@ -212,7 +235,7 @@ test('statusOptions returns the board columns in project order', async () => {
       ['opt-backlog', 'Backlog', 'backlog'],
       ['opt-ready', 'Ready', 'todo'],
       ['opt-progress', 'In progress', 'in_progress'],
-      ['opt-needs-you', 'Needs-you', 'in_progress'],
+      ['opt-needs-you', 'Needs You', 'in_progress'],
       ['opt-done', 'Done', 'done']
     ]
   );
@@ -270,7 +293,7 @@ test('list joins repository issues with the board and keeps board-only cards', a
     items.map(item => [item.locator, item.status, item.stateCategory]),
     [
       [`${REPO}#25`, 'Ready', 'todo'],
-      [`${REPO}#8`, 'No status', 'todo'],
+      [`${REPO}#8`, 'No status', 'backlog'],
       ['pzoltowski/other-repo#3', 'Done', 'done']
     ]
   );
@@ -398,4 +421,54 @@ test('without a configured project the adapter still reports Open and Closed', a
     ['open', 'closed']
   );
   assert.equal(cli.calls.length, 0);
+});
+
+test('board items carry parent, progress and pull request facts', async () => {
+  clearGithubProjectCache();
+  const cli = makeCli({
+    items: [
+      {
+        id: 'PVTI_epic',
+        fieldValueByName: { optionId: 'opt-progress', name: 'In progress' },
+        content: content(10, 'Timeline', {
+          subIssues: { total: 6, completed: 2 },
+          prs: [
+            {
+              number: 17,
+              isDraft: true,
+              state: 'OPEN',
+              headRefName: 'feat/timeline'
+            }
+          ]
+        })
+      },
+      {
+        id: 'PVTI_child',
+        fieldValueByName: null,
+        content: content(11, 'Timeline: pure C seams', { parent: 10 })
+      }
+    ]
+  });
+  const adapter = createGithubAdapter(
+    makeBb([ghIssue(10, 'Timeline'), ghIssue(11, 'Timeline: pure C seams')]),
+    true,
+    'proj_test',
+    cli.run,
+    PROJECT
+  );
+  const items = await adapter.list();
+  const parent = items.find(item => item.locator === `${REPO}#10`)!;
+  const child = items.find(item => item.locator === `${REPO}#11`)!;
+  assert.equal(parent.epic?.parentKey, null);
+  assert.equal(parent.epic?.totalChildren, 6);
+  assert.equal(parent.epic?.completedChildren, 2);
+  assert.deepEqual(parent.epic?.children.map(entry => entry.key), [
+    `${REPO}#11`
+  ]);
+  assert.deepEqual(parent.epic?.pullRequest, {
+    number: 17,
+    state: 'draft',
+    branch: 'feat/timeline'
+  });
+  assert.equal(child.epic?.parentKey, `${REPO}#10`);
 });

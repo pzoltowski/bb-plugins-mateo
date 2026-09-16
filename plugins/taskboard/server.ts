@@ -1704,12 +1704,13 @@ export default async function plugin(bb: BbPluginApi) {
     },
     async statusOptions(input) {
       await assertProjectExists(input.projectId);
+      const [options, adapter] = await Promise.all([
+        liveStatusOptions(input.projectId, input.source, input.locator),
+        adapters(input.projectId).then(current => current.get(input.source))
+      ]);
       return {
-        options: await liveStatusOptions(
-          input.projectId,
-          input.source,
-          input.locator
-        )
+        options,
+        boardOrdered: adapter?.boardOrdered?.() ?? false
       };
     },
     async updateItemStatus(input) {

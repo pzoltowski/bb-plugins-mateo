@@ -429,6 +429,7 @@ export function createGithubAdapter(
       if (!enabled) throw new Error('GitHub is disabled');
       return statusOptions(locator);
     },
+    boardOrdered: () => githubProject !== null,
     async createMetadata(input) {
       if (!enabled) throw new Error('GitHub is disabled');
       await assertMappedRepository(input.destinationId);

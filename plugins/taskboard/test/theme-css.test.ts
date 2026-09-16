@@ -131,3 +131,117 @@ test('shows restrained composer drop feedback and discoverable drag grips', () =
     /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.tb-composer-drag-grip/u
   );
 });
+
+test('styles epic chips and child rows on theme tokens only', () => {
+  const chip = ruleBody(/\.tb-label-chip\s*\{([^}]*)\}/s, 'label chip');
+  assert.match(chip, /border-radius:\s*6px/);
+  assert.match(chip, /border:\s*0/);
+  assert.match(chip, /font-size:\s*10\.5px/);
+  assert.match(chip, /font-weight:\s*400/);
+  assert.match(chip, /line-height:\s*15px/);
+  assert.match(chip, /letter-spacing:\s*0\.01em/);
+  assert.match(chip, /padding:\s*1px 6px/);
+  assert.match(chip, /background:\s*var\(--tb-chip-bg\)/);
+  assert.match(chip, /color:\s*var\(--tb-chip-fg\)/);
+  // The approved badge palette is literal; it lives in the token block only.
+  const tokens = ruleBody(/\.tb-linear\s*\{([^}]*)\}/s, 'taskboard tokens');
+  for (const token of [
+    '--tb-chip-type-bg: #1f2432',
+    '--tb-chip-type-fg: #8ea8ff',
+    '--tb-chip-area-bg: #202020',
+    '--tb-chip-area-fg: #979eaa',
+    '--tb-chip-bug-bg: #2b1e1b',
+    '--tb-chip-bug-fg: #e0705a',
+    '--tb-chip-decision-bg: #271f2a',
+    '--tb-chip-decision-fg: #be84cf',
+    '--tb-chip-feature-bg: #1a2a29',
+    '--tb-chip-feature-fg: #6fc3b8',
+    '--tb-chip-spike-bg: #2a2418',
+    '--tb-chip-spike-fg: #d9b45a',
+    '--tb-chip-polish-bg: #2a1f26',
+    '--tb-chip-polish-fg: #d08fb0',
+    '--tb-child-number: #3b82c4',
+    '--tb-epic-title: #c1c1c1',
+    '--tb-child-done: #b7b7b7',
+    '--tb-child-open: #858585',
+    '--tb-epic-footer: #b7b7b7'
+  ]) {
+    assert.ok(tokens.includes(token), `Missing ${token}`);
+  }
+
+  const doneChild = ruleBody(
+    /\.tb-epic-child\[data-child-state='closed'\]\s*\{([^}]*)\}/s,
+    'done child'
+  );
+  assert.match(doneChild, /border-left-color:\s*var\(--tb-green\)/);
+  assert.match(
+    doneChild,
+    /color:\s*var\(--tb-child-done\)/
+  );
+
+  const openChild = ruleBody(/\.tb-epic-child\s*\{([^}]*)\}/s, 'open child');
+  assert.match(openChild, /color:\s*var\(--tb-child-open\)/);
+
+  const childNumber = ruleBody(
+    /\.tb-epic-child\s+\.tb-key\s*\{([^}]*)\}/s,
+    'child number'
+  );
+  assert.match(childNumber, /color:\s*var\(--tb-child-number\)/);
+
+  // The synthetic no-status column reads grey, not Backlog's purple.
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='unset'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-slate\)/s
+  );
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='unset'\]\s+\.tb-state-glyph\s*\{[^}]*color:\s*var\(--tb-slate\)/s
+  );
+  // Attention columns read orange, backlog grey, and both own a glyph shape.
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='attention'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-attention\)/s
+  );
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='backlog'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-slate\)/s
+  );
+  assert.match(
+    stylesheet,
+    /\.tb-state-glyph\[data-glyph-tone='attention'\]\s*\{[^}]*color:\s*var\(--tb-attention\)/s
+  );
+  assert.match(
+    stylesheet,
+    /\.tb-state-glyph\[data-glyph-tone='backlog'\]\s*\{[^}]*color:\s*var\(--tb-slate\)/s
+  );
+  const track = ruleBody(/\.tb-epic-bar\s*\{([^}]*)\}/s, 'progress track');
+  assert.match(track, /height:\s*4px/);
+  assert.match(track, /background:\s*var\(--tb-epic-track\)/);
+  // A board's in-progress column reads yellow — its own token, not --tb-amber,
+  // which resolves to the host's orange --warning and would collide with
+  // attention. Working and Needs-you must never look alike.
+  assert.match(
+    stylesheet,
+    /\[data-status-tone='progress'\]\s*\{[^}]*--tb-state-accent:\s*var\(--tb-working\)/s
+  );
+  const tokenBlock = ruleBody(/\.tb-linear\s*\{([^}]*)\}/s, 'taskboard tokens');
+  const working = /--tb-working:\s*(#[0-9a-f]{6})/i.exec(tokenBlock)?.[1];
+  const attention = /--tb-attention:\s*(#[0-9a-f]{6})/i.exec(tokenBlock)?.[1];
+  assert.ok(working && attention, 'both state colours are declared literally');
+  assert.notEqual(
+    working!.toLowerCase(),
+    attention!.toLowerCase(),
+    'working and attention must not share a colour'
+  );
+
+  const row = ruleBody(/\.tb-epic-progress-row\s*\{([^}]*)\}/s, 'progress row');
+  assert.match(row, /cursor:\s*pointer/);
+  assert.match(
+    stylesheet,
+    /\.tb-epic-progress-row:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--state-hover\)/s
+  );
+  // Outside the token block the epic surface stays literal-colour free.
+  assert.doesNotMatch(chip, /#[0-9a-f]{3,8}/i);
+  assert.doesNotMatch(doneChild, /#[0-9a-f]{3,8}/i);
+  assert.doesNotMatch(childNumber, /#[0-9a-f]{3,8}/i);
+});

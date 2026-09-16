@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "workflow": "fast",
+  "classification": "behavioral",
+  "request": "Move the taskboard project indicator to the top line of each issue row/card: top line becomes 'ISSUE-KEY' left with the ghost Cube+project chip pushed to the right (all-muted tone); title drops to its own line; chip removed from bottom/trailing meta. Applies to WorkItemRow and KanbanCard in plugins/taskboard/app.tsx. Approved variant from mockup grid: key-first, chip-right, muted.",
+  "capabilities": [],
+  "surfaces": [
+    "request-scoped-implementation"
+  ],
+  "canonical": false,
+  "verification": "skipped",
+  "digest": "sha256:5a36738fe03cf3c7a31850830de1353c696eab5602fa8691908fa56dc917cfef"
+}

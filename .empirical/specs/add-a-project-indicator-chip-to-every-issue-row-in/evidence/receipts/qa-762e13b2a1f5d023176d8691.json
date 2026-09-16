@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-762e13b2a1f5d023176d8691",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Rewrote the stale taskboard browser harness (was pinned to the discarded drag-preview action title). New harness discovers a bb project with live work items (proj_iu2ivecrkf, Linear), opens /plugins/taskboard/tasks/<id>, and asserts: 333 list rows all render .tb-project-mark ghost text (Cube glyph aria-hidden, non-empty project name, no pill/chip classes), row aria-label names the project, Kanban cards render 80 marks. Screenshots captured into the active feature qa dir.",
+  "passed": true,
+  "startedAt": "2026-09-16T01:25:02.853Z",
+  "completedAt": "2026-09-16T01:25:42.783Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+    "specRevision": 2,
+    "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
+    "treeDigest": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b",
+    "workflowRevision": 6,
+    "gitCommit": "c62e4f9b19266634746a2f42e634cdb71b05993d"
+  },
+  "digest": "sha256:754c4a696110225872ef381746f5c996921e7da4d73ec2244826ba8b9390354d",
+  "kind": "qa",
+  "matrixDigest": "sha256:6c7fca1ff9c620651ecaa4e9e553f3f94ddce55785e12c344039ecfbff785fe6",
+  "check": {
+    "id": "qa-end-to-end",
+    "kind": "end-to-end"
+  },
+  "coveredChecks": [
+    "end-to-end"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "arm64",
+    "node": "24.20.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Rewrote the stale taskboard browser harness (was pinned to the discarded drag-preview action title). New harness discovers a bb project with live work items (proj_iu2ivecrkf, Linear), opens /plugins/taskboard/tasks/<id>, and asserts: 333 list rows all render .tb-project-mark ghost text (Cube glyph aria-hidden, non-empty project name, no pill/chip classes), row aria-label names the project, Kanban cards render 80 marks. Screenshots captured into the active feature qa dir.",
+      "startedAt": "2026-09-16T01:25:02.853Z",
+      "completedAt": "2026-09-16T01:25:42.783Z",
+      "durationMs": 39930,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:afadded812b9cd8ba6a52a18f2ed300919f44b65dbf5eba517462ed68410e4d1",
+        "argv": [
+          "node",
+          ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
+        ],
+        "cwd": ".",
+        "timeoutMs": 120000,
+        "maxOutputBytes": 262144,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:c72b5289e4a185fe5b8e9ed6b040e4061373ee6569687038e4a4fdd9d2fb0763",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "{\"projectId\":\"proj_iu2ivecrkf\",\"listRows\":333,\"listProjectMarks\":333,\"kanbanProjectMarks\":80,\"sampleProject\":\"cv-supa\",\"screenshots\":[\".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-list.png\",\".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-kanban.png\"]}\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": true,
+      "sourceTreeBefore": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+      "sourceTreeAfter": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-kanban.png",
+          "mediaType": "image/png",
+          "bytes": 315984,
+          "digest": "sha256:4107d80535a56c51aaecba0dd673d8b10f3bf20d8f541751fdd5e4767e285be7"
+        },
+        {
+          "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-list.png",
+          "mediaType": "image/png",
+          "bytes": 266306,
+          "digest": "sha256:3db7b1412b1b740cd12b74383ae7355d8d7894ed449c2cacb57e9c5f30e19e0d"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

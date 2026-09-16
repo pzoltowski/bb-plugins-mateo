@@ -9,12 +9,27 @@ export const NO_PRIORITY_FILTER = '__taskboard_no_priority__';
 export const NO_PROJECT_FILTER = '__taskboard_no_project__';
 export const NO_LABELS_FILTER = '__taskboard_no_labels__';
 
+/**
+ * Column order, left to right, for boards with no order of their own. Names
+ * from every tracker live in one list; only the ones a board actually uses
+ * become columns, so the interleaving lets one default serve Linear, Jira and
+ * plain GitHub Issues alike.
+ *
+ * A board bound to a GitHub Project never reaches here: it mirrors the
+ * Project's own column order, because there the Project is the board. Reorder
+ * those columns in the Project's Status field, not here.
+ */
 export const DEFAULT_WORKFLOW_STATUS_ORDER: readonly string[] = [
+  'No status',
   'Backlog',
+  'Shaping',
+  'Ready',
   'Todo',
+  'Working',
   'In Progress',
   'In Review',
   'QA',
+  'Needs You',
   'Ready for Release',
   'Blocked',
   'Duplicate',
@@ -137,6 +152,8 @@ function normalizedStatus(value: string): string {
 }
 
 export const WORKFLOW_STATUS_TONES = [
+  'unset',
+  'attention',
   'review',
   'progress',
   'blocked',
@@ -151,11 +168,15 @@ export const WORKFLOW_STATUS_TONES = [
 export type WorkflowStatusTone = (typeof WORKFLOW_STATUS_TONES)[number];
 
 const EXACT_STATUS_TONES = new Map<string, WorkflowStatusTone>([
+  ['no status', 'unset'],
+  ['none', 'unset'],
   ['in review', 'review'],
   ['review', 'review'],
   ['in progress', 'progress'],
   ['started', 'progress'],
-  ['blocked', 'blocked'],
+  ['needs you', 'attention'],
+  ['needs human', 'attention'],
+  ['blocked', 'attention'],
   ['paused', 'blocked'],
   ['qa', 'qa'],
   ['quality assurance', 'qa'],
@@ -163,6 +184,7 @@ const EXACT_STATUS_TONES = new Map<string, WorkflowStatusTone>([
   ['unstarted', 'todo'],
   ['duplicate', 'duplicate'],
   ['triage', 'triage'],
+  ['shaping', 'backlog'],
   ['backlog', 'backlog'],
   ['done', 'done'],
   ['completed', 'done'],
@@ -178,6 +200,9 @@ export function workflowStatusTone(
   const normalized = normalizedStatus(name);
   const exact = EXACT_STATUS_TONES.get(normalized);
   if (exact) return exact;
+  // A board's own in-progress column ("Working", "Doing", …) reads from its
+  // category, so the tone never depends on what the column is called.
+  if (category === 'in_progress') return 'progress';
 
   let hash = 0;
   for (const character of `${category}:${normalized}`) {
@@ -190,6 +215,8 @@ function workflowRank(
   status: WorkflowStatus,
   statusOrder: readonly string[]
 ): number {
+  // Items no column has claimed lead the board, whatever the saved order says.
+  if (normalizedStatus(status.name) === 'no status') return -1;
   const normalizedOrder = statusOrder.map(normalizedStatus);
   const exactRank = normalizedOrder.indexOf(normalizedStatus(status.name));
   if (exactRank >= 0) return exactRank;
@@ -285,9 +312,16 @@ export function workflowStatusLanes(
       category: status.stateCategory
     });
   }
-  return [...lanes.values()].sort((left, right) =>
-    compareWorkflowStatuses(left, right, statusOrder)
-  );
+  return [...lanes.values()]
+    .filter(
+      lane =>
+        lane.category !== 'canceled' &&
+        normalizedStatus(lane.name) !== 'duplicate' &&
+        normalizedStatus(lane.name) !== 'triage'
+    )
+    .sort((left, right) =>
+      compareWorkflowStatuses(left, right, statusOrder)
+    );
 }
 
 function normalizedOptionalValue(

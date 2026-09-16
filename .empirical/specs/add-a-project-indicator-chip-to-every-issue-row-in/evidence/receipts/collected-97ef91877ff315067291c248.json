@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-97ef91877ff315067291c248",
+  "criteria": [
+    "AC-1",
+    "AC-2"
+  ],
+  "evidenceKinds": [
+    "browser"
+  ],
+  "summary": "Real-browser evidence: live Taskboard plugin (reloaded from main checkout) renders Cube ghost-text project marks — List trailing meta on all rows (project-chip-list.png), Kanban bottom meta row on all cards (project-chip-kanban.png). Captured by receipt qa-762e13b2a1f5d023176d8691.",
+  "passed": true,
+  "startedAt": "2026-09-16T01:29:07.179Z",
+  "completedAt": "2026-09-16T01:29:07.179Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+    "specRevision": 2,
+    "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
+    "treeDigest": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b"
+  },
+  "digest": "sha256:3cf1a0f47818eaaac360f6d0497efbba33147f694d4eb46b89704b2529a4cd96",
+  "kind": "collected",
+  "collector": "agent",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-kanban.png",
+      "mediaType": "image/png",
+      "bytes": 315984,
+      "digest": "sha256:4107d80535a56c51aaecba0dd673d8b10f3bf20d8f541751fdd5e4767e285be7"
+    },
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-list.png",
+      "mediaType": "image/png",
+      "bytes": 266306,
+      "digest": "sha256:3db7b1412b1b740cd12b74383ae7355d8d7894ed449c2cacb57e9c5f30e19e0d"
+    }
+  ]
+}

@@ -43,7 +43,7 @@
         "id": "taskboard-browser",
         "argv": [
           "node",
-          ".empirical/specs/taskboard-new-thread-drag-to-composer/qa/browser.mjs"
+          "plugins/taskboard/scripts/browser-qa.mjs"
         ],
         "cwd": ".",
         "timeoutMs": 120000,
@@ -63,6 +63,7 @@
           "AC-5",
           "AC-6",
           "AC-7",
+          "AC-8",
           "AC-UI-1"
         ]
       },
@@ -124,7 +125,8 @@
           "end-to-end",
           "cross-platform"
         ],
-        "criteria": []
+        "criteria": [],
+        "testFiles": "changed"
       },
       {
         "id": "touchbar-focused",
@@ -238,7 +240,8 @@
         "checks": [
           "end-to-end"
         ],
-        "criteria": []
+        "criteria": [],
+        "testFiles": "changed"
       },
       {
         "id": "dockside-portability",
@@ -333,7 +336,8 @@
         "checks": [
           "end-to-end"
         ],
-        "criteria": []
+        "criteria": [],
+        "testFiles": "changed"
       },
       {
         "id": "save-model-portability",
