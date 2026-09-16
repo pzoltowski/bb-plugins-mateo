@@ -1,25 +1,21 @@
 {
   "schemaVersion": 1,
-  "sequence": 5,
-  "previousDigest": "sha256:963d1f4534c80c03b153c77b55653344329464ccf1dffb0b2e1e2e9910f5e3d6",
-  "actor": "agent",
-  "type": "transition",
-  "summary": "Implemented ghost-text project indicator: Cube registered in icon.tsx ICON_MAP, shared ProjectGhostMark helper, WorkItemRow trailing meta + KanbanCard bottom meta render when item.project non-empty, Project name added to both aria-labels, new app-ui.test.ts assertions. tsc --noEmit clean; app-ui.test.ts 20/20 pass. Committed c62e4f9 on feat/taskboard-project-chip.",
-  "createdAt": "2026-09-16T01:09:44.818Z",
-  "stateBeforeDigest": "sha256:eabefc0dc2a380408ef2afe3bbde7645476f39f4a35f37ccb5ecf9845abff72b",
-  "stateAfterDigest": "sha256:c004cc4c75397fb0537a03689e6d894869c961a73b0377922b404e92770cfc67",
+  "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+  "lastSequence": 9,
+  "lastEventDigest": "sha256:863bf316817a0c04c9312d884b0b880020d63020277a1478fe29d09cfdc3de56",
+  "stateDigest": "sha256:156fbc9385d7749f32b1af27ca21373c0ecc5b65e78f5dfa9c4b2187ad190da6",
   "state": {
     "schemaVersion": 5,
-    "revision": 5,
+    "revision": 9,
     "activeFeature": "add-a-project-indicator-chip-to-every-issue-row-in",
     "request": "Add a project indicator chip to every issue row in the bb Taskboard plugin (plugins/taskboard). Approved design 'Ghost text': vendored Hugeicons Cube glyph + project name in single-tone muted gray text, no pill container. Render as trailing meta in WorkItemRow (list view) and bottom meta row in KanbanCard (kanban view). item.project is already populated by all three sources (Linear project.name ?? team.name, Jira fields.project.name, GitHub repo/nameWithOwner); render whenever non-empty, zero data-layer changes expected. Register/reuse the Cube glyph via the plugin's icon registry at components/ui/icon.tsx — no new icon assets. Always one neutral gray, no per-project colors.",
     "profile": "complex",
     "workflow": "complex",
     "mode": "normal",
-    "phase": "context",
-    "status": "waiting",
+    "phase": "done",
+    "status": "done",
     "repairAttempts": 0,
-    "message": "Implemented ghost-text project indicator: Cube registered in icon.tsx ICON_MAP, shared ProjectGhostMark helper, WorkItemRow trailing meta + KanbanCard bottom meta render when item.project non-empty, Project name added to both aria-labels, new app-ui.test.ts assertions. tsc --noEmit clean; app-ui.test.ts 20/20 pass. Committed c62e4f9 on feat/taskboard-project-chip.",
+    "message": "Integrated capability changes: taskboard-browser",
     "implementationActor": "agent",
     "workStartedAt": null,
     "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
@@ -30,23 +26,30 @@
     "capabilityClaimId": "add-a-project-indicator-chip-to-every-issue-row-in-d1a5bbb2c61d",
     "authorizationDigest": null,
     "evidence": [],
-    "evidenceReceiptIds": [],
+    "evidenceReceiptIds": [
+      "qa-ef08d20c64a397f2c25964de",
+      "qa-de808c2598a225de5e761807",
+      "qa-9777dc412cca545ef2872ba0",
+      "collected-a3d6cef6572fdcc18341239a",
+      "collected-1b557f02e68e1c35f64f152e",
+      "collected-35d4b7b4a1c5a5cf5461578a",
+      "qa-ae39bf2ecb8fcb4748e501fc"
+    ],
     "legacyEvidenceCount": 0,
     "completion": {
       "implemented": true,
-      "verified": false,
-      "integrated": false,
+      "verified": true,
+      "integrated": true,
       "delivered": false,
       "published": false,
-      "highest": "implemented",
+      "highest": "integrated",
       "reasons": {
-        "verified": "verified has not been proven by a durable receipt.",
-        "integrated": "integrated has not been proven by a durable receipt.",
         "delivered": "delivered has not been proven by a durable receipt.",
         "published": "published has not been proven by a durable receipt."
       }
     },
-    "updatedAt": "2026-09-16T01:09:44.818Z"
+    "updatedAt": "2026-09-16T02:08:09.357Z"
   },
-  "digest": "sha256:d5aaa459fd8c6e712313c22611a141ee77169170e0c1d907211bc50d37cdf607"
+  "compactedAt": "2026-09-16T02:08:09.549Z",
+  "digest": "sha256:e0dfbb1b96222a3004b38616ed687befc77dcd098cf0e8835c5cd329bfe5dbfe"
 }

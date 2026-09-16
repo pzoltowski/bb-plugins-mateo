@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+  "claimId": "add-a-project-indicator-chip-to-every-issue-row-in-d1a5bbb2c61d",
+  "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+  "baseCommit": "4476b680a46811682223127163d5cc443a0f8348",
+  "baseTree": "a279e75aa1763c48d87770970afd524907c23995",
+  "featureTree": "sha256:cd1628af0cae3cd9e99439df0d98742b922bac097b55e02baa46a4a3b7405a60",
+  "targetCommit": "ec71d8a40339001470f6788286a3ee1c8a16cc6f",
+  "targetTree": "89150a25533bafddeb192fa2e43c127dea4c99f2",
+  "capabilityBaseDigests": {
+    "taskboard-browser": "sha256:04bf0664ae90d67adcdb184c5744a353dbe6ba012091d3b7232867a3de1ee0c1"
+  },
+  "deltaDigest": "sha256:30b68787bf65d93d332ddb2dcb090c14efbfe044606f1396cb5585eb5f5f0d3f",
+  "resultDigests": {
+    "taskboard-browser": "sha256:5f9d5d6bfb589a54eba953c4d54d3da9d70404c5f173c2c8886a4889de5e2b0d"
+  },
+  "verificationReceiptDigests": [
+    "sha256:069ae011e14c7cf522ab71ab2291ad3dc4dd06366c080e52a13704080658d9a4",
+    "sha256:0e6e7417addcc3a8a73710c591a1e592cdf68280c41ab79e314369e3ee648522",
+    "sha256:21c91e4d20a3b69ae00c58730611f08d51e4856617a5cba567a9a557015ce091",
+    "sha256:453887c53df7d21a124e1990d33bd12cab57fa0d943659156806a51f22644362",
+    "sha256:4af376e024579ac7640fee238c7df2a36a89ec2897594fd84da7019e3402b9ce",
+    "sha256:675e9698922644a9f284bf9a5cb22bbcee7d445df2fdb3231a0513ea5a828b22",
+    "sha256:7715e34b4e5afcd5f60db11b2e62c81803be47925aad8f350cf1ee7aa5a0c409",
+    "sha256:7cb1e368ef33aec3c95de5aa0c39ec107d8a5d0ed8ac2f276cbe9436595ef3de",
+    "sha256:c3f39a50c2bde0b343cd663e125c765ada9110e078081bf2459f6731c4db3200",
+    "sha256:cc5ca51787c8fc71482385a1b9432d60db5754efddc7191cc796f895116f6c7a",
+    "sha256:d2d6222facc01b807d751b538c92656c76e0c5dc24c0c82d315c1127c94573b2",
+    "sha256:e2bce7340ba92408e51ad0c4b9892bd7d8731f8549b73635eccc4c95bd32bace",
+    "sha256:f85ae960ffce16d290b53d3be6ae9543c3220d5c58d33cd5b12b2885ddd17cd0"
+  ],
+  "integratedAt": "2026-09-16T02:08:09.267Z",
+  "digest": "sha256:87c839e5b929cd519ed4ebcf0ec22a41e3905c4b9b656d19a3954acbbfd757c3"
+}
