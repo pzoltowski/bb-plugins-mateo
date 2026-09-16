@@ -3648,7 +3648,7 @@ function AssigneeMark({ assignee }: { assignee: string }) {
 function ProjectGhostMark({ project }: { project: string }) {
   return (
     <span
-      className="tb-project-mark flex min-w-0 max-w-28 items-center gap-1"
+      className="tb-project-mark tb-key flex min-w-0 max-w-28 items-center gap-1 text-xs"
       title={project}
     >
       <Icon name="Cube" aria-hidden="true" className="size-3 shrink-0" />
@@ -3852,7 +3852,10 @@ function KanbanCard({
           {composerDragEnabled ? (
             <span
               aria-hidden="true"
-              className="tb-composer-drag-grip ml-auto flex shrink-0 items-center justify-center text-muted-foreground"
+              className={cn(
+                'tb-composer-drag-grip flex shrink-0 items-center justify-center text-muted-foreground',
+                !item.project && 'ml-auto'
+              )}
             >
               <Icon name="DragDropVertical" className="size-3.5" />
             </span>

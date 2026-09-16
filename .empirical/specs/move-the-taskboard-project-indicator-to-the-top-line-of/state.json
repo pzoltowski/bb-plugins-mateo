@@ -1,15 +1,15 @@
 {
   "schemaVersion": 5,
-  "revision": 2,
+  "revision": 3,
   "activeFeature": "move-the-taskboard-project-indicator-to-the-top-line-of",
   "request": "Move the taskboard project indicator to the top line of each issue row/card: top line becomes 'ISSUE-KEY' left with the ghost Cube+project chip pushed to the right (all-muted tone); title drops to its own line; chip removed from bottom/trailing meta. Applies to WorkItemRow and KanbanCard in plugins/taskboard/app.tsx. Approved variant from mockup grid: key-first, chip-right, muted.",
   "profile": "fast",
   "workflow": "fast",
   "mode": "normal",
-  "phase": "done",
-  "status": "done",
+  "phase": "implement",
+  "status": "waiting",
   "repairAttempts": 0,
-  "message": "Approved variant implemented surgically: WorkItemRow title drops to row 2 (col-span-full row-start-2) and the ghost Cube+project mark moved to the rightmost slot of the top-line trailing meta; KanbanCard top line is now priority + key + chip pushed right + drag grip, with the title on its own line and the chip removed from the bottom meta (meta now renders only for pending/assignee). aria-label project announcement unchanged. Root npm run check green; taskboard@0.5.10 reloaded from the main checkout path.",
+  "message": "Fix the KanbanCard top-line chip: it renders brighter and larger than the issue key and sits mid-line. Chip must match the key's exact font size and muted color (--tb-ink-soft/text-xs) and sit flush right immediately adjacent to the grip/right edge; same checks on WorkItemRow.",
   "implementationActor": "agent",
   "workStartedAt": null,
   "specDigest": "sha256:0118c243aebd41c46db54fe8927ab56b1c1a31c77b8c0a921ff717757657d81b",
@@ -23,18 +23,24 @@
   "evidenceReceiptIds": [],
   "legacyEvidenceCount": 0,
   "completion": {
-    "implemented": true,
+    "implemented": false,
     "verified": false,
     "integrated": false,
     "delivered": false,
     "published": false,
-    "highest": "implemented",
+    "highest": "none",
     "reasons": {
+      "implemented": "implemented has not been proven by a durable receipt.",
       "verified": "verified has not been proven by a durable receipt.",
       "integrated": "integrated has not been proven by a durable receipt.",
       "delivered": "delivered has not been proven by a durable receipt.",
       "published": "published has not been proven by a durable receipt."
     }
   },
-  "updatedAt": "2026-09-16T10:33:19.755Z"
+  "updatedAt": "2026-09-16T10:36:42.763Z",
+  "lifecycle": {
+    "stage": "iteration",
+    "iteration": 1,
+    "awaitingFeedback": false
+  }
 }
