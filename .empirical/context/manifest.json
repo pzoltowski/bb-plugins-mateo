@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generator": "empirical-0.35.0",
-  "sourceDigest": "sha256:fec8b789785bd1452bedcd71e7390c5e2b9a0b9ede2177d08ce97c3c1d36ca38",
+  "sourceDigest": "sha256:48aa702ec3f9c0e475187e4a94cd558392f4384a959afe829314eae9eff9feac",
   "files": [
     {
       "path": ".agents/skills/empirical/SKILL.md",
@@ -290,8 +290,8 @@
     },
     {
       "path": "plugins/dockside/README.md",
-      "size": 10553,
-      "digest": "sha256:291ccfdd7cdb4e347afdab1c3b539a648bad8126f74cba5fbbcde48dd23c8df0"
+      "size": 11312,
+      "digest": "sha256:2a6f00663741340ec33a42a51dfff856c7c99b2dd8cae9a11cb35ea2ac0f6af5"
     },
     {
       "path": "plugins/dockside/THIRD_PARTY_NOTICES.md",
@@ -345,8 +345,8 @@
     },
     {
       "path": "plugins/dockside/components/inbox/project-group.tsx",
-      "size": 12500,
-      "digest": "sha256:d039c1c6656a3d4ccb6e9492879bfd7cabceaf547f2ae49208b8e68ceebf2362"
+      "size": 13059,
+      "digest": "sha256:ad55274814171bf9828e98e6dc271c993fba494dc8c58c512731c9d1c325e959"
     },
     {
       "path": "plugins/dockside/components/inbox/provider-glyph.tsx",
@@ -390,13 +390,13 @@
     },
     {
       "path": "plugins/dockside/components/inbox/thread-inbox.tsx",
-      "size": 30003,
-      "digest": "sha256:cfa56b8f7c978477016ef11ba9a3f8e8157c5429cc2fadceee1c8e60908f71ce"
+      "size": 30258,
+      "digest": "sha256:d251f99066925a2aef5606ddcde22e3a4455ac934da34f0c2f39e3b6d1801595"
     },
     {
       "path": "plugins/dockside/components/settings/dockside-settings.tsx",
-      "size": 14171,
-      "digest": "sha256:bbdcd61df588f87d58bbddb9ad6d59fa08a3c20f15541686012d59146e543af5"
+      "size": 15515,
+      "digest": "sha256:e076926c9df44b3036619966bd9b38f3007e4fafde48045139aff81a54aac075"
     },
     {
       "path": "plugins/dockside/components/ui/icon.tsx",
@@ -417,6 +417,11 @@
       "path": "plugins/dockside/hooks/use-project-colors.ts",
       "size": 2626,
       "digest": "sha256:b4018099c69586de2afb1b3aa985b2cfd00eeb69e54b93539373ca5d9ebe52aa"
+    },
+    {
+      "path": "plugins/dockside/hooks/use-project-icons.ts",
+      "size": 2023,
+      "digest": "sha256:8ef7d5c5d5c3029dff62c454cfeb129d797151174ca1e7c565c021162796f062"
     },
     {
       "path": "plugins/dockside/hooks/use-retrying-read.ts",
@@ -465,8 +470,8 @@
     },
     {
       "path": "plugins/dockside/lib/preferences.ts",
-      "size": 7028,
-      "digest": "sha256:0f897bed7c0f9115cdb05c33de808522f431b0ba19eef6ea1ad6938ad012ea40"
+      "size": 7376,
+      "digest": "sha256:3f7c15cb717284f3582e779111115edf540d298ff97bff93219f6444e52ab52a"
     },
     {
       "path": "plugins/dockside/lib/project-color-store.ts",
@@ -475,8 +480,13 @@
     },
     {
       "path": "plugins/dockside/lib/project-colors.ts",
-      "size": 2861,
-      "digest": "sha256:803653d32b3a55a58c939192673b587daf6e7119b6210322f47783979bb45ee7"
+      "size": 3512,
+      "digest": "sha256:36c88d00413e5f75d8cda863b85140d9567774f8f4d44ead6dde20e311702c9b"
+    },
+    {
+      "path": "plugins/dockside/lib/project-icons.ts",
+      "size": 4672,
+      "digest": "sha256:2622e5ffee87b1320764027d14f299a0380c85df99231523b61a95466410aeb1"
     },
     {
       "path": "plugins/dockside/lib/project-order.ts",
@@ -530,8 +540,8 @@
     },
     {
       "path": "plugins/dockside/server.ts",
-      "size": 27946,
-      "digest": "sha256:9db262e6a816e74fdde8e31b8f329fdc23431455659ed95a92ab7f30155ef4f6"
+      "size": 29335,
+      "digest": "sha256:975573c586416c37451480ff3590d1ec50466ab9a90190f9c2427105f0727443"
     },
     {
       "path": "plugins/dockside/test/attention-state.test.ts",
@@ -570,8 +580,8 @@
     },
     {
       "path": "plugins/dockside/test/preferences.test.ts",
-      "size": 4249,
-      "digest": "sha256:7e309752756231e8856d27ebf8f20cbe5ba25bbb569db91c9e161f7d315e8802"
+      "size": 4691,
+      "digest": "sha256:c52c95d9e5922b6a741dc8cc482877e46385badd21e275c9642d9c17f9d94345"
     },
     {
       "path": "plugins/dockside/test/project-color-store.test.ts",
@@ -580,8 +590,13 @@
     },
     {
       "path": "plugins/dockside/test/project-colors.test.ts",
-      "size": 2694,
-      "digest": "sha256:11acf860c32fd4954730e79f46e3348205949b71cc3ec07ff91f5ed5cdf47639"
+      "size": 3720,
+      "digest": "sha256:ba4ce0ba4ce52e19e5be50d9fbe18fdc41b288bae5c8aa383b487b21bc6cd9da"
+    },
+    {
+      "path": "plugins/dockside/test/project-icons.test.ts",
+      "size": 4586,
+      "digest": "sha256:1339ea2112c6a09e924f7de0bd7b143abae319395f0f23ddad89cfc418e4b3b3"
     },
     {
       "path": "plugins/dockside/test/project-order.test.ts",
@@ -605,8 +620,8 @@
     },
     {
       "path": "plugins/dockside/test/settings-contract.test.ts",
-      "size": 5195,
-      "digest": "sha256:508f2540fe9ba4420dfe1a7fd37a4f68a6828c68ddfd214d329a96762f5d0c33"
+      "size": 5992,
+      "digest": "sha256:5eb5f75c1b1076dbc5ae04a27efc8170007ac83211f43ab4df80d06205db00ea"
     },
     {
       "path": "plugins/dockside/test/settled-threads.test.ts",
@@ -955,8 +970,8 @@
     },
     {
       "path": "plugins/taskboard/app.tsx",
-      "size": 258540,
-      "digest": "sha256:06b916620a5772db476cfc9997d6459e7b4919357b7569c81e9ffb52c1344c93"
+      "size": 261447,
+      "digest": "sha256:056f5bff8f825c79821521686c00025f9cbf92f04c7fb060bf924a1c0371e85c"
     },
     {
       "path": "plugins/taskboard/assets/icon.svg",
@@ -1121,12 +1136,22 @@
     {
       "path": "plugins/taskboard/package.json",
       "size": 2293,
-      "digest": "sha256:4b845e8a5118096cd88603624fa336ccd397a7fdcc3c7ad6852e739fa97db952"
+      "digest": "sha256:f0d2a52a2030b27d37a15fddf095c4ceb9036c4adf7903712a55c58920043c61"
     },
     {
       "path": "plugins/taskboard/project-selection.ts",
       "size": 2295,
       "digest": "sha256:543ed6c976898ffcbed3ada2a490f9b418b692df2b643304c8b0b0c1bde042b1"
+    },
+    {
+      "path": "plugins/taskboard/scripts/browser-qa.mjs",
+      "size": 4368,
+      "digest": "sha256:214bd171a73f62dacf96e0878c749cc8b6bb3dfa9b1cc50cf0091271658deb03"
+    },
+    {
+      "path": "plugins/taskboard/scripts/toolbar-verify.mjs",
+      "size": 3425,
+      "digest": "sha256:78600bd0c8457c1730795bd2cef0107a1ed835f246f9e3a8858a88fbe26744c3"
     },
     {
       "path": "plugins/taskboard/scripts/verify-build.mjs",
@@ -1180,8 +1205,8 @@
     },
     {
       "path": "plugins/taskboard/test/app-ui.test.ts",
-      "size": 15748,
-      "digest": "sha256:08d6df5022293cd12317990821a0314ffae7aa4f38dfbe12c9841a38589f4e92"
+      "size": 17267,
+      "digest": "sha256:2a51ebf9197290a5732f491a8705697405ddd5cc5c2cef6a699545fe0c35c68b"
     },
     {
       "path": "plugins/taskboard/test/browse-preferences.test.ts",
@@ -1211,7 +1236,7 @@
     {
       "path": "plugins/taskboard/test/distribution.test.ts",
       "size": 6831,
-      "digest": "sha256:fddd59de6f460f8a5b3cc4fc7d98a630eb3446efe6ebbef52bce9b854581c91f"
+      "digest": "sha256:379c6ab4e2328a14ba75380b963524eab7c2d7a26f3fc3b9abae095243cdf75d"
     },
     {
       "path": "plugins/taskboard/test/epic-board.test.ts",
@@ -1693,6 +1718,7 @@
         "plugins/dockside/components/ui/select.tsx",
         "plugins/dockside/hooks/use-lifecycle.ts",
         "plugins/dockside/hooks/use-project-colors.ts",
+        "plugins/dockside/hooks/use-project-icons.ts",
         "plugins/dockside/hooks/use-retrying-read.ts",
         "plugins/dockside/hooks/use-settled-threads.ts",
         "plugins/dockside/lib/attention-state.ts",
@@ -1705,6 +1731,7 @@
         "plugins/dockside/lib/preferences.ts",
         "plugins/dockside/lib/project-color-store.ts",
         "plugins/dockside/lib/project-colors.ts",
+        "plugins/dockside/lib/project-icons.ts",
         "plugins/dockside/lib/project-order.ts",
         "plugins/dockside/lib/provider-marks.ts",
         "plugins/dockside/lib/pull-request-presentation.ts",
@@ -1726,6 +1753,7 @@
         "plugins/dockside/test/preferences.test.ts",
         "plugins/dockside/test/project-color-store.test.ts",
         "plugins/dockside/test/project-colors.test.ts",
+        "plugins/dockside/test/project-icons.test.ts",
         "plugins/dockside/test/project-order.test.ts",
         "plugins/dockside/test/pull-request-presentation.test.ts",
         "plugins/dockside/test/relative-time.test.ts",
@@ -1835,6 +1863,8 @@
         "plugins/taskboard/lib/utils.ts",
         "plugins/taskboard/package.json",
         "plugins/taskboard/project-selection.ts",
+        "plugins/taskboard/scripts/browser-qa.mjs",
+        "plugins/taskboard/scripts/toolbar-verify.mjs",
         "plugins/taskboard/scripts/verify-build.mjs",
         "plugins/taskboard/server.ts",
         "plugins/taskboard/sources/epic-index.ts",
@@ -1931,7 +1961,7 @@
         "plugins/usage-tracker/tsconfig.json",
         "plugins/usage-tracker/types/css-modules.d.ts"
       ],
-      "sourceDigest": "sha256:fec8b789785bd1452bedcd71e7390c5e2b9a0b9ede2177d08ce97c3c1d36ca38",
+      "sourceDigest": "sha256:48aa702ec3f9c0e475187e4a94cd558392f4384a959afe829314eae9eff9feac",
       "digest": "sha256:eed9cfd95fdecbf70535c9b9bfdb204011bdad5af0a5418d4d923f3a99f354f2",
       "freshness": "fresh"
     },
@@ -1950,10 +1980,12 @@
         "plugins/dockside/components/inbox/project-group.tsx",
         "plugins/dockside/lib/project-color-store.ts",
         "plugins/dockside/lib/project-colors.ts",
+        "plugins/dockside/lib/project-icons.ts",
         "plugins/dockside/lib/project-order.ts",
         "plugins/dockside/package.json",
         "plugins/dockside/test/project-color-store.test.ts",
         "plugins/dockside/test/project-colors.test.ts",
+        "plugins/dockside/test/project-icons.test.ts",
         "plugins/dockside/test/project-order.test.ts",
         "plugins/host-monitor/README.md",
         "plugins/host-monitor/package.json",
@@ -1968,7 +2000,7 @@
         "plugins/usage-tracker/README.md",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:81d31685a624fbacc2aac91be9f03c42bcf9de9a58f7f4ac095ea3747fb8b921",
+      "sourceDigest": "sha256:043502fa6107c87ce109baf066bc71a1951257c402260cd7caaf5fbb2875b2a6",
       "digest": "sha256:37f1b782a0e88dee101030bf6ac6aa2742c329ca37daf764d5022e793ce6bc15",
       "freshness": "fresh"
     },
@@ -1987,7 +2019,7 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:c8b520b8464a586f1f49d3f47d652776e9d161cfc63e139475930e2c14ae0f74",
+      "sourceDigest": "sha256:0cd77a52983b181858977a075ea7d64493e8d16cf0d88a31aa67c102033fbdd4",
       "digest": "sha256:6a3333fdbbcffff93c96400aab0596932dc23cce823061cdedacad5e44ef7bd7",
       "freshness": "fresh"
     },
@@ -2007,7 +2039,7 @@
         "plugins/touchbar/package.json",
         "plugins/usage-tracker/package.json"
       ],
-      "sourceDigest": "sha256:78c7fa31aa9515f30bce1b827187a652290db33ad4ebdeb1f2e41a1678bdaa34",
+      "sourceDigest": "sha256:57f5a103e9c1547ebfd274eb18699248b8d63eb63814ef0d3d304eeeb06fe675",
       "digest": "sha256:06a7a6d07d2649e2d00a93cf62beef749d2f5dada25077c225726f81ec2eeed3",
       "freshness": "fresh"
     },
@@ -2083,11 +2115,11 @@
         "plugins/usage-tracker/app.css",
         "plugins/usage-tracker/app.tsx"
       ],
-      "sourceDigest": "sha256:e4f0567817eaaefc535a774446072233b0fee1489bd062f3714bcf7407293669",
+      "sourceDigest": "sha256:026a5255301df5862784cac061a5429cb62474f987c10b06da261abbd334c641",
       "digest": "sha256:23f355d733d86c584f760d4a0c0136ee7bb2c3a3aa12edfc199b29b55a480ca2",
       "freshness": "fresh"
     }
   ],
   "truncated": false,
-  "digest": "sha256:0b20c979006a4b6e0e90435c27593fb1b199de382fd1360b77ac01df258fe12e"
+  "digest": "sha256:73a81a5fb505c8c976cb23247ea63219f32f35bb7e791271ca4e26cf15de068f"
 }

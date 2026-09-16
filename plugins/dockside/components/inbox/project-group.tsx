@@ -19,8 +19,8 @@ import {
 } from "@/lib/thread-management";
 import type { DocksidePreferences } from "@/lib/preferences";
 import {
-  projectBadgeLetter,
   projectBadgePresentation,
+  projectBadgeText,
 } from "@/lib/project-colors";
 
 export function ProjectGroup({
@@ -45,6 +45,7 @@ export function ProjectGroup({
   onProjectKeyboardMove,
   preferences,
   projectColorOverrides,
+  projectIcons,
 }: {
   group: ProjectThreadGroup;
   providerInfoById: ReadonlyMap<string, ProviderGlyphInfo>;
@@ -77,6 +78,7 @@ export function ProjectGroup({
   onProjectKeyboardMove: (projectId: string, direction: -1 | 1) => void;
   preferences: DocksidePreferences;
   projectColorOverrides: ReadonlyMap<string, string>;
+  projectIcons: ReadonlyMap<string, string>;
 }) {
   const actions = useSidebarThreadActions();
   const projectDragStarted = useRef(false);
@@ -87,10 +89,17 @@ export function ProjectGroup({
     ...family.children,
   ]);
   const expanded = forceExpanded || expandedByUser;
+  const badgeText = projectBadgeText(
+    group.project.name,
+    preferences.badgeLetterCount,
+  );
   const badge = projectBadgePresentation(
-    group.project.id,
+    badgeText,
     projectColorOverrides.get(group.project.id),
   );
+  const iconDataUrl = preferences.preferProjectIcon
+    ? projectIcons.get(group.project.id)
+    : undefined;
 
   return (
     <section
@@ -178,13 +187,24 @@ export function ProjectGroup({
         <span
           aria-hidden
           data-dockside-project-badge={group.project.id}
-          className="pointer-events-none relative flex size-5 shrink-0 items-center justify-center rounded-md border border-black/15 text-2xs font-semibold uppercase shadow-sm"
+          className={cn(
+            "pointer-events-none relative flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-md border border-black/15 font-semibold uppercase shadow-sm",
+            badgeText.length === 1 ? "text-2xs" : "text-[8px] tracking-[-0.02em]",
+          )}
           style={{
             backgroundColor: badge.backgroundColor,
             color: badge.foregroundColor,
           }}
         >
-          {projectBadgeLetter(group.project.name)}
+          {iconDataUrl === undefined ? (
+            badgeText
+          ) : (
+            <img
+              src={iconDataUrl}
+              alt=""
+              className="size-full object-cover"
+            />
+          )}
         </span>
         <span className="pointer-events-none relative min-w-0 flex-1 truncate text-xs font-semibold text-foreground/90">
           {group.project.name}

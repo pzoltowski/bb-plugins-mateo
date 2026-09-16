@@ -20,10 +20,12 @@ import {
   type SemanticColorRole,
 } from "@/lib/preferences";
 import { useProjectColors } from "@/hooks/use-project-colors";
+import { useProjectIcons } from "@/hooks/use-project-icons";
+import { cn } from "@/lib/utils";
 import {
   automaticProjectColor,
-  projectBadgeLetter,
   projectBadgePresentation,
+  projectBadgeText,
 } from "@/lib/project-colors";
 
 const THREAD_STATES: readonly FamilyStatusKind[] = [
@@ -65,6 +67,8 @@ export function DocksideSettingsSection() {
   const preferences = resolveDocksidePreferences(settings.values);
   const { projects } = useSidebarThreads();
   const projectColors = useProjectColors();
+  const projectIds = useMemo(() => projects.map((project) => project.id), [projects]);
+  const projectIcons = useProjectIcons(projectIds);
 
   return (
     <section
@@ -89,6 +93,9 @@ export function DocksideSettingsSection() {
         isLoading={projectColors.isLoading}
         setProjectColor={projectColors.setProjectColor}
         resetProjectColor={projectColors.resetProjectColor}
+        badgeLetterCount={preferences.badgeLetterCount}
+        preferProjectIcon={preferences.preferProjectIcon}
+        icons={projectIcons.icons}
       />
       <PalettePreview title="Pull requests" items={PR_SWATCHES} preferences={preferences} />
       <p className="text-2xs text-muted-foreground">
@@ -96,7 +103,9 @@ export function DocksideSettingsSection() {
         children {preferences.defaultChildrenExpanded ? "expanded" : "collapsed"} ·
         providers {preferences.showProviderIcons ? "shown" : "hidden"} · PR metadata{" "}
         {preferences.showPullRequestMetadata ? "shown" : "hidden"} · times{" "}
-        {preferences.showRelativeTime ? "shown" : "hidden"}
+        {preferences.showRelativeTime ? "shown" : "hidden"} · badge{" "}
+        {preferences.badgeLetterCount === 2 ? "two letters" : "one letter"} ·
+        repo icons {preferences.preferProjectIcon ? "on" : "off"}
       </p>
     </section>
   );
@@ -108,12 +117,18 @@ function ProjectColorEditor({
   isLoading,
   setProjectColor,
   resetProjectColor,
+  badgeLetterCount,
+  preferProjectIcon,
+  icons,
 }: {
   projects: readonly { id: string; name: string }[];
   overrides: ReadonlyMap<string, string>;
   isLoading: boolean;
   setProjectColor(projectId: string, color: string): Promise<string>;
   resetProjectColor(projectId: string): Promise<void>;
+  badgeLetterCount: 1 | 2;
+  preferProjectIcon: boolean;
+  icons: ReadonlyMap<string, string>;
 }) {
   const [query, setQuery] = useState("");
   const [announcement, setAnnouncement] = useState("");
@@ -165,6 +180,9 @@ function ProjectColorEditor({
               setProjectColor={setProjectColor}
               resetProjectColor={resetProjectColor}
               announce={setAnnouncement}
+              badgeLetterCount={badgeLetterCount}
+              preferProjectIcon={preferProjectIcon}
+              icon={icons.get(project.id)}
             />
           ))}
         </ul>
@@ -182,14 +200,21 @@ function ProjectColorRow({
   setProjectColor,
   resetProjectColor,
   announce,
+  badgeLetterCount,
+  preferProjectIcon,
+  icon,
 }: {
   project: { id: string; name: string };
   override: string | undefined;
   setProjectColor(projectId: string, color: string): Promise<string>;
   resetProjectColor(projectId: string): Promise<void>;
   announce(message: string): void;
+  badgeLetterCount: 1 | 2;
+  preferProjectIcon: boolean;
+  icon: string | undefined;
 }) {
-  const automatic = automaticProjectColor(project.id);
+  const badgeText = projectBadgeText(project.name, badgeLetterCount);
+  const automatic = automaticProjectColor(badgeText);
   const persisted = override ?? automatic;
   const [draft, setDraft] = useState(persisted);
   const [dirty, setDirty] = useState(false);
@@ -213,7 +238,8 @@ function ProjectColorRow({
     }
   }, [dirty, draft, persisted]);
 
-  const preview = projectBadgePresentation(project.id, draft);
+  const preview = projectBadgePresentation(badgeText, draft);
+  const showIcon = preferProjectIcon && icon !== undefined;
   const status = dirty ? "Draft" : override === undefined ? "Automatic" : "Custom";
 
   const save = async () => {
@@ -259,13 +285,22 @@ function ProjectColorRow({
       <div className="flex items-center gap-2">
         <span
           aria-hidden
-          className="flex size-5 shrink-0 items-center justify-center rounded-md border border-black/15 text-2xs font-semibold uppercase shadow-sm"
+          className={cn(
+            "flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-md border border-black/15 font-semibold uppercase shadow-sm",
+            badgeText.length === 1
+              ? "text-2xs"
+              : "text-[8px] tracking-[-0.02em]",
+          )}
           style={{
             backgroundColor: preview.backgroundColor,
             color: preview.foregroundColor,
           }}
         >
-          {projectBadgeLetter(project.name)}
+          {showIcon ? (
+            <img src={icon} alt="" className="size-full object-cover" />
+          ) : (
+            badgeText
+          )}
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-medium text-foreground">

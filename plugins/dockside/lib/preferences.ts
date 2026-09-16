@@ -7,6 +7,7 @@ export const PALETTE_PRESET_OPTIONS = [
 
 export const ROW_DENSITY_OPTIONS = ["Comfortable", "Compact"] as const;
 export const CHILD_EXPANSION_OPTIONS = ["Expanded", "Collapsed"] as const;
+export const BADGE_LETTER_OPTIONS = ["Two letters", "One letter"] as const;
 
 export type PalettePreset = (typeof PALETTE_PRESET_OPTIONS)[number];
 export type RowDensity = "comfortable" | "compact";
@@ -43,6 +44,8 @@ export interface DocksidePreferences {
   showProviderIcons: boolean;
   showPullRequestMetadata: boolean;
   showRelativeTime: boolean;
+  badgeLetterCount: 1 | 2;
+  preferProjectIcon: boolean;
 }
 
 export const CUSTOM_COLOR_DEFAULTS = {
@@ -182,6 +185,12 @@ export function resolveDocksidePreferences(
       true,
     ),
     showRelativeTime: readBoolean(values?.showRelativeTime, true),
+    badgeLetterCount:
+      readOption(values?.badgeLetters, BADGE_LETTER_OPTIONS, "Two letters") ===
+      "One letter"
+        ? 1
+        : 2,
+    preferProjectIcon: readBoolean(values?.preferProjectIcon, true),
   };
 }
 

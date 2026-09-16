@@ -8,21 +8,46 @@ import {
   contrastRatio,
   projectBadgeLetter,
   projectBadgePresentation,
+  projectBadgeText,
   validProjectId,
 } from "../lib/project-colors.ts";
 
 describe("project badge colors", () => {
-  it("selects a stable palette color from project id, not display name", () => {
-    const first = automaticProjectColor("project-stable-id");
+  it("selects a stable palette color from the rendered badge text", () => {
+    const first = automaticProjectColor("TA");
     assert.ok(PROJECT_BADGE_PALETTE.some((color) => color === first));
-    assert.equal(automaticProjectColor("project-stable-id"), first);
+    assert.equal(automaticProjectColor("TA"), first);
     assert.equal(
-      projectBadgePresentation("project-stable-id", undefined).backgroundColor,
-      projectBadgePresentation("project-stable-id", undefined).backgroundColor,
+      projectBadgePresentation("TA", undefined).backgroundColor,
+      projectBadgePresentation("TA", undefined).backgroundColor,
     );
     assert.equal(projectBadgeLetter("  Alpha"), "A");
     assert.equal(projectBadgeLetter("Beta"), "B");
     assert.equal(projectBadgeLetter("  "), "?");
+  });
+
+  it("derives one-letter badges from the first token", () => {
+    assert.equal(projectBadgeText("taskboard", 1), "T");
+    assert.equal(projectBadgeText("  Alpha Project ", 1), "A");
+    assert.equal(projectBadgeText("bb-plugins-mateo", 1), "B");
+    assert.equal(projectBadgeText("  ", 1), "?");
+    assert.equal(projectBadgeText("!!!", 1), "?");
+  });
+
+  it("derives two-letter badges from initials of the first two tokens", () => {
+    assert.equal(projectBadgeText("BB Plugins", 2), "BP");
+    assert.equal(projectBadgeText("bb-plugins-mateo", 2), "BP");
+    assert.equal(projectBadgeText("bb_plugins mateo", 2), "BP");
+    assert.equal(projectBadgeText("a.b.c", 2), "AB");
+    assert.equal(projectBadgeText("Żabka Max", 2), "ŻM");
+  });
+
+  it("derives two-letter badges from a single word and pads safely", () => {
+    assert.equal(projectBadgeText("taskboard", 2), "TA");
+    assert.equal(projectBadgeText("x", 2), "X?");
+    assert.equal(projectBadgeText("  ", 2), "??");
+    assert.equal(projectBadgeText("!!!", 2), "??");
+    assert.equal(projectBadgeText("42", 2), "42");
   });
 
   it("accepts only canonicalizable opaque six-digit hex overrides", () => {
@@ -42,13 +67,13 @@ describe("project badge colors", () => {
   });
 
   it("uses a valid override and otherwise restores the automatic color", () => {
-    const automatic = projectBadgePresentation("project-a", null);
-    const custom = projectBadgePresentation("project-a", "#abcdef");
+    const automatic = projectBadgePresentation("PA", null);
+    const custom = projectBadgePresentation("PA", "#abcdef");
     assert.equal(custom.backgroundColor, "#ABCDEF");
     assert.equal(custom.isCustom, true);
     assert.equal(automatic.isCustom, false);
     assert.equal(
-      projectBadgePresentation("project-a", "not-css").backgroundColor,
+      projectBadgePresentation("PA", "not-css").backgroundColor,
       automatic.backgroundColor,
     );
   });

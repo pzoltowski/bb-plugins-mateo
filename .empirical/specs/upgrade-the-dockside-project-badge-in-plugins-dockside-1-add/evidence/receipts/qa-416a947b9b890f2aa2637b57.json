@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-416a947b9b890f2aa2637b57",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-UI-1"
+  ],
+  "evidenceKinds": [
+    "human"
+  ],
+  "summary": "Live bb via non-destructive dev install (dockside-dev, /tmp path source; git install untouched), sidebar.threadListProvider=dockside-dev/inbox. Dark sidebar shows repo favicons rendered for 5 projects (rn-opencv OC, cv-supa SU etc. are favicon.svg files) and letter badges PW/MA for projects without icons. One-letter mode collapses to P/M and recolors (letter-keyed color). Icons-off + two letters yields RO/RD/CS/CH/MA matching multi-word initial derivation. Settings declared server-side, applied live. AC-6 fail-closed paths unit-tested. Live light shot blocked by macOS appearance permission; mockup-light.png (same derivation+palette code) evidences light rendering.",
+  "passed": true,
+  "startedAt": "2026-09-16T17:18:36.251Z",
+  "completedAt": "2026-09-16T17:18:36.251Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "upgrade-the-dockside-project-badge-in-plugins-dockside-1-add",
+    "specRevision": 2,
+    "specDigest": "sha256:efc2833248d31e45e2db17b2bb3bedbed3a88ca6eea85076dc636efb3ccc4c2b",
+    "treeDigest": "sha256:b163ab7e51957f6ec9eb36d8f556e2880a56e8ef44dfbfa258c316553e1422b7",
+    "policyDigest": "sha256:39756d282dbc50abdafffb1c08856ba35233585bb8288516dc750f615625790e",
+    "workflowRevision": 6,
+    "gitCommit": "3ca4bde6580da08f3e930e7ca910cc106d9a3062"
+  },
+  "digest": "sha256:44d1c2c75f2d618e13ef79189738d4aebd7c1575d2ed1c5f1c5ae7b08c8cd74b",
+  "kind": "qa",
+  "matrixDigest": "sha256:d0a296928d702f4f38522a517d98c81d247c7fcc127670ad7d4e6ea5756f65b4",
+  "check": {
+    "id": "qa-fresh-context",
+    "kind": "fresh-context"
+  },
+  "coveredChecks": [
+    "fresh-context"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "arm64",
+    "node": "24.20.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Live bb via non-destructive dev install (dockside-dev, /tmp path source; git install untouched), sidebar.threadListProvider=dockside-dev/inbox. Dark sidebar shows repo favicons rendered for 5 projects (rn-opencv OC, cv-supa SU etc. are favicon.svg files) and letter badges PW/MA for projects without icons. One-letter mode collapses to P/M and recolors (letter-keyed color). Icons-off + two letters yields RO/RD/CS/CH/MA matching multi-word initial derivation. Settings declared server-side, applied live. AC-6 fail-closed paths unit-tested. Live light shot blocked by macOS appearance permission; mockup-light.png (same derivation+palette code) evidences light rendering.",
+      "startedAt": "2026-09-16T17:18:36.251Z",
+      "completedAt": "2026-09-16T17:18:36.251Z",
+      "durationMs": 0,
+      "collector": "devin-agent-live-bb",
+      "command": null,
+      "result": null,
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:b163ab7e51957f6ec9eb36d8f556e2880a56e8ef44dfbfa258c316553e1422b7",
+      "sourceTreeAfter": "sha256:b163ab7e51957f6ec9eb36d8f556e2880a56e8ef44dfbfa258c316553e1422b7",
+      "artifacts": [
+        {
+          "path": ".empirical/specs/upgrade-the-dockside-project-badge-in-plugins-dockside-1-add/evidence/icons-off-crop.png",
+          "mediaType": "image/png",
+          "bytes": 211836,
+          "digest": "sha256:c31797d544bee5246ca9335fa239238da3bf438f17778d468abc8ef9a1a74b28"
+        },
+        {
+          "path": ".empirical/specs/upgrade-the-dockside-project-badge-in-plugins-dockside-1-add/evidence/mockup-light.png",
+          "mediaType": "image/png",
+          "bytes": 86931,
+          "digest": "sha256:47af34077b9a224d8595b04dae5cf6bddbb5519b21046b43fd0299e1408bf868"
+        },
+        {
+          "path": ".empirical/specs/upgrade-the-dockside-project-badge-in-plugins-dockside-1-add/evidence/oneletter-lower.png",
+          "mediaType": "image/png",
+          "bytes": 176307,
+          "digest": "sha256:c48b1c5bf1cc225c6e58145f59742c3123abb30befdcec33a598b490afe15ac5"
+        },
+        {
+          "path": ".empirical/specs/upgrade-the-dockside-project-badge-in-plugins-dockside-1-add/evidence/sidebar-crop.png",
+          "mediaType": "image/png",
+          "bytes": 212607,
+          "digest": "sha256:01905cec7aca922a2cc17e278c6ab6f4f983378bcc9f33350631a2cce28b2555"
+        }
+      ]
+    }
+  ],
+  "anomalies": []
+}

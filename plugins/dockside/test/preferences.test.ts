@@ -16,6 +16,8 @@ describe("resolveDocksidePreferences", () => {
     assert.equal(loading.showProviderIcons, true);
     assert.equal(loading.showPullRequestMetadata, true);
     assert.equal(loading.showRelativeTime, true);
+    assert.equal(loading.badgeLetterCount, 2);
+    assert.equal(loading.preferProjectIcon, true);
     assert.equal(loading.colors.working, "#34A853");
     assert.equal(loading.colors.prReady, "#34A853");
 
@@ -24,11 +26,15 @@ describe("resolveDocksidePreferences", () => {
       rowDensity: "Tiny",
       defaultChildExpansion: "Sometimes",
       showProviderIcons: "false",
+      badgeLetters: "Three letters",
+      preferProjectIcon: "yes",
     });
     assert.equal(malformed.palettePreset, "Default");
     assert.equal(malformed.density, "comfortable");
     assert.equal(malformed.defaultChildrenExpanded, true);
     assert.equal(malformed.showProviderIcons, true);
+    assert.equal(malformed.badgeLetterCount, 2);
+    assert.equal(malformed.preferProjectIcon, true);
   });
 
   it("resolves distinct high-contrast and colorblind-friendly presets", () => {
@@ -78,6 +84,8 @@ describe("resolveDocksidePreferences", () => {
       showProviderIcons: false,
       showPullRequestMetadata: false,
       showRelativeTime: false,
+      badgeLetters: "One letter",
+      preferProjectIcon: false,
     });
 
     assert.equal(preferences.density, "compact");
@@ -85,6 +93,8 @@ describe("resolveDocksidePreferences", () => {
     assert.equal(preferences.showProviderIcons, false);
     assert.equal(preferences.showPullRequestMetadata, false);
     assert.equal(preferences.showRelativeTime, false);
+    assert.equal(preferences.badgeLetterCount, 1);
+    assert.equal(preferences.preferProjectIcon, false);
   });
 });
 

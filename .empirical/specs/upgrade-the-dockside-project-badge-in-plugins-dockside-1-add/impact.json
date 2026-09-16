@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
-  "status": "draft",
   "classification": "behavioral",
-  "capabilities": [],
+  "capabilities": [
+    "dockside-project-appearance"
+  ],
   "surfaces": [
     "workflow"
   ],
   "regressionRationale": null,
-  "digest": "sha256:50cdf659d260b3862fa5d4114b18e620487a9024681daa6489af839cd84aa470"
+  "digest": "sha256:4dd05393830e5696f0e6a4c7690321ea89aa8973f34c1768092a233a95af5ce4"
 }

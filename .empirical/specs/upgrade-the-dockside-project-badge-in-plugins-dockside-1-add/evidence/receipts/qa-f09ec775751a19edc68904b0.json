@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "qa-f09ec775751a19edc68904b0",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6"
+  ],
+  "evidenceKinds": [
+    "test"
+  ],
+  "summary": "Dockside focused run: tsc --noEmit plus the plugin node --test suite — badge text derivation (initials/first-two/padding/unicode), letter-keyed deterministic colors, override precedence, settings resolution defaults+malformed, settings/RPC contract, and fail-closed icon resolution (allowlist order, app.json expo.icon, size cap, non-image rejection, ../ and symlink escape, personal + non-local source skips).",
+  "passed": true,
+  "startedAt": "2026-09-16T17:01:06.104Z",
+  "completedAt": "2026-09-16T17:01:06.608Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "upgrade-the-dockside-project-badge-in-plugins-dockside-1-add",
+    "specRevision": 2,
+    "specDigest": "sha256:efc2833248d31e45e2db17b2bb3bedbed3a88ca6eea85076dc636efb3ccc4c2b",
+    "treeDigest": "sha256:e0ec4218eac44c1ae173378cbc74304769f0af02f4dc85483441edfb1c756f16",
+    "policyDigest": "sha256:39756d282dbc50abdafffb1c08856ba35233585bb8288516dc750f615625790e",
+    "workflowRevision": 6,
+    "gitCommit": "3ca4bde6580da08f3e930e7ca910cc106d9a3062"
+  },
+  "digest": "sha256:4cc83013dc4efb20b400cbcdcd418b6b0a50832065134e378f4693046bb1de19",
+  "kind": "qa",
+  "matrixDigest": "sha256:d0a296928d702f4f38522a517d98c81d247c7fcc127670ad7d4e6ea5756f65b4",
+  "check": {
+    "id": "qa-unit",
+    "kind": "unit"
+  },
+  "coveredChecks": [
+    "unit"
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "arm64",
+    "node": "24.20.0",
+    "bun": null
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "passed",
+      "summary": "Dockside focused run: tsc --noEmit plus the plugin node --test suite — badge text derivation (initials/first-two/padding/unicode), letter-keyed deterministic colors, override precedence, settings resolution defaults+malformed, settings/RPC contract, and fail-closed icon resolution (allowlist order, app.json expo.icon, size cap, non-image rejection, ../ and symlink escape, personal + non-local source skips).",
+      "startedAt": "2026-09-16T17:01:06.104Z",
+      "completedAt": "2026-09-16T17:01:06.608Z",
+      "durationMs": 504,
+      "collector": null,
+      "command": {
+        "executableDigest": "sha256:e61cac024efe6f7b5142c09e706c77117cb00bd4b51127624f6ba799770f05d2",
+        "argv": [
+          "npm",
+          "test",
+          "--workspace",
+          "bb-plugin-dockside"
+        ],
+        "cwd": ".",
+        "timeoutMs": 60000,
+        "maxOutputBytes": 1048576,
+        "environmentKeys": [
+          "PATH",
+          "TMPDIR"
+        ]
+      },
+      "result": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "stdoutDigest": "sha256:82d15cb67cf168831694d00a42831029eec28dfcc747c7017584ef5cc0757bf2",
+        "stderrDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutTail": "6ms)\n✔ relativeTimeLabel (1.385292ms)\n▶ family reorder UI contract\n  ✔ applies persisted complete-family order before filter and search (0.346709ms)\n  ✔ disables reorder for selection, filters, and host search (0.176625ms)\n  ✔ wires explicit drag and keyboard controls with announcements (0.179958ms)\n  ✔ keeps navigation split props and bulk selection overlays independent (0.074209ms)\n✔ family reorder UI contract (1.305292ms)\n▶ Dockside settings contract\n  ✔ declares every palette and behavior setting with safe defaults (1.254583ms)\n  ✔ registers one settings preview and reads live settings (0.136083ms)\n  ✔ edits durable project-id colors and paints only project letter badges (0.154875ms)\n  ✔ resolves repository icons through a bounded, published RPC (0.092333ms)\n  ✔ uses optional metadata and layout preferences without changing defaults (0.082375ms)\n  ✔ uses a semantic full-row selection target and keeps navigation separate (0.095625ms)\n✔ Dockside settings contract (2.474333ms)\n▶ isUnread\n  ✔ is bb's own rule: last read has to catch up with last attention (0.410125ms)\n  ✔ treats a never-read thread as unread (0.066416ms)\n✔ isUnread (1.102417ms)\n▶ isWithinSettledWindow\n  ✔ keeps a settle from inside the window (0.114834ms)\n  ✔ drops a settle older than the window (0.05175ms)\n  ✔ keeps a settle stamped in the future (0.0515ms)\n  ✔ is a day by default (0.060333ms)\n✔ isWithinSettledWindow (0.404334ms)\n▶ settledIndicator\n  ✔ draws nothing for a quiet thread (0.514458ms)\n  ✔ puts a raised hand above everything else (0.073917ms)\n  ✔ reports live work from the status (0.077958ms)\n  ✔ reports live work from an activity count alone (0.101625ms)\n  ✔ separates an unread failure from an unread success (0.074291ms)\n✔ settledIndicator (1.04225ms)\n▶ toSidebarThread\n  ✔ marks the thread archived, which is why this path exists (0.108208ms)\n  ✔ keeps only the origin kinds this sidebar draws (0.062208ms)\n  ✔ carries the fields the list sorts, filters, and searches on (0.046583ms)\n✔ toSidebarThread (0.266709ms)\n▶ mergeSettledThreads\n  ✔ adds the settled threads the host cannot report (0.109541ms)\n  ✔ lets the host win a collision (0.041708ms)\n  ✔ returns the host list unchanged when nothing is settled (0.045417ms)\n✔ mergeSettledThreads (0.250041ms)\n▶ pendingSettledCount\n  ✔ counts a settled thread the host cannot report (0.083917ms)\n  ✔ ignores a row that is not settled (0.0385ms)\n  ✔ ignores a settled thread the host still reports (0.029458ms)\n  ✔ drops a settle that has aged out of the window (0.031084ms)\n  ✔ counts each pending row once and nothing else (0.038ms)\n  ✔ counts nothing when no row was seeded (0.025208ms)\n  ✔ reads any iterable of rows (0.034417ms)\n✔ pendingSettledCount (0.361417ms)\n▶ parseArchivedThreadIds\n  ✔ reads back what settle stored (0.077208ms)\n  ✔ gives nothing back for a missing or unusable value (0.063708ms)\n✔ parseArchivedThreadIds (0.175208ms)\n▶ statusColorRole\n  ✔ separates error, waiting, unread, working, and idle roles (0.89325ms)\n✔ statusColorRole (1.757458ms)\n▶ compact root card contract\n  ✔ keeps zero-child and no-PR roots on the same two-row skeleton (0.517958ms)\n  ✔ co-locates root PR and multiple-child controls in row two (0.103417ms)\n  ✔ looks up PR data only for the parent and never on child rows (0.090375ms)\n  ✔ truncates long title and branch text without shrinking metadata (0.087541ms)\n  ✔ keeps semantic, disclosure, provider, and reorder help keyboard-readable (0.142916ms)\n  ✔ keeps child status and disclosure-provider help keyboard-readable (0.066875ms)\n✔ compact root card contract (1.618417ms)\n▶ family status\n  ✔ uses the newest member update and requires every member to be quiet (1.21725ms)\n✔ family status (1.68825ms)\n▶ filterProjectThreadGroups\n  ✔ supports attention and quiet presets (0.523542ms)\n  ✔ uses inclusive family age boundaries (0.080084ms)\n  ✔ preserves project and family order without mutating the input (0.08775ms)\n✔ filterProjectThreadGroups (0.811209ms)\n▶ bulkEligibility\n  ✔ protects the current, working, waiting, unread, and pinned family (0.312625ms)\n  ✔ allows a quiet read family (0.066834ms)\n✔ bulkEligibility (0.4665ms)\n▶ selection helpers\n  ✔ selects eligible visible roots and prunes roots that disappeared (0.240334ms)\n  ✔ keeps a selected family visible after it stops matching the filter (0.132708ms)\n✔ selection helpers (1.006667ms)\n▶ applyRootSelection\n  ✔ ordinary clicks toggle one root and replace the anchor (0.183959ms)\n  ✔ selects inclusive forward and reverse Shift ranges (0.102083ms)\n  ✔ uses the clicked checked state to deselect a range (0.054ms)\n  ✔ skips protected gaps omitted from eligible order (0.064458ms)\n  ✔ falls back to one toggle when the anchor is no longer visible (0.044458ms)\n  ✔ fails closed when the target is no longer eligible (0.0375ms)\n✔ applyRootSelection (0.598542ms)\n▶ resolveFamilyExpanded\n  ✔ keeps a family with no children closed (0.06975ms)\n  ✔ opens a child family by default and while search forces it (0.179167ms)\n  ✔ respects explicit open and closed overrides (0.114667ms)\n  ✔ uses the configured default until search or a user override wins (0.123584ms)\n✔ resolveFamilyExpanded (0.641667ms)\n▶ decodeWarmStartRows\n  ✔ round-trips what encodeWarmStartRows wrote (0.815458ms)\n  ✔ reads nothing stored as a miss (0.069125ms)\n  ✔ reads unparseable text as a miss (0.068ms)\n  ✔ reads a payload that is not an array as a miss (0.050125ms)\n  ✔ keeps a hit with no rows apart from a miss (0.05875ms)\n  ✔ rejects a row without a usable thread id (0.068459ms)\n  ✔ rejects an entry that is not an object (0.055792ms)\n  ✔ rejects a timestamp the wire could not have produced (0.065209ms)\n  ✔ rejects a non-finite timestamp (0.083834ms)\n  ✔ reads an absent timestamp as null (0.090667ms)\n  ✔ rejects the whole payload when one row is bad (0.056833ms)\n  ✔ rejects more rows than the encoder would ever write (0.28425ms)\n  ✔ rejects an entry too long to be worth parsing (0.04625ms)\n✔ decodeWarmStartRows (2.50475ms)\n▶ encodeWarmStartRows\n  ✔ writes an array, which is the only shape that survives the trip (0.054291ms)\n  ✔ carries only the four fields a row is made of (0.0355ms)\n  ✔ caps the entry and keeps the newest parks (0.215167ms)\n  ✔ ranks a park by when it was made, not by when a snooze ends (0.054458ms)\n  ✔ keeps a fresh settle over a full cap of long snoozes (0.218541ms)\n✔ encodeWarmStartRows (0.656166ms)\n▶ readWarmStartRows\n  ✔ serves what was stored (0.116208ms)\n  ✔ does not throw when the store does (0.043583ms)\n  ✔ still serves from memory after the store failed (0.067459ms)\n  ✔ prefers the memory tier over what the store holds (0.048875ms)\n  ✔ drops an entry that did not decode (0.04975ms)\n  ✔ ignores an entry written under another version's key (0.039667ms)\n✔ readWarmStartRows (0.439375ms)\n▶ writeWarmStartRows\n  ✔ does not throw when the store does (0.050792ms)\n  ✔ writes under the versioned key (0.036084ms)\n  ✔ offers a refused value to the store again (0.06175ms)\n✔ writeWarmStartRows (0.190375ms)\n▶ decodeWarmStartProviders\n  ✔ round-trips providers (0.11975ms)\n  ✔ reads a miss as null (0.04175ms)\n  ✔ rejects a provider with no name to fall back to (0.0335ms)\n  ✔ rejects a provider whose name is blank (0.028833ms)\n  ✔ drops a logo that is not a same-origin path (0.124833ms)\n  ✔ drops a path that resolves onto another host (0.049917ms)\n  ✔ drops a path carrying the characters that end a CSS token (0.040625ms)\n  ✔ rejects an entry too long to be worth parsing (0.029667ms)\n✔ decodeWarmStartProviders (0.564208ms)\n▶ encodeWarmStartProviders\n  ✔ carries only the three fields the glyph reads (0.036167ms)\n✔ encodeWarmStartProviders (0.062042ms)\n▶ readWarmStartProviders\n  ✔ serves what was stored (0.066791ms)\n  ✔ survives a store that throws on every call (0.051458ms)\n  ✔ drops an entry that did not decode (0.038334ms)\n  ✔ ignores an entry written under another version's key (0.03175ms)\n✔ readWarmStartProviders (0.252917ms)\n▶ writeWarmStartProviders\n  ✔ does not throw when the store does (0.044083ms)\n  ✔ keeps its own versioned key (0.042583ms)\n✔ writeWarmStartProviders (0.12475ms)\nℹ tests 212\nℹ suites 58\nℹ pass 212\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 298.29575\n",
+        "stderrTail": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false
+      },
+      "cleanStart": false,
+      "sourceTreeBefore": "sha256:e0ec4218eac44c1ae173378cbc74304769f0af02f4dc85483441edfb1c756f16",
+      "sourceTreeAfter": "sha256:e0ec4218eac44c1ae173378cbc74304769f0af02f4dc85483441edfb1c756f16",
+      "artifacts": []
+    }
+  ],
+  "anomalies": []
+}

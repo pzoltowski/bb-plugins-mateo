@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "sequence": 4,
+  "previousDigest": "sha256:0259082fe9ee0288e9850b776f7b7fdb756dd8b41d0d4e8149846c0024eee234",
+  "actor": "agent",
+  "type": "transition",
+  "summary": "plan.md written: 9 ordered steps — letter derivation + letter-keyed colors, preferences + settings declarations, icon resolver lib, RPC + channel, frontend hook + badge img render, settings preview, tests, docs, verification (typecheck/plugin tests/npm run check/bb plugin build+reload+screenshots).",
+  "createdAt": "2026-09-16T16:42:58.753Z",
+  "stateBeforeDigest": "sha256:2282beb1e27f5efc42ec900ffede4d85298615ce8710a216c089db397404bc27",
+  "stateAfterDigest": "sha256:8620740c21eccb04f0f871fd10215c0f083afef03e423d25a446cd1247d7e03b",
+  "state": {
+    "schemaVersion": 5,
+    "revision": 4,
+    "activeFeature": "upgrade-the-dockside-project-badge-in-plugins-dockside-1-add",
+    "request": "Upgrade the Dockside project badge in plugins/dockside: (1) add a plugin setting for one- vs two-letter badges, default two letters — two-letter rendering uses initials for multi-word project names (first letter of the first two words) and the first two characters for single-word names; (2) key the automatic badge color on the rendered badge letters instead of the project id so the same letters always get the same palette color, while existing per-project color overrides keep working and still win; (3) add a prefer-favicon setting (default ON) that shows a favicon/icon file found in the project's repository — resolved by the plugin server via project sources path — and falls back to the letter badge when no icon exists or the setting is off.",
+    "profile": "complex",
+    "workflow": "complex",
+    "mode": "normal",
+    "phase": "implement",
+    "status": "waiting",
+    "repairAttempts": 0,
+    "message": "plan.md written: 9 ordered steps — letter derivation + letter-keyed colors, preferences + settings declarations, icon resolver lib, RPC + channel, frontend hook + badge img render, settings preview, tests, docs, verification (typecheck/plugin tests/npm run check/bb plugin build+reload+screenshots).",
+    "implementationActor": null,
+    "workStartedAt": null,
+    "specDigest": "sha256:efc2833248d31e45e2db17b2bb3bedbed3a88ca6eea85076dc636efb3ccc4c2b",
+    "approvedSpecRevision": 2,
+    "capabilityArchiveRequired": true,
+    "capabilityDeltaDigest": "sha256:bb350180879228d10944b90f4bb80ebe56a3b2c44b7e8b280792817ea7bca7c6",
+    "impactDigest": "sha256:4dd05393830e5696f0e6a4c7690321ea89aa8973f34c1768092a233a95af5ce4",
+    "capabilityClaimId": "upgrade-the-dockside-project-badge-in-plugins-dockside-1-add-d1a5bbb2c61d",
+    "authorizationDigest": null,
+    "evidence": [],
+    "evidenceReceiptIds": [],
+    "legacyEvidenceCount": 0,
+    "completion": {
+      "implemented": false,
+      "verified": false,
+      "integrated": false,
+      "delivered": false,
+      "published": false,
+      "highest": "none",
+      "reasons": {
+        "implemented": "implemented has not been proven by a durable receipt.",
+        "verified": "verified has not been proven by a durable receipt.",
+        "integrated": "integrated has not been proven by a durable receipt.",
+        "delivered": "delivered has not been proven by a durable receipt.",
+        "published": "published has not been proven by a durable receipt."
+      }
+    },
+    "updatedAt": "2026-09-16T16:42:58.753Z"
+  },
+  "digest": "sha256:63aa1cae85ffa4632a27c06d53c0937014a08c75598ff3378f6fb1b594feafea"
+}

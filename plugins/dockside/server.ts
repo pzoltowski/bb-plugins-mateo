@@ -21,11 +21,17 @@ import {
   type BulkDeleteThreadSnapshot,
 } from "./lib/bulk-delete.ts";
 import {
+  BADGE_LETTER_OPTIONS,
   CHILD_EXPANSION_OPTIONS,
   CUSTOM_COLOR_DEFAULTS,
   PALETTE_PRESET_OPTIONS,
   ROW_DENSITY_OPTIONS,
 } from "./lib/preferences.ts";
+import {
+  MAX_ICON_DATA_URL_LENGTH,
+  MAX_PROJECT_ICON_ROWS,
+  resolveAllProjectIcons,
+} from "./lib/project-icons.ts";
 import {
   PROJECT_COLOR_MIGRATION,
   createProjectColorStore,
@@ -152,6 +158,19 @@ export const docksideRpcContract = defineRpcContract({
     input: z.object({ projectId: projectIdSchema }),
     output: z.object({ projectId: projectIdSchema, reset: z.boolean() }),
   },
+  listProjectIcons: {
+    input: z.object({}),
+    output: z.object({
+      icons: z
+        .array(
+          z.object({
+            projectId: projectIdSchema,
+            dataUrl: z.string().max(MAX_ICON_DATA_URL_LENGTH),
+          }),
+        )
+        .max(MAX_PROJECT_ICON_ROWS),
+    }),
+  },
   listProviders: {
     input: z.object({}),
     output: z.object({
@@ -264,6 +283,7 @@ export const docksideRpcContract = defineRpcContract({
 /** Channel the frontend re-reads on. */
 export const LIFECYCLE_CHANNEL = "lifecycle";
 export const PROJECT_COLOR_CHANNEL = "project-colors";
+export const PROJECT_ICON_CHANNEL = "project-icons";
 
 export default function plugin(bb: BbPluginApi) {
   bb.settings.define({
@@ -301,6 +321,21 @@ export default function plugin(bb: BbPluginApi) {
       CUSTOM_COLOR_DEFAULTS.inactive,
     ),
     staleColor: colorSetting("Custom · Stale", CUSTOM_COLOR_DEFAULTS.stale),
+    badgeLetters: {
+      type: "select",
+      label: "Project badge letters",
+      description:
+        "Two letters uses the first letter of the first two words; one letter keeps the first character only.",
+      options: [...BADGE_LETTER_OPTIONS],
+      default: "Two letters",
+    },
+    preferProjectIcon: {
+      type: "boolean",
+      label: "Prefer repository icon",
+      description:
+        "Show the project's favicon/icon file instead of letters when the repository has one.",
+      default: true,
+    },
     prReviewColor: colorSetting(
       "Custom · PR review",
       CUSTOM_COLOR_DEFAULTS.prReview,
@@ -632,6 +667,15 @@ export default function plugin(bb: BbPluginApi) {
       const reset = projectColors.reset(projectId);
       bb.realtime.publish(PROJECT_COLOR_CHANNEL, { projectId });
       return { projectId, reset };
+    },
+    /**
+     * Repo icons resolve fresh on every call: the candidate list is a bounded
+     * stat+read per project, so a favicon added mid-session appears on the
+     * next fetch without any cache to clear.
+     */
+    async listProjectIcons() {
+      const projects = await bb.sdk.projects.list();
+      return { icons: await resolveAllProjectIcons(projects) };
     },
     // A custom ACP provider already carries its own brand mark, so the sidebar
     // reads it from the host rather than hard-coding a second glyph per agent.

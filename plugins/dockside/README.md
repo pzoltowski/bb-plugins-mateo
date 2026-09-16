@@ -180,6 +180,19 @@ custom values accept only six-digit hex colors and otherwise fall back safely.
 You can also choose row density, default child expansion, provider marks,
 parent-only PR metadata, and relative-time visibility.
 
+Project badges default to two letters — initials for multi-word names
+(`BB Plugins` → `BP`), the first two characters for single-word names
+(`taskboard` → `TA`). Switch them back to one letter in Settings → Dockside →
+Badge letters. Automatic badge colors hash the rendered letters, so the same
+letters always get the same color; a per-project badge color still wins.
+
+When **Prefer project icon** is on (the default), Dockside looks for a
+`favicon.*`, `icon.*`, `logo.*`, `apple-touch-icon.png`, or an `app.json`
+`expo.icon` in the project's local source and shows it instead of letters.
+Missing, oversized (>256 KiB), non-image, or non-local sources fall back to
+letters, and personal projects never get icons. Turn it off to always use
+letters.
+
 The snooze presets still assume a 09:00 morning, an 18:00 evening, and a week
 starting Monday in your local timezone. The settled shelf reaches back 24 hours.
 Those timing constants are not configurable.

@@ -24,6 +24,10 @@ const projectColorsHook = await readFile(
   new URL("../hooks/use-project-colors.ts", import.meta.url),
   "utf8",
 );
+const projectIconsHook = await readFile(
+  new URL("../hooks/use-project-icons.ts", import.meta.url),
+  "utf8",
+);
 
 describe("Dockside settings contract", () => {
   it("declares every palette and behavior setting with safe defaults", () => {
@@ -53,12 +57,15 @@ describe("Dockside settings contract", () => {
       "showProviderIcons",
       "showPullRequestMetadata",
       "showRelativeTime",
+      "badgeLetters",
+      "preferProjectIcon",
     ]) {
       assert.match(server, new RegExp(`${key}:`));
     }
     assert.match(server, /default: "Default"/);
     assert.match(server, /default: "Comfortable"/);
     assert.match(server, /default: "Expanded"/);
+    assert.match(server, /default: "Two letters"/);
   });
 
   it("registers one settings preview and reads live settings", () => {
@@ -108,6 +115,19 @@ describe("Dockside settings contract", () => {
     assert.match(projectGroup, /color: badge\.foregroundColor/);
     assert.match(projectColorsHook, /useRealtime\("project-colors"/);
     assert.match(projectColorsHook, /previous === "reconnecting"/);
+  });
+
+  it("resolves repository icons through a bounded, published RPC", () => {
+    assert.match(server, /listProjectIcons:/);
+    assert.match(server, /PROJECT_ICON_CHANNEL/);
+    assert.match(server, /bb\.sdk\.projects\.list\(\)/);
+    assert.match(server, /resolveAllProjectIcons/);
+
+    assert.match(inbox, /useProjectIcons\(/);
+    assert.match(inbox, /projectIcons=\{projectIcons\}/);
+    assert.match(projectGroup, /projectBadgeText\(/);
+    assert.match(projectGroup, /preferences\.preferProjectIcon/);
+    assert.match(projectIconsHook, /useRealtime\("project-icons"/);
   });
 
   it("uses optional metadata and layout preferences without changing defaults", () => {
