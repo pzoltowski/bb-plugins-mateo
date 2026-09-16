@@ -3393,7 +3393,7 @@ function WorkItemRow({
       <span className="tb-key pointer-events-none relative z-[1] min-w-0 truncate text-xs font-medium tabular-nums">
         {item.key}
       </span>
-      <span className="pointer-events-none relative z-[1] min-w-0 truncate text-[13px] font-medium text-foreground">
+      <span className="pointer-events-none relative z-[1] col-span-full row-start-2 min-w-0 truncate text-[13px] font-medium text-foreground">
         {item.title}
       </span>
       <span className="tb-row-trailing tb-meta pointer-events-none relative z-[1] flex min-w-0 items-center gap-2 overflow-hidden text-xs">
@@ -3403,11 +3403,11 @@ function WorkItemRow({
             {project.name}
           </span>
         ) : null}
-        {item.project ? <ProjectGhostMark project={item.project} /> : null}
         {assignee ? <AssigneeMark assignee={assignee} /> : null}
         <time className="tb-row-time ml-auto shrink-0 tabular-nums">
           {formatUpdatedAt(item.updatedAt)}
         </time>
+        {item.project ? <ProjectGhostMark project={item.project} /> : null}
       </span>
     </div>
   );
@@ -3832,21 +3832,23 @@ function KanbanCard({
           composerDragEnabled && 'cursor-grab active:cursor-grabbing'
         )}
       >
-        <span className="flex items-start gap-1.5">
+        <span className="flex items-center gap-1.5">
           {priority ? (
-            <span className="tb-priority-slot mt-0.5 flex size-4 shrink-0 items-center justify-center">
+            <span className="tb-priority-slot flex size-4 shrink-0 items-center justify-center">
               <PriorityMark priority={priority} />
             </span>
           ) : null}
-          <span className="tb-kanban-card-title line-clamp-3 block text-sm font-medium leading-snug">
-            <span
-              className="tb-key mr-1 font-normal tabular-nums"
-              title={item.key}
-            >
-              {reference}
-            </span>
-            {item.title}
+          <span
+            className="tb-key min-w-0 truncate text-xs font-normal tabular-nums"
+            title={item.key}
+          >
+            {reference}
           </span>
+          {item.project ? (
+            <span className="ml-auto flex min-w-0">
+              <ProjectGhostMark project={item.project} />
+            </span>
+          ) : null}
           {composerDragEnabled ? (
             <span
               aria-hidden="true"
@@ -3855,6 +3857,9 @@ function KanbanCard({
               <Icon name="DragDropVertical" className="size-3.5" />
             </span>
           ) : null}
+        </span>
+        <span className="tb-kanban-card-title line-clamp-3 block text-sm font-medium leading-snug">
+          {item.title}
         </span>
         {labels.length > 0 ? (
           <span className="mt-1.5 flex min-w-0 flex-wrap gap-1">
@@ -3870,11 +3875,8 @@ function KanbanCard({
             ))}
           </span>
         ) : null}
-        {pending || assignee || item.project ? (
+        {pending || assignee ? (
           <span className="tb-meta mt-1.5 flex min-w-0 items-center gap-2 text-xs">
-            {item.project ? (
-              <ProjectGhostMark project={item.project} />
-            ) : null}
             {pending ? (
               <span className="min-w-0 truncate">Updating…</span>
             ) : assignee ? (

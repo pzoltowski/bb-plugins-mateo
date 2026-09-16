@@ -162,13 +162,14 @@ test('marks tracker projects as ghost text on List rows and Kanban cards', async
   const row = app
     .match(/function WorkItemRow[\s\S]*?\nfunction ListStateGroups/u)?.[0];
   assert.ok(row, 'Missing WorkItemRow');
+  assert.match(row, /col-span-full row-start-2/u);
   assert.match(row, /<ProjectGhostMark project=\{item\.project\} \/>/u);
   assert.match(row, /` Project \$\{item\.project\}\.`/u);
 
   const card = app.match(/function KanbanCard[\s\S]*?\nfunction KanbanBoard/u)?.[0];
   assert.ok(card, 'Missing KanbanCard');
-  assert.match(card, /\{pending \|\| assignee \|\| item\.project \? \(/u);
-  assert.match(card, /<ProjectGhostMark project=\{item\.project\} \/>/u);
+  assert.match(card, /\{pending \|\| assignee \? \(/u);
+  assert.match(card, /ml-auto flex min-w-0">\s*<ProjectGhostMark project=\{item\.project\} \/>/u);
   assert.match(card, /` Project \$\{item\.project\}\.`/u);
   assert.match(card, /ml-auto flex shrink-0/u);
 
