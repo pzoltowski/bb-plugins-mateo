@@ -120,6 +120,8 @@ export function ThreadInbox({
   const lifecycle = useLifecycle(threads);
   const [showSnoozed, setShowSnoozed] = useState(false);
   const [showSettled, setShowSettled] = useState(false);
+  const [projectsExpanded, setProjectsExpanded] = useState(true);
+  const [foldEpoch, setFoldEpoch] = useState(0);
   const [filterPreset, setFilterPreset] =
     useState<ThreadFilterPreset>("all");
   const [selectionMode, setSelectionMode] = useState(false);
@@ -615,7 +617,34 @@ export function ThreadInbox({
           </span>
           <span className="ml-auto flex items-center gap-0.5">
             {selectionMode ? null : (
-              <FilterMenu value={filterPreset} onChange={setFilterPreset} />
+              <>
+                <FilterMenu value={filterPreset} onChange={setFilterPreset} />
+                <button
+                  type="button"
+                  aria-label={
+                    projectsExpanded
+                      ? "Collapse all projects"
+                      : "Expand all projects"
+                  }
+                  title={
+                    projectsExpanded
+                      ? "Collapse all projects"
+                      : "Expand all projects"
+                  }
+                  disabled={projectGroups.length === 0}
+                  onClick={() => {
+                    setProjectsExpanded((expanded) => !expanded);
+                    setFoldEpoch((epoch) => epoch + 1);
+                  }}
+                  className="flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+                >
+                  <Icon
+                    name={projectsExpanded ? "Collapse" : "Expand"}
+                    className="size-3.5"
+                    aria-hidden
+                  />
+                </button>
+              </>
             )}
             <button
               type="button"
@@ -764,6 +793,8 @@ export function ThreadInbox({
                 preferences={preferences}
                 projectColorOverrides={projectColorOverrides}
                 projectIcons={projectIcons}
+                foldEpoch={foldEpoch}
+                foldExpanded={projectsExpanded}
               />
             ))}
             {showParkedShelves ? (

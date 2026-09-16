@@ -46,6 +46,8 @@ export function ProjectGroup({
   preferences,
   projectColorOverrides,
   projectIcons,
+  foldEpoch,
+  foldExpanded,
 }: {
   group: ProjectThreadGroup;
   providerInfoById: ReadonlyMap<string, ProviderGlyphInfo>;
@@ -79,10 +81,17 @@ export function ProjectGroup({
   preferences: DocksidePreferences;
   projectColorOverrides: ReadonlyMap<string, string>;
   projectIcons: ReadonlyMap<string, string>;
+  foldEpoch: number;
+  foldExpanded: boolean;
 }) {
   const actions = useSidebarThreadActions();
   const projectDragStarted = useRef(false);
   const [expandedByUser, setExpandedByUser] = useState(true);
+  const lastFoldEpoch = useRef(foldEpoch);
+  if (foldEpoch !== lastFoldEpoch.current) {
+    lastFoldEpoch.current = foldEpoch;
+    setExpandedByUser(foldExpanded);
+  }
   const projectListId = useId();
   const threads = group.families.flatMap((family) => [
     family.root,
