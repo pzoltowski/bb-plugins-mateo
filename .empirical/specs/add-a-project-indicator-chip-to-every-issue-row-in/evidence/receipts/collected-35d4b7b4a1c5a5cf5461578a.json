@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-35d4b7b4a1c5a5cf5461578a",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7",
+    "AC-8"
+  ],
+  "evidenceKinds": [
+    "review"
+  ],
+  "summary": "fresh-context review approved the exact committed base diff",
+  "passed": true,
+  "startedAt": "2026-09-16T01:46:12.839Z",
+  "completedAt": "2026-09-16T01:46:12.839Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+    "specRevision": 2,
+    "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
+    "treeDigest": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+    "policyDigest": "sha256:b9531bc676ecda0f65efadb176821566cf416d11dff5a60b5ec0390d55bebe50"
+  },
+  "digest": "sha256:6070a77949bf09072e5184679f2efb2939c26e393cf0aa862d38e2f63a9252b0",
+  "kind": "collected",
+  "collector": "empirical-review:devin-fresh-context-reviewer",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/reviews/cf6e257b06feba1668d337db.json",
+      "mediaType": "application/json",
+      "bytes": 5361,
+      "digest": "sha256:552a74f6fe30d380bb6338b0277936cf9da304b5a37fa7a9ccaf6eb2997d67ff"
+    },
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/reviews/cf6e257b06feba1668d337db.md",
+      "mediaType": "text/markdown",
+      "bytes": 4628,
+      "digest": "sha256:46b215ca2728e95fe1b3502a9c97e9ab3c826dacb6db78a09990ed6eeb5189bc"
+    }
+  ]
+}

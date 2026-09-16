@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-02d273c42f81696c161113df",
+  "criteria": [
+    "AC-1",
+    "AC-2"
+  ],
+  "evidenceKinds": [
+    "browser",
+    "screenshot"
+  ],
+  "summary": "Re-collected at HEAD ef5235e with the regenerated captures from receipt qa-2d2f3b0bbf17f7e85fec1348: live Taskboard List view shows Cube ghost-text project marks on all rows; Kanban cards show marks in the bottom meta row.",
+  "passed": true,
+  "startedAt": "2026-09-16T01:32:53.808Z",
+  "completedAt": "2026-09-16T01:32:53.808Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+    "specRevision": 2,
+    "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
+    "treeDigest": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b"
+  },
+  "digest": "sha256:1d34d8308b80196e78ef1d612777993c32b0222e11120cfdc69a5c6f7f3078cf",
+  "kind": "collected",
+  "collector": "agent",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-kanban.png",
+      "mediaType": "image/png",
+      "bytes": 322491,
+      "digest": "sha256:eb0b74bdb26b40512ebcbc3375d8022650665d1a9a30c808290fa396093f5ecf"
+    },
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/qa/project-chip-list.png",
+      "mediaType": "image/png",
+      "bytes": 266304,
+      "digest": "sha256:feed4a208d8542975cb642958626d8b375c0004f98917d4361682f08a934aace"
+    }
+  ]
+}

@@ -23,5 +23,6 @@ truncation consistent with neighboring metadata.
 
 ### Divergence: none observed
 
-- Divergence: none
-- Accepted: n/a
+- Divergence: none — both captured screens match the approved Ghost text direction.
+- Accepted: yes
+- Rationale: no divergence was found; the built List and Kanban surfaces render the Cube glyph + project name in single-tone muted meta text with no pill container and no per-project color, matching the approved mockup.

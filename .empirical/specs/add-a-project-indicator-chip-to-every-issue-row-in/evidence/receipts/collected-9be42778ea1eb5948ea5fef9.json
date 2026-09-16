@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "collected-9be42778ea1eb5948ea5fef9",
+  "criteria": [
+    "AC-1",
+    "AC-2",
+    "AC-3"
+  ],
+  "evidenceKinds": [
+    "screenshot"
+  ],
+  "summary": "Re-collect fidelity.md after format fix (Accepted field corrected to yes/no literal). Verdict: loyal — built List and Kanban surfaces match the approved Ghost text mockup.",
+  "passed": true,
+  "startedAt": "2026-09-16T01:28:32.362Z",
+  "completedAt": "2026-09-16T01:28:32.362Z",
+  "provenance": {
+    "repositoryId": "sha256:84ef6d049a00bfcb08a4614cb3e5ba4ac14787e48eda927d0fe4b60fc30de8b0",
+    "feature": "add-a-project-indicator-chip-to-every-issue-row-in",
+    "specRevision": 2,
+    "specDigest": "sha256:a5db8458e2d818ac5fc68eb18bf5268e7f0e3d12a5e8d45ff1ce8d9d7037b6ea",
+    "treeDigest": "sha256:144cf918608d4f76c7da5d3a835c9c5dae28f25b8a2db7c5262aa9a048a68f19",
+    "policyDigest": "sha256:593bbd252bb2fbe423ab33a35f9f4ea2869e5b89423f2d528b42e434681e8e5b"
+  },
+  "digest": "sha256:7054fc042c576dd67075058b769620f29efdc550cfe84f774fec2cf81c73d78e",
+  "kind": "collected",
+  "collector": "agent",
+  "artifacts": [
+    {
+      "path": ".empirical/specs/add-a-project-indicator-chip-to-every-issue-row-in/mockups/fidelity.md",
+      "mediaType": "text/markdown",
+      "bytes": 1444,
+      "digest": "sha256:bdaed1da9ef14c8ed5057a5b140e53adeb567ee52407f454015318b1f13f28b9"
+    }
+  ]
+}
