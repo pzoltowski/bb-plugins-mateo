@@ -125,7 +125,8 @@
           "end-to-end",
           "cross-platform"
         ],
-        "criteria": []
+        "criteria": [],
+        "testFiles": "changed"
       },
       {
         "id": "touchbar-focused",
@@ -239,7 +240,8 @@
         "checks": [
           "end-to-end"
         ],
-        "criteria": []
+        "criteria": [],
+        "testFiles": "changed"
       },
       {
         "id": "dockside-portability",
@@ -334,7 +336,8 @@
         "checks": [
           "end-to-end"
         ],
-        "criteria": []
+        "criteria": [],
+        "testFiles": "changed"
       },
       {
         "id": "save-model-portability",
