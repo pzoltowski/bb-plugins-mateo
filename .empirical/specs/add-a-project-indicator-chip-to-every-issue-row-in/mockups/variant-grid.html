@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project indicator — first-line variant grid</title>
+<style>
+  * { box-sizing: border-box; margin: 0; font-family: -apple-system, "SF Pro Text", sans-serif; }
+
+  section.theme { padding: 28px 32px 36px; }
+  section.dark {
+    --bg: #1b1d21; --panel: #202329; --col: #1e2025; --hairline: #2c2f36;
+    --ink: #e4e6ea; --ink-soft: #9ba0a8; --ink-subtle: #6f747d;
+    --chip-bg: #2a2d34; --chip-fg: #b8bcc4; --accent: #7ea2d8; --prio: #d29922;
+    background: var(--bg); color: var(--ink);
+  }
+  section.light {
+    --bg: #f4f5f7; --panel: #ffffff; --col: #eceef1; --hairline: #e0e2e7;
+    --ink: #1d2025; --ink-soft: #596069; --ink-subtle: #8b919a;
+    --chip-bg: #e8eaee; --chip-fg: #5a616b; --accent: #4a6fae; --prio: #bf8b17;
+    background: var(--bg); color: var(--ink);
+  }
+
+  h1 { font-size: 14px; font-weight: 600; }
+  p.note { color: var(--ink-subtle); font-size: 12px; margin: 4px 0 20px; }
+
+  .matrix { display: grid; grid-template-columns: repeat(4, minmax(220px, 1fr)); gap: 18px 14px; align-items: start; }
+  .colhead, .rowhead { font-size: 10px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-subtle); }
+  .colhead { padding-bottom: 6px; border-bottom: 1px solid var(--hairline); }
+  .rowhead { grid-column: 1 / -1; margin-top: 10px; padding-top: 14px; border-top: 1px dashed var(--hairline); }
+
+  /* mini board column */
+  .board { background: var(--col); border: 1px solid var(--hairline); border-radius: 8px; padding: 8px; }
+  .board .board-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--ink-soft); margin: 0 2px 8px; }
+  .board .board-title .count { color: var(--ink-subtle); font-weight: 400; }
+  .board .ghost-card { height: 30px; border-radius: 6px; background: var(--panel); border: 1px solid var(--hairline); opacity: .45; margin-top: 6px; }
+
+  /* the card under test */
+  .card { background: var(--panel); border: 1px solid var(--hairline); border-radius: 6px; padding: 8px 10px 6px; }
+  .topline { display: flex; align-items: center; gap: 6px; font-size: 11px; min-height: 16px; }
+  .key { font-variant-numeric: tabular-nums; }
+  .proj { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .proj svg { width: 11px; height: 11px; flex: none; }
+  .push-right { margin-left: auto; }
+  .grip { color: var(--ink-subtle); flex: none; margin-left: 4px; }
+  .grip svg { width: 12px; height: 12px; display: block; }
+
+  .title { font-size: 13px; font-weight: 500; line-height: 1.35; color: var(--ink); margin-top: 3px; }
+  .labels { display: flex; gap: 4px; margin-top: 6px; }
+  .label-chip { background: var(--chip-bg); color: var(--chip-fg); border-radius: 999px; padding: 1px 7px; font-size: 10px; }
+  .meta { display: flex; align-items: center; gap: 6px; margin-top: 7px; }
+  .avatar { margin-left: auto; width: 18px; height: 18px; border-radius: 50%; background: #3b4a5f; color: #cdd6e4; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 600; box-shadow: 0 0 0 1px var(--hairline); }
+  .prio-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--prio); flex: none; }
+
+  /* tone variants */
+  .tone-muted .key, .tone-muted .proj { color: var(--ink-subtle); }
+  .tone-strong .key { color: var(--ink-subtle); }
+  .tone-strong .proj { color: var(--ink-soft); }
+  .tone-accent .key { color: var(--ink-subtle); }
+  .tone-accent .proj { color: var(--accent); }
+
+  /* before reference */
+  .before .topline .title-inline { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .before .meta .proj { font-size: 11px; }
+  .variant-tag { font-size: 10px; color: var(--ink-subtle); margin-top: 6px; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="cube" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2l8.5 4.9v9.8L12 21.6l-8.5-4.9V6.9L12 2z"/><path d="M12 21.6v-9.8"/><path d="M3.5 6.9l8.5 4.9 8.5-4.9"/>
+  </symbol>
+  <symbol id="grip" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/>
+  </symbol>
+</svg>
+
+<section class="theme light">
+  <h1>Project indicator — first-line variant grid · light</h1>
+  <p class="note">Kanban card, real example OSS-326 / cv-supa. Title drops to its own line in every variant; project chip removed from bottom meta.</p>
+  <div id="grid-light" class="matrix"></div>
+</section>
+
+<section class="theme dark">
+  <h1>Project indicator — first-line variant grid · dark</h1>
+  <p class="note">Same matrix, dark theme.</p>
+  <div id="grid-dark" class="matrix"></div>
+</section>
+
+<script>
+const CUBE = '<svg><use href="#cube"/></svg>';
+const GRIP = '<span class="grip" aria-hidden="true"><svg><use href="#grip"/></svg></span>';
+const KEY = '<span class="key">OSS-326</span>';
+const PROJ = '<span class="proj" title="cv-supa">' + CUBE + 'cv-supa</span>';
+const TITLE = 'Add a project indicator chip to every issue row';
+const LABELS = '<div class="labels"><span class="label-chip">feature</span><span class="label-chip">linear</span></div>';
+const META = '<div class="meta"><span class="prio-dot"></span><span class="avatar">PZ</span></div>';
+
+// ORDER × POSITION rendered on the top line
+const toplines = {
+  'key-left':  KEY + PROJ + GRIP,
+  'key-right': KEY + '<span class="push-right">' + PROJ + '</span>' + GRIP,
+  'proj-left': PROJ + KEY + GRIP,
+  'proj-right': '<span class="push-right">' + PROJ + '</span>' + KEY + GRIP,
+};
+const colheads = {
+  'key-left': 'key first · chip inline left',
+  'key-right': 'key first · chip right',
+  'proj-left': 'project first · chip inline left',
+  'proj-right': 'project first · chip right',
+};
+const tones = [
+  ['tone-muted', 'tone i — all muted gray'],
+  ['tone-strong', 'tone ii — project slightly stronger'],
+  ['tone-accent', 'tone iii — subtle accent tint'],
+];
+
+function card(inner, toneClass, tag) {
+  return '<div class="card ' + toneClass + '">' +
+    '<div class="topline">' + inner + '</div>' +
+    '<div class="title">' + TITLE + '</div>' +
+    LABELS + META +
+    '<div class="variant-tag">' + tag + '</div>' +
+    '</div>';
+}
+function column(content) {
+  return '<div class="board"><div class="board-title">In progress <span class="count">· 4</span></div>' +
+    content + '<div class="ghost-card"></div><div class="ghost-card"></div></div>';
+}
+
+for (const gridId of ['grid-light', 'grid-dark']) {
+  const grid = document.getElementById(gridId);
+  // BEFORE reference row
+  grid.insertAdjacentHTML('beforeend', '<div class="rowhead">current — chip in bottom meta</div>');
+  const before = '<div class="card before tone-muted">' +
+    '<div class="topline"><span class="key">OSS-326</span><span class="title-inline">' + TITLE + '</span>' + GRIP + '</div>' +
+    LABELS +
+    '<div class="meta">' + PROJ + '<span class="avatar">PZ</span></div>' +
+    '</div>';
+  grid.insertAdjacentHTML('beforeend', column(before));
+  // matrix: rows = tone, cols = order × position
+  for (const [toneClass, toneLabel] of tones) {
+    grid.insertAdjacentHTML('beforeend', '<div class="rowhead">' + toneLabel + '</div>');
+    for (const pos of ['key-left', 'key-right', 'proj-left', 'proj-right']) {
+      const cell = '<div><div class="colhead">' + colheads[pos] + '</div>' +
+        column(card(toplines[pos], toneClass, pos + ' · ' + toneClass.replace('tone-', ''))) + '</div>';
+      grid.insertAdjacentHTML('beforeend', cell);
+    }
+  }
+}
+</script>
+</body>
+</html>
